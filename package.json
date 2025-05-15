@@ -8,7 +8,9 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "commit": "./.lazy-commit.sh",
+    "commitr": "./.review-commit.sh"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
