@@ -59,7 +59,7 @@ export default function HomeScreen() {
       setLoading(true);
 
       const ai = new GoogleGenAI({
-        apiKey: "AIzaSyBvXjNiYC5nJ9qWrGCJQKYn8LcsplXlIUA",
+        apiKey: process.env.EXPO_PUBLIC_GEMINI_API_KEY,
       });
       const model = "gemini-2.0-flash";
       const contents = [
