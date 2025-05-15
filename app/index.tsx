@@ -1,291 +1,148 @@
-import QuickSafeAreaView from "@/components/layout/QuickSafeAreaView";
-import QuickPhrasesSection from "@/components/QuickPhrasesSection";
-import QuickTipsSection from "@/components/QuickTipsSection";
-import QuickVocabularySection from "@/components/QuickVocabularySection";
-import { AVAILABLE_LANGUAGES } from "@/constants/languages";
-import useTranslation from "@/hooks/useTranslation";
-import { AntDesign } from "@expo/vector-icons";
-import { GoogleGenAI } from "@google/genai";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+// App.tsx
+
+import { Canvas, Circle, Group, Rect } from "@shopify/react-native-skia";
 import React, { useEffect } from "react";
+import { Dimensions, StyleSheet, View } from "react-native";
 import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
-import RNPickerSelect, { Item } from "react-native-picker-select";
-import {
-  termsConfig,
-  termsPrompt,
-  tipsConfig,
-  tipsPrompt,
-} from "../api/gemini";
+  Easing,
+  useDerivedValue,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
-const studentLanguage = "spanish";
+const { width, height } = Dimensions.get("window");
 
-export default function HomeScreen() {
-  const [selectedLanguage, setSelectedLanguage] = React.useState("");
-  const [topic, setTopic] = React.useState("");
-  const [loading, setLoading] = React.useState(false);
-  const [phrases, setPhrases] = React.useState([]);
-  const [vocabulary, setVocabulary] = React.useState([]);
-  const [tips, setTips] = React.useState([]);
-  const [explanation, setExplanation] = React.useState("");
+// your 10×8 map
+const townMap = [
+  [1,1,1,1,1,1,1,1,1,1],
+  [1,0,0,0,2,2,0,0,0,1],
+  [1,0,1,0,2,2,0,1,0,1],
+  [1,0,1,0,2,2,0,1,0,1],
+  [1,0,0,0,0,0,0,0,0,1],
+  [1,0,1,1,1,1,1,1,0,1],
+  [1,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,1],
+  [1,1,1,1,1,1,1,1,1,1],
+] as number[][];
 
-  const t = useTranslation();
+export default function App() {
+  const ROWS = townMap.length;
+  const COLS = townMap[0].length;
 
-  // const bottomSheetRef = React.useRef<BottomSheet>(null);
+  const tileSize = Math.min(width / COLS, height / ROWS);
+  const heroRadius = tileSize * 0.4;
 
+  const heroCol = useSharedValue(5);
+  const heroRow = useSharedValue(4);
+
+  // how long each tile-to-tile move should take
+  const MOVE_DURATION = 300;
+
+  // pixel positions, animating with linear timing
+  const heroX = useDerivedValue(
+    () =>
+      withTiming(heroCol.value * tileSize, {
+        duration: MOVE_DURATION,
+        easing: Easing.linear,
+      }),
+    [tileSize]
+  );
+  const heroY = useDerivedValue(
+    () =>
+      withTiming(heroRow.value * tileSize, {
+        duration: MOVE_DURATION,
+        easing: Easing.linear,
+      }),
+    [tileSize]
+  );
+
+  const move = (dx: number, dy: number) => {
+    const tx = heroCol.value + dx;
+    const ty = heroRow.value + dy;
+    if (
+      ty >= 0 &&
+      ty < ROWS &&
+      tx >= 0 &&
+      tx < COLS &&
+      townMap[ty][tx] !== 1
+    ) {
+      heroCol.value = tx;
+      heroRow.value = ty;
+    }
+  };
+
+  // smooth, continuous wandering
   useEffect(() => {
-    // textToSpeech("Havaalanına gidelim", "tr-TR").then((uri) => {
-    //   console.log("Audio file saved at: ", uri);
-    //   const player = createAudioPlayer(uri);
-    //   player.play();
-    // });
+    const directions: [number, number][] = [
+      [0, -1],
+      [-1, 0],
+      [1, 0],
+      [0, 1],
+    ];
+
+    const step = () => {
+      // pick only the non‐wall moves
+      const valid = directions.filter(([dx, dy]) => {
+        const tx = heroCol.value + dx;
+        const ty = heroRow.value + dy;
+        return (
+          ty >= 0 &&
+          ty < ROWS &&
+          tx >= 0 &&
+          tx < COLS &&
+          townMap[ty][tx] !== 1
+        );
+      });
+      if (valid.length) {
+        const [dx, dy] = valid[Math.floor(Math.random() * valid.length)];
+        move(dx, dy);
+      }
+      // schedule the next step *exactly* when this one finishes
+      setTimeout(step, MOVE_DURATION);
+    };
+
+    step();
+    // no cleanup needed, we're not holding an interval handle—
+    // the timeouts will just stop once the component unmounts
   }, []);
 
-  const handleSheetChanges = (index: number) => {
-    if (index === -1) {
-      setExplanation("");
-    }
-  };
-
-  const generate = async () => {
-    try {
-      setLoading(true);
-
-      const ai = new GoogleGenAI({
-        apiKey: process.env.EXPO_PUBLIC_GEMINI_API_KEY,
-      });
-      const model = "gemini-2.0-flash";
-      const contents = [
-        {
-          role: "user",
-          parts: [
-            {
-              text: `${selectedLanguage} for ${topic}`,
-            },
-          ],
-        },
-      ];
-
-      const response: any = await ai.models.generateContent({
-        model,
-        config: {
-          systemInstruction: [
-            {
-              text: termsPrompt(studentLanguage, selectedLanguage),
-            },
-          ],
-          ...termsConfig,
-        },
-        contents,
-      });
-
-      setPhrases(JSON.parse(response.text).phrases);
-      setVocabulary(JSON.parse(response.text).vocabulary);
-
-      const tipsResponse = await ai.models.generateContent({
-        model,
-        config: {
-          systemInstruction: [
-            {
-              text: tipsPrompt(studentLanguage, selectedLanguage),
-            },
-          ],
-          ...tipsConfig,
-        },
-        contents,
-      });
-
-      if (tipsResponse && tipsResponse.text) {
-        setTips(JSON.parse(tipsResponse.text).relevantGrammar);
-      } else {
-        setTips([]); // Default to empty array if text is undefined
-      }
-    } catch (error) {
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
-    <QuickSafeAreaView>
-      <ScrollView style={{ flex: 1 }}>
-        {selectedLanguage ? (
-          <Text style={styles.title}>
-            <Text style={styles.bigTitle}>
-              {selectedLanguage
-                ? selectedLanguage.charAt(0).toUpperCase() +
-                  selectedLanguage.slice(1)
-                : ""}{" "}
-              for
-            </Text>
-            {"\n"}
-            {topic}
-          </Text>
-        ) : (
-          <Text style={styles.title}>{t("screens.home.quickLesson")}</Text>
-        )}
-
-        {/* Language and Topic Selection */}
-        {!phrases.length && !loading ? (
-          <View>
-            <RNPickerSelect
-              onValueChange={(_, index) =>
-                setSelectedLanguage(AVAILABLE_LANGUAGES[index - 1]?.label || "")
-              }
-              items={[...AVAILABLE_LANGUAGES] as Item[]}
-            >
-              <View style={styles.picker}>
-                <Text style={styles.pickerLabel}>
-                  {!selectedLanguage ? "Select Language" : selectedLanguage}
-                </Text>
-                <AntDesign name={"down"} size={16} color="#0b57d0" />
-              </View>
-            </RNPickerSelect>
-
-            <TextInput
-              placeholder="Taking a taxi"
-              onChangeText={(text) => setTopic(text)}
-              style={styles.input}
-              onSubmitEditing={() => generate()}
-              autoFocus
-            />
-
-            <Pressable
-              onPress={() => generate()}
-              disabled={!topic || !selectedLanguage}
-              style={[
-                styles.button,
-                !topic || !selectedLanguage ? { opacity: 0.5 } : { opacity: 1 },
-              ]}
-            >
-              <Text style={styles.buttonText}>Generate</Text>
-            </Pressable>
-          </View>
-        ) : null}
-
-        {/* Vocabulary Section */}
-        <QuickVocabularySection vocabulary={vocabulary} />
-
-        {/* Phrases Section */}
-        <QuickPhrasesSection phrases={phrases} />
-
-        {/* Tips Section */}
-        <QuickTipsSection tips={tips} setExplanation={setExplanation} />
-
-        {loading ? <ActivityIndicator size="large" color="#0b57d0" /> : null}
-      </ScrollView>
-
-      {explanation ? (
-        <BottomSheet
-          //ref={bottomSheetRef}
-          onChange={handleSheetChanges}
-          enablePanDownToClose={true}
-          handleIndicatorStyle={{ backgroundColor: "#fff" }}
-          backgroundStyle={{ backgroundColor: "#0b57d0" }}
-        >
-          <BottomSheetView style={styles.bottomSheetView}>
-            <Text style={{ color: "#fff", fontSize: 18 }}>{explanation}</Text>
-          </BottomSheetView>
-        </BottomSheet>
-      ) : null}
-    </QuickSafeAreaView>
+    <View style={styles.container}>
+      <Canvas style={{ width, height }}>
+        <Group>
+          {townMap.map((row, y) =>
+            row.map((tile, x) => (
+              <Rect
+                key={`${x}-${y}`}
+                x={x * tileSize}
+                y={y * tileSize}
+                width={tileSize}
+                height={tileSize}
+                color={
+                  tile === 1
+                    ? "darkgray"
+                    : tile === 2
+                    ? "tan"
+                    : "lightgreen"
+                }
+              />
+            ))
+          )}
+          <Circle cx={heroX} cy={heroY} r={heroRadius} color="crimson" />
+        </Group>
+      </Canvas>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    marginBottom: 24,
-    color: "#222",
-  },
-  picker: {
-    backgroundColor: "#f0f4f9",
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  pickerLabel: {
-    fontSize: 18,
-    marginRight: 4,
-  },
-  bigTitle: {
-    color: "#0b57d0",
-    fontSize: 36,
-  },
-  input: {
-    backgroundColor: "#f0f4f9",
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    fontSize: 18,
-  },
-  button: {
-    backgroundColor: "#0b57d0",
-    paddingHorizontal: 16,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    height: 50,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 16,
-    color: "#222",
-  },
-  card: {
-    backgroundColor: "#eaf1fb",
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  term: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#1a237e",
-    marginBottom: 4,
-  },
-  transliteration: {
-    fontSize: 16,
-    color: "#5c6bc0",
-    marginBottom: 4,
-  },
-  translation: {
-    fontSize: 16,
-    color: "#333",
-  },
-  bottomSheetView: {
-    flex: 1,
-    padding: 24,
-    backgroundColor: "#0b57d0",
-  },
+  container: { flex: 1 },
 });
