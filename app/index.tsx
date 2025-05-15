@@ -1,7 +1,10 @@
+import QuickSafeAreaView from "@/components/layout/QuickSafeAreaView";
+import { textToSpeech } from "@/lib/texToSpeech";
 import { AntDesign } from "@expo/vector-icons";
 import { GoogleGenAI } from "@google/genai";
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
-import React from "react";
+import { createAudioPlayer } from 'expo-audio';
+import React, { useEffect } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -13,7 +16,6 @@ import {
 } from "react-native";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import RNPickerSelect from "react-native-picker-select";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { termsConfig, termsPrompt, tipsConfig, tipsPrompt } from "../api/gemini";
 
 const studentLanguage = "spanish";
@@ -47,6 +49,14 @@ export default function HomeScreen() {
   const [explanation, setExplanation] = React.useState("");
 
   // const bottomSheetRef = React.useRef<BottomSheet>(null);
+
+  useEffect(()=> {
+    textToSpeech("Havaalanına gidelim", 'tr').then((uri) => {
+      console.log("Audio file saved at: ", uri);
+      const player = createAudioPlayer(uri);
+      player.play();
+    })
+  }, [])
 
   const handleSheetChanges = (index: number) => {
     if (index === -1) {
@@ -112,7 +122,7 @@ export default function HomeScreen() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-    <SafeAreaView style={styles.container}>
+    <QuickSafeAreaView>
       <ScrollView style={{ flex: 1 }}>
         {selectedLanguage ? (
           <Text style={styles.title}>
@@ -261,7 +271,7 @@ export default function HomeScreen() {
             </BottomSheet>
               : null
           }
-    </SafeAreaView>
+    </QuickSafeAreaView>
     </GestureHandlerRootView>
   );
 }
