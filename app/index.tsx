@@ -1,4 +1,5 @@
 import QuickSafeAreaView from "@/components/layout/QuickSafeAreaView";
+import { AVAILABLE_LANGUAGES } from "@/constants/languages";
 import { textToSpeech } from "@/lib/texToSpeech";
 import { AntDesign } from "@expo/vector-icons";
 import { GoogleGenAI } from "@google/genai";
@@ -20,25 +21,6 @@ import { termsConfig, termsPrompt, tipsConfig, tipsPrompt } from "../api/gemini"
 
 const studentLanguage = "spanish";
 
-const languages = [
-  { label: "Español", value: "spanish" },
-  { label: "Türkçe", value: "turkish" },
-  { label: "Português", value: "portuguese" },
-  { label: "Français", value: "french" },
-  { label: "Deutsch", value: "german" },
-  { label: "Italiano", value: "italian" },
-  { label: "Nederlands", value: "dutch" },
-  { label: "Norsk", value: "norwegian" },
-  { label: "Polski", value: "polish" },
-  { label: "Pусский", value: "russian" },
-  { label: "中文", value: "chinese" },
-  { label: "日本語", value: "japanese" },
-  { label: "한국어", value: "korean" },
-  { label: "Arabic", value: "arabic" },
-  { label: "Hindi", value: "hindi" },
-  { label: "Bengali", value: "bengali" },
-];
-
 export default function HomeScreen() {
   const [selectedLanguage, setSelectedLanguage] = React.useState("");
   const [topic, setTopic] = React.useState("");
@@ -51,7 +33,7 @@ export default function HomeScreen() {
   // const bottomSheetRef = React.useRef<BottomSheet>(null);
 
   useEffect(()=> {
-    textToSpeech("Havaalanına gidelim", 'tr').then((uri) => {
+    textToSpeech("Havaalanına gidelim", 'tr-TR').then((uri) => {
       console.log("Audio file saved at: ", uri);
       const player = createAudioPlayer(uri);
       player.play();
@@ -142,10 +124,10 @@ export default function HomeScreen() {
         {!phrases.length && !loading ? (
           <View>
             <RNPickerSelect
-              onValueChange={(value, index) =>
-                setSelectedLanguage(languages[index - 1].label)
+              onValueChange={(_, index) =>
+                setSelectedLanguage(AVAILABLE_LANGUAGES[index - 1].label)
               }
-              items={languages}
+              items={AVAILABLE_LANGUAGES}
             >
               <View style={styles.picker}>
                 <Text style={styles.pickerLabel}>

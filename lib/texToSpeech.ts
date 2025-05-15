@@ -1,14 +1,8 @@
+import { AVAILABLE_LANGUAGES, LanguageCode } from '@/constants/languages';
 import { sanitizeFilename } from '@/utils';
 import * as FileSystem from 'expo-file-system';
 
 const GOOGLE_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_API_KEY
-
-// Map of short codes to Google language codes
-const LANGUAGE_CODES = {
-  en: 'en-US',
-  es: 'es-ES',
-  tr: 'tr-TR',
-};
 
 /**
  * Synthesizes speech and saves it as an MP3, or returns the existing file.
@@ -17,8 +11,8 @@ const LANGUAGE_CODES = {
  * @param {'en'|'es'|'tr'} lang - Language code: 'en', 'es', or 'tr'.
  * @returns {Promise<string>} URI where the MP3 is stored.
  */
-export const textToSpeech = async (text: string, lang: keyof typeof LANGUAGE_CODES): Promise<string> => {
-  const languageCode = LANGUAGE_CODES[lang];
+export const textToSpeech = async (text: string, lang: LanguageCode): Promise<string> => {
+  const languageCode = AVAILABLE_LANGUAGES.find((l) => l.code === lang)?.code;
   if (!languageCode) {
     throw new Error(`Unsupported language: ${lang}`);
   }
