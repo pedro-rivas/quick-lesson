@@ -1,14 +1,12 @@
 import QuickSafeAreaView from "@/components/layout/QuickSafeAreaView";
-import PhrasesSection from "@/components/PhrasesSection";
-import TipsSection from "@/components/TipsSection";
-import VocabularySection from "@/components/VocabularySection";
+import QuickPhrasesSection from "@/components/QuickPhrasesSection";
+import QuickTipsSection from "@/components/QuickTipsSection";
+import QuickVocabularySection from "@/components/QuickVocabularySection";
 import { AVAILABLE_LANGUAGES } from "@/constants/languages";
 import useTranslation from "@/hooks/useTranslation";
-import { textToSpeech } from "@/lib/texToSpeech";
 import { AntDesign } from "@expo/vector-icons";
 import { GoogleGenAI } from "@google/genai";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import { createAudioPlayer } from "expo-audio";
 import React, { useEffect } from "react";
 import {
   ActivityIndicator,
@@ -43,11 +41,11 @@ export default function HomeScreen() {
   // const bottomSheetRef = React.useRef<BottomSheet>(null);
 
   useEffect(() => {
-    textToSpeech("Havaalanına gidelim", "tr-TR").then((uri) => {
-      console.log("Audio file saved at: ", uri);
-      const player = createAudioPlayer(uri);
-      player.play();
-    });
+    // textToSpeech("Havaalanına gidelim", "tr-TR").then((uri) => {
+    //   console.log("Audio file saved at: ", uri);
+    //   const player = createAudioPlayer(uri);
+    //   player.play();
+    // });
   }, []);
 
   const handleSheetChanges = (index: number) => {
@@ -173,13 +171,13 @@ export default function HomeScreen() {
         ) : null}
 
         {/* Vocabulary Section */}
-        <VocabularySection vocabulary={vocabulary} />
+        <QuickVocabularySection vocabulary={vocabulary} />
 
         {/* Phrases Section */}
-        <PhrasesSection phrases={phrases} />
+        <QuickPhrasesSection phrases={phrases} />
 
         {/* Tips Section */}
-        <TipsSection tips={tips} setExplanation={setExplanation} />
+        <QuickTipsSection tips={tips} setExplanation={setExplanation} />
 
         {loading ? <ActivityIndicator size="large" color="#0b57d0" /> : null}
       </ScrollView>

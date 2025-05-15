@@ -1,6 +1,6 @@
-import { AntDesign } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import QuickSpeechButton from './QuickSpeechButton';
 
 interface VocabularyItem {
   term: string;
@@ -8,11 +8,18 @@ interface VocabularyItem {
   translation: string;
 }
 
-interface VocabularySectionProps {
+interface QuickVocabularySectionProps {
   vocabulary: VocabularyItem[];
 }
 
-const VocabularySection: React.FC<VocabularySectionProps> = ({ vocabulary }) => {
+/**
+ * Renders a section displaying a list of vocabulary terms, each with its term, optional transliteration, and translation.
+ * If the vocabulary list is empty or undefined, nothing is rendered.
+ *
+ * @param vocabulary - An array of vocabulary objects, each containing a term, optional transliteration, and translation.
+ * @returns A React element displaying the vocabulary section, or null if no vocabulary is provided.
+ */
+const QuickVocabularySection: React.FC<QuickVocabularySectionProps> = ({ vocabulary }) => {
   if (!vocabulary || vocabulary.length === 0) {
     return null;
   }
@@ -31,7 +38,7 @@ const VocabularySection: React.FC<VocabularySectionProps> = ({ vocabulary }) => 
             ) : null}
             <Text style={styles.translation}>{vocab.translation}</Text>
           </View>
-          <AntDesign name="sound" size={20} color="#1a237e" />
+              <QuickSpeechButton text={vocab.term} />
         </View>
       ))}
     </View>
@@ -79,6 +86,6 @@ const styles = StyleSheet.create({
   },
 });
 
-VocabularySection.displayName = 'VocabularySection';
+QuickVocabularySection.displayName = 'QuickVocabularySection';
 
-export default VocabularySection; 
+export default QuickVocabularySection; 

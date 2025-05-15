@@ -1,6 +1,7 @@
 import { AntDesign } from '@expo/vector-icons';
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import QuickSpeechButton from './QuickSpeechButton';
 
 interface Example {
   sentence: string;
@@ -14,12 +15,21 @@ interface Tip {
   examples?: Example[];
 }
 
-interface TipsSectionProps {
+interface QuickTipsSectionProps {
   tips: Tip[];
   setExplanation: (explanation: string) => void;
 }
 
-const TipsSection: React.FC<TipsSectionProps> = ({ tips, setExplanation }) => {
+/**
+ * Renders a section displaying quick tips, each with a topic, description, and optional examples.
+ * Each example can be pressed to set an explanation and includes a speech button for pronunciation.
+ *
+ * @param tips - An array of tip objects to display. Each tip contains a topic, description, and optional examples.
+ * @param setExplanation - Callback function to set the explanation text when an example is pressed.
+ *
+ * @returns A React element displaying the tips and their examples, or null if no tips are provided.
+ */
+const QuickTipsSection: React.FC<QuickTipsSectionProps> = ({ tips, setExplanation }) => {
   if (!tips || tips.length === 0) {
     return null;
   }
@@ -50,7 +60,7 @@ const TipsSection: React.FC<TipsSectionProps> = ({ tips, setExplanation }) => {
                         {ex.translation}
                       </Text>
                     </Pressable>
-                    <AntDesign name="sound" size={20} color="#1a237e" />
+                    <QuickSpeechButton text={ex.sentence} />
                   </View>
                 ))}
               </View>
@@ -130,6 +140,6 @@ const styles = StyleSheet.create({
   },
 });
 
-TipsSection.displayName = 'TipsSection';
+QuickTipsSection.displayName = 'QuickTipsSection';
 
-export default TipsSection; 
+export default QuickTipsSection; 
