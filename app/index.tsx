@@ -1,10 +1,11 @@
 import QuickSafeAreaView from "@/components/layout/QuickSafeAreaView";
 import { AVAILABLE_LANGUAGES } from "@/constants/languages";
+import useTranslation from "@/hooks/useTranslation";
 import { textToSpeech } from "@/lib/texToSpeech";
 import { AntDesign } from "@expo/vector-icons";
 import { GoogleGenAI } from "@google/genai";
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
-import { createAudioPlayer } from 'expo-audio';
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import { createAudioPlayer } from "expo-audio";
 import React, { useEffect } from "react";
 import {
   ActivityIndicator,
@@ -15,9 +16,13 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import RNPickerSelect from "react-native-picker-select";
-import { termsConfig, termsPrompt, tipsConfig, tipsPrompt } from "../api/gemini";
+import {
+  termsConfig,
+  termsPrompt,
+  tipsConfig,
+  tipsPrompt,
+} from "../api/gemini";
 
 const studentLanguage = "spanish";
 
@@ -30,15 +35,17 @@ export default function HomeScreen() {
   const [tips, setTips] = React.useState([]);
   const [explanation, setExplanation] = React.useState("");
 
+  const t = useTranslation();
+
   // const bottomSheetRef = React.useRef<BottomSheet>(null);
 
-  useEffect(()=> {
-    textToSpeech("Havaalanına gidelim", 'tr-TR').then((uri) => {
+  useEffect(() => {
+    textToSpeech("Havaalanına gidelim", "tr-TR").then((uri) => {
       console.log("Audio file saved at: ", uri);
       const player = createAudioPlayer(uri);
       player.play();
-    })
-  }, [])
+    });
+  }, []);
 
   const handleSheetChanges = (index: number) => {
     if (index === -1) {
@@ -81,16 +88,15 @@ export default function HomeScreen() {
       setPhrases(JSON.parse(response.text).phrases);
       setVocabulary(JSON.parse(response.text).vocabulary);
 
-
       const tipsResponse = await ai.models.generateContent({
         model,
         config: {
           systemInstruction: [
             {
               text: tipsPrompt(studentLanguage, selectedLanguage),
-            }
+            },
           ],
-          ...tipsConfig
+          ...tipsConfig,
         },
         contents,
       });
@@ -103,7 +109,6 @@ export default function HomeScreen() {
   };
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
     <QuickSafeAreaView>
       <ScrollView style={{ flex: 1 }}>
         {selectedLanguage ? (
@@ -117,7 +122,7 @@ export default function HomeScreen() {
             {topic}
           </Text>
         ) : (
-          <Text style={styles.title}>Quick Lesson</Text>
+          <Text style={styles.title}>{t("screens.home.quickLesson")}</Text>
         )}
 
         {/* Language and Topic Selection */}
@@ -202,59 +207,62 @@ export default function HomeScreen() {
 
         {/* Tips Section */}
         {tips.length > 0 && (
-              <View style={{ marginBottom: 32 }}>
-                <Text style={styles.sectionTitle}>Tips</Text>
-                {tips.map((tip:any, idx) => (
-                  <View key={idx} style={styles.tipCard}>
-                    <Text style={styles.tipTopic}>{tip.topic}</Text>
-                    <Text style={styles.tipDescription}>{tip.description}</Text>
-                    {tip.examples && tip.examples.length > 0 && (
-                      <View style={{ marginTop: 24 }}>
-                        <Text style={styles.examplesLabel}>EXAMPLES</Text>
-                        <View style={styles.examplesRow}>
-                          {tip.examples.map((ex: any, exIdx: number) => (
-                            <View key={exIdx} style={styles.exampleCard}>
-                              <Pressable onPress={() => setExplanation(ex.explanation)}>
-                                <Text style={styles.exampleGerman}>
-                                  <AntDesign name={'infocirlceo'} size={15} color="#1a237e" />
-                                  {' ' + ex.sentence}
-                                </Text>
+          <View style={{ marginBottom: 32 }}>
+            <Text style={styles.sectionTitle}>Tips</Text>
+            {tips.map((tip: any, idx) => (
+              <View key={idx} style={styles.tipCard}>
+                <Text style={styles.tipTopic}>{tip.topic}</Text>
+                <Text style={styles.tipDescription}>{tip.description}</Text>
+                {tip.examples && tip.examples.length > 0 && (
+                  <View style={{ marginTop: 24 }}>
+                    <Text style={styles.examplesLabel}>EXAMPLES</Text>
+                    <View style={styles.examplesRow}>
+                      {tip.examples.map((ex: any, exIdx: number) => (
+                        <View key={exIdx} style={styles.exampleCard}>
+                          <Pressable
+                            onPress={() => setExplanation(ex.explanation)}
+                          >
+                            <Text style={styles.exampleGerman}>
+                              <AntDesign
+                                name={"infocirlceo"}
+                                size={15}
+                                color="#1a237e"
+                              />
+                              {" " + ex.sentence}
+                            </Text>
 
-                                <Text style={styles.exampleEnglish}>{ex.translation}</Text>
-                              </Pressable>
-                              <AntDesign name="sound" size={20} color="#1a237e" />
-                            </View>
-                          ))}
+                            <Text style={styles.exampleEnglish}>
+                              {ex.translation}
+                            </Text>
+                          </Pressable>
+                          <AntDesign name="sound" size={20} color="#1a237e" />
                         </View>
-                      </View>
-                    )}
+                      ))}
+                    </View>
                   </View>
-                ))}
+                )}
               </View>
-            )}
-
+            ))}
+          </View>
+        )}
 
         {loading ? <ActivityIndicator size="large" color="#0b57d0" /> : null}
       </ScrollView>
 
-      {
-            explanation ? <BottomSheet
-              //ref={bottomSheetRef}
-              onChange={handleSheetChanges}
-              enablePanDownToClose={true}
-              handleIndicatorStyle={{ backgroundColor: '#fff' }}
-              backgroundStyle={{ backgroundColor: '#0b57d0' }}
-            >
-              <BottomSheetView style={styles.bottomSheetView} >
-                <Text style={{ color: '#fff', fontSize: 18 }}>{
-                  explanation
-                }</Text>
-              </BottomSheetView>
-            </BottomSheet>
-              : null
-          }
+      {explanation ? (
+        <BottomSheet
+          //ref={bottomSheetRef}
+          onChange={handleSheetChanges}
+          enablePanDownToClose={true}
+          handleIndicatorStyle={{ backgroundColor: "#fff" }}
+          backgroundStyle={{ backgroundColor: "#0b57d0" }}
+        >
+          <BottomSheetView style={styles.bottomSheetView}>
+            <Text style={{ color: "#fff", fontSize: 18 }}>{explanation}</Text>
+          </BottomSheetView>
+        </BottomSheet>
+      ) : null}
     </QuickSafeAreaView>
-    </GestureHandlerRootView>
   );
 }
 
@@ -331,7 +339,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "#1a237e",
-    marginBottom: 4
+    marginBottom: 4,
   },
   transliteration: {
     fontSize: 16,
@@ -343,11 +351,11 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   tipCard: {
-    backgroundColor: '#eaf4fb',
+    backgroundColor: "#eaf4fb",
     borderRadius: 32,
     padding: 24,
     marginBottom: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
@@ -355,52 +363,52 @@ const styles = StyleSheet.create({
   },
   tipTopic: {
     fontSize: 22,
-    fontWeight: 'bold',
-    color: '#1a237e',
+    fontWeight: "bold",
+    color: "#1a237e",
     marginBottom: 12,
   },
   tipDescription: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
     marginBottom: 8,
   },
   examplesLabel: {
     fontSize: 13,
-    color: '#7b8a97',
-    fontWeight: '600',
+    color: "#7b8a97",
+    fontWeight: "600",
     marginBottom: 12,
     letterSpacing: 1,
   },
   examplesRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 16,
-    flexWrap: 'wrap',
+    flexWrap: "wrap",
   },
   exampleCard: {
-    backgroundColor: '#dbeafe',
+    backgroundColor: "#dbeafe",
     borderRadius: 20,
     padding: 16,
     flex: 1,
     minWidth: 180,
     marginBottom: 12,
     marginRight: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   exampleGerman: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#222',
+    fontWeight: "bold",
+    color: "#222",
     marginBottom: 4,
   },
   exampleEnglish: {
     fontSize: 15,
-    color: '#444',
+    color: "#444",
   },
   bottomSheetView: {
     flex: 1,
     padding: 24,
-    backgroundColor: '#0b57d0',
+    backgroundColor: "#0b57d0",
   },
 });
