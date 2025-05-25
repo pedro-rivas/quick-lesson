@@ -1,7 +1,13 @@
+import QuickSafeAreaView from "@/components/layout/QuickSafeAreaView";
+import QuickPhrasesSection from "@/components/QuickPhrasesSection";
+import QuickTipsSection from "@/components/QuickTipsSection";
+import QuickVocabularySection from "@/components/QuickVocabularySection";
+import { AVAILABLE_LANGUAGES } from "@/constants/languages";
+import useTranslation from "@/hooks/useTranslation";
 import { AntDesign } from "@expo/vector-icons";
 import { GoogleGenAI } from "@google/genai";
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
-import React from "react";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import React, { useEffect } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -11,31 +17,15 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import RNPickerSelect from "react-native-picker-select";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { termsConfig, termsPrompt, tipsConfig, tipsPrompt } from "../api/gemini";
+import RNPickerSelect, { Item } from "react-native-picker-select";
+import {
+  termsConfig,
+  termsPrompt,
+  tipsConfig,
+  tipsPrompt,
+} from "../api/gemini";
 
 const studentLanguage = "spanish";
-
-const languages = [
-  { label: "Español", value: "spanish" },
-  { label: "Türkçe", value: "turkish" },
-  { label: "Português", value: "portuguese" },
-  { label: "Français", value: "french" },
-  { label: "Deutsch", value: "german" },
-  { label: "Italiano", value: "italian" },
-  { label: "Nederlands", value: "dutch" },
-  { label: "Norsk", value: "norwegian" },
-  { label: "Polski", value: "polish" },
-  { label: "Pусский", value: "russian" },
-  { label: "中文", value: "chinese" },
-  { label: "日本語", value: "japanese" },
-  { label: "한국어", value: "korean" },
-  { label: "Arabic", value: "arabic" },
-  { label: "Hindi", value: "hindi" },
-  { label: "Bengali", value: "bengali" },
-];
 
 export default function HomeScreen() {
   const [selectedLanguage, setSelectedLanguage] = React.useState("");
@@ -46,7 +36,17 @@ export default function HomeScreen() {
   const [tips, setTips] = React.useState([]);
   const [explanation, setExplanation] = React.useState("");
 
+  const t = useTranslation();
+
   // const bottomSheetRef = React.useRef<BottomSheet>(null);
+
+  useEffect(() => {
+    // textToSpeech("Havaalanına gidelim", "tr-TR").then((uri) => {
+    //   console.log("Audio file saved at: ", uri);
+    //   const player = createAudioPlayer(uri);
+    //   player.play();
+    // });
+  }, []);
 
   const handleSheetChanges = (index: number) => {
     if (index === -1) {
@@ -89,21 +89,24 @@ export default function HomeScreen() {
       setPhrases(JSON.parse(response.text).phrases);
       setVocabulary(JSON.parse(response.text).vocabulary);
 
-
       const tipsResponse = await ai.models.generateContent({
         model,
         config: {
           systemInstruction: [
             {
               text: tipsPrompt(studentLanguage, selectedLanguage),
-            }
+            },
           ],
-          ...tipsConfig
+          ...tipsConfig,
         },
         contents,
       });
 
-      setTips(JSON.parse(tipsResponse.text).relevantGrammar);
+      if (tipsResponse && tipsResponse.text) {
+        setTips(JSON.parse(tipsResponse.text).relevantGrammar);
+      } else {
+        setTips([]); // Default to empty array if text is undefined
+      }
     } catch (error) {
     } finally {
       setLoading(false);
@@ -111,31 +114,32 @@ export default function HomeScreen() {
   };
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-    <SafeAreaView style={styles.container}>
+    <QuickSafeAreaView>
       <ScrollView style={{ flex: 1 }}>
         {selectedLanguage ? (
           <Text style={styles.title}>
             <Text style={styles.bigTitle}>
-              {selectedLanguage?.charAt(0)?.toUpperCase() +
-                selectedLanguage.slice(1)}{" "}
+              {selectedLanguage
+                ? selectedLanguage.charAt(0).toUpperCase() +
+                  selectedLanguage.slice(1)
+                : ""}{" "}
               for
             </Text>
             {"\n"}
             {topic}
           </Text>
         ) : (
-          <Text style={styles.title}>Quick Lesson</Text>
+          <Text style={styles.title}>{t("screens.home.quickLesson")}</Text>
         )}
 
         {/* Language and Topic Selection */}
         {!phrases.length && !loading ? (
           <View>
             <RNPickerSelect
-              onValueChange={(value, index) =>
-                setSelectedLanguage(languages[index - 1].label)
+              onValueChange={(_, index) =>
+                setSelectedLanguage(AVAILABLE_LANGUAGES[index - 1]?.label || "")
               }
-              items={languages}
+              items={[...AVAILABLE_LANGUAGES] as Item[]}
             >
               <View style={styles.picker}>
                 <Text style={styles.pickerLabel}>
@@ -167,102 +171,31 @@ export default function HomeScreen() {
         ) : null}
 
         {/* Vocabulary Section */}
-        {vocabulary.length > 0 && (
-          <View style={{ marginBottom: 32 }}>
-            <Text style={styles.sectionTitle}>Vocabulary</Text>
-            {vocabulary.map((vocab: any, idx) => (
-              <View key={idx} style={styles.card}>
-                <View>
-                  <Text style={styles.term}>{vocab.term}</Text>
-                  {vocab.transliteration ? (
-                    <Text style={styles.transliteration}>
-                      {vocab.transliteration}
-                    </Text>
-                  ) : null}
-                  <Text style={styles.translation}>{vocab.translation}</Text>
-                </View>
-                <AntDesign name="sound" size={20} color="#1a237e" />
-              </View>
-            ))}
-          </View>
-        )}
+        <QuickVocabularySection vocabulary={vocabulary} />
 
         {/* Phrases Section */}
-        {phrases.length > 0 && (
-          <View style={{ marginBottom: 32 }}>
-            <Text style={styles.sectionTitle}>Phrases</Text>
-            {phrases.map((phrase: any, idx) => (
-              <View key={idx} style={styles.card}>
-                <View>
-                  <Text style={styles.term}>{phrase.phrase}</Text>
-                  {phrase.transliteration ? (
-                    <Text style={styles.transliteration}>
-                      {phrase.transliteration}
-                    </Text>
-                  ) : null}
-                  <Text style={styles.translation}>{phrase.translation}</Text>
-                </View>
-                <AntDesign name="sound" size={20} color="#1a237e" />
-              </View>
-            ))}
-          </View>
-        )}
+        <QuickPhrasesSection phrases={phrases} />
 
         {/* Tips Section */}
-        {tips.length > 0 && (
-              <View style={{ marginBottom: 32 }}>
-                <Text style={styles.sectionTitle}>Tips</Text>
-                {tips.map((tip:any, idx) => (
-                  <View key={idx} style={styles.tipCard}>
-                    <Text style={styles.tipTopic}>{tip.topic}</Text>
-                    <Text style={styles.tipDescription}>{tip.description}</Text>
-                    {tip.examples && tip.examples.length > 0 && (
-                      <View style={{ marginTop: 24 }}>
-                        <Text style={styles.examplesLabel}>EXAMPLES</Text>
-                        <View style={styles.examplesRow}>
-                          {tip.examples.map((ex: any, exIdx: number) => (
-                            <View key={exIdx} style={styles.exampleCard}>
-                              <Pressable onPress={() => setExplanation(ex.explanation)}>
-                                <Text style={styles.exampleGerman}>
-                                  <AntDesign name={'infocirlceo'} size={15} color="#1a237e" />
-                                  {' ' + ex.sentence}
-                                </Text>
-
-                                <Text style={styles.exampleEnglish}>{ex.translation}</Text>
-                              </Pressable>
-                              <AntDesign name="sound" size={20} color="#1a237e" />
-                            </View>
-                          ))}
-                        </View>
-                      </View>
-                    )}
-                  </View>
-                ))}
-              </View>
-            )}
-
+        <QuickTipsSection tips={tips} setExplanation={setExplanation} />
 
         {loading ? <ActivityIndicator size="large" color="#0b57d0" /> : null}
       </ScrollView>
 
-      {
-            explanation ? <BottomSheet
-              //ref={bottomSheetRef}
-              onChange={handleSheetChanges}
-              enablePanDownToClose={true}
-              handleIndicatorStyle={{ backgroundColor: '#fff' }}
-              backgroundStyle={{ backgroundColor: '#0b57d0' }}
-            >
-              <BottomSheetView style={styles.bottomSheetView} >
-                <Text style={{ color: '#fff', fontSize: 18 }}>{
-                  explanation
-                }</Text>
-              </BottomSheetView>
-            </BottomSheet>
-              : null
-          }
-    </SafeAreaView>
-    </GestureHandlerRootView>
+      {explanation ? (
+        <BottomSheet
+          //ref={bottomSheetRef}
+          onChange={handleSheetChanges}
+          enablePanDownToClose={true}
+          handleIndicatorStyle={{ backgroundColor: "#fff" }}
+          backgroundStyle={{ backgroundColor: "#0b57d0" }}
+        >
+          <BottomSheetView style={styles.bottomSheetView}>
+            <Text style={{ color: "#fff", fontSize: 18 }}>{explanation}</Text>
+          </BottomSheetView>
+        </BottomSheet>
+      ) : null}
+    </QuickSafeAreaView>
   );
 }
 
@@ -339,7 +272,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "#1a237e",
-    marginBottom: 4
+    marginBottom: 4,
   },
   transliteration: {
     fontSize: 16,
@@ -350,65 +283,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
   },
-  tipCard: {
-    backgroundColor: '#eaf4fb',
-    borderRadius: 32,
-    padding: 24,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  tipTopic: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#1a237e',
-    marginBottom: 12,
-  },
-  tipDescription: {
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 8,
-  },
-  examplesLabel: {
-    fontSize: 13,
-    color: '#7b8a97',
-    fontWeight: '600',
-    marginBottom: 12,
-    letterSpacing: 1,
-  },
-  examplesRow: {
-    flexDirection: 'row',
-    gap: 16,
-    flexWrap: 'wrap',
-  },
-  exampleCard: {
-    backgroundColor: '#dbeafe',
-    borderRadius: 20,
-    padding: 16,
-    flex: 1,
-    minWidth: 180,
-    marginBottom: 12,
-    marginRight: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  exampleGerman: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#222',
-    marginBottom: 4,
-  },
-  exampleEnglish: {
-    fontSize: 15,
-    color: '#444',
-  },
   bottomSheetView: {
     flex: 1,
     padding: 24,
-    backgroundColor: '#0b57d0',
+    backgroundColor: "#0b57d0",
   },
 });
