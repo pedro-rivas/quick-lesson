@@ -1,17 +1,17 @@
 import QuickSafeAreaView from "@/components/layout/QuickSafeAreaView";
-import QuickPhrasesSection from "@/components/QuickPhrasesSection";
-import QuickTipsSection from "@/components/QuickTipsSection";
-import QuickVocabularySection from "@/components/QuickVocabularySection";
+import LessonCard from "@/components/LessonCard";
 import { AVAILABLE_LANGUAGES } from "@/constants/languages";
 import useTranslation from "@/hooks/useTranslation";
-import { useLessonStore } from "@/store/lessonStore";
-import { AntDesign } from "@expo/vector-icons";
+import { GrammarTip, Lesson, Phrase, useLessonStore, VocabularyItem } from "@/store/lessonStore";
+import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { GoogleGenAI } from "@google/genai";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
 import React, { useEffect } from "react";
 import {
   ActivityIndicator,
+  Alert,
+  FlatList,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -33,12 +33,13 @@ export default function HomeScreen() {
   const [selectedLanguage, setSelectedLanguage] = React.useState("");
   const [topic, setTopic] = React.useState("");
   const [loading, setLoading] = React.useState(false);
-  const [phrases, setPhrases] = React.useState([]);
-  const [vocabulary, setVocabulary] = React.useState([]);
-  const [tips, setTips] = React.useState([]);
+  const [phrases, setPhrases] = React.useState<Phrase[]>([]);
+  const [vocabulary, setVocabulary] = React.useState<VocabularyItem[]>([]);
+  const [tips, setTips] = React.useState<GrammarTip[]>([]);
   const [explanation, setExplanation] = React.useState("");
 
-  const { addLesson } = useLessonStore();
+  const { addLesson, getAllLessons, removeLesson } = useLessonStore();
+  const lessons = getAllLessons();
   const t = useTranslation();
 
   // const bottomSheetRef = React.useRef<BottomSheet>(null);
@@ -134,6 +135,28 @@ export default function HomeScreen() {
     }
   };
 
+  const handleDeleteLesson = (id: string, title: string) => {
+    Alert.alert(
+      "Delete Lesson",
+      `Are you sure you want to delete "${title}"?`,
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => removeLesson(id),
+        },
+      ]
+    );
+  };
+
+  const handleViewLesson = (lesson: Lesson) => {
+    router.push(`/lessons/${lesson.id}` as any);
+  };
+
   return (
     <QuickSafeAreaView>
       <ScrollView style={{ flex: 1, paddingHorizontal: 16 }}>
@@ -154,7 +177,7 @@ export default function HomeScreen() {
         )}
 
         {/* Language and Topic Selection */}
-        {!phrases.length && !loading ? (
+        {!loading ? (
           <View>
             <RNPickerSelect
               onValueChange={(_, index) =>
@@ -187,33 +210,49 @@ export default function HomeScreen() {
               ]}
             >
               <Text style={styles.buttonText}>Generate</Text>
-
             </Pressable>
           </View>
         ) : null}
 
-<Pressable
-              onPress={() => {
-                router.push("/lessons");
-              }}
-              style={[
-                styles.button,
-              ]}
-            >
-              <Text style={styles.buttonText}>Ir a lecciones</Text>
-              
-            </Pressable>
 
-        {/* Vocabulary Section */}
-        <QuickVocabularySection vocabulary={vocabulary} />
+        {loading ? <ActivityIndicator size="large" color="#0b57d0" style={{ marginTop: 20 }}/> : null}
 
-        {/* Phrases Section */}
-        <QuickPhrasesSection phrases={phrases} />
+        {/* --- My Lessons Section --- */}
+        <View style={styles.lessonsSectionContainer}>
+          <View style={styles.lessonsHeader}>
+            <Text style={styles.lessonsTitle}>My Lessons</Text>
+            {lessons.length > 0 && (
+              <Text style={styles.lessonsSubtitle}>{lessons.length} lesson{lessons.length !== 1 ? 's' : ''}</Text>
+            )}
+          </View>
+          
+          {lessons.length === 0 && !loading ? (
+            <View style={styles.lessonEmptyState}>
+              <MaterialIcons name="school" size={64} color="#ccc" />
+              <Text style={styles.lessonEmptyTitle}>No lessons yet</Text>
+              <Text style={styles.lessonEmptySubtitle}>
+                Generate your first lesson using the form above.
+              </Text>
+            </View>
+          ) : (
+            <FlatList
+              data={lessons}
+              renderItem={({ item }) => (
+                <LessonCard 
+                  lesson={item} 
+                  onView={handleViewLesson} 
+                  onDelete={handleDeleteLesson} 
+                />
+              )}
+              keyExtractor={(item) => item.id}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.lessonListContainer}
+              scrollEnabled={false}
+            />
+          )}
+        </View>
+        {/* --- End My Lessons Section --- */}
 
-        {/* Tips Section */}
-        <QuickTipsSection tips={tips} setExplanation={setExplanation} />
-
-        {loading ? <ActivityIndicator size="large" color="#0b57d0" /> : null}
       </ScrollView>
 
       {explanation ? (
@@ -282,44 +321,48 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 16,
-    color: "#222",
-  },
-  card: {
-    backgroundColor: "#eaf1fb",
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  term: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#1a237e",
-    marginBottom: 4,
-  },
-  transliteration: {
-    fontSize: 16,
-    color: "#5c6bc0",
-    marginBottom: 4,
-  },
-  translation: {
-    fontSize: 16,
-    color: "#333",
-  },
   bottomSheetView: {
     flex: 1,
     padding: 24,
     backgroundColor: "#0b57d0",
+  },
+  lessonsSectionContainer: {
+    marginTop: 32,
+  },
+  lessonsHeader: {
+    marginBottom: 24,
+  },
+  lessonsTitle: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#222",
+    marginBottom: 4,
+  },
+  lessonsSubtitle: {
+    fontSize: 16,
+    color: "#666",
+  },
+  lessonListContainer: {
+    paddingBottom: 20,
+  },
+  lessonEmptyState: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 32,
+    minHeight: 200,
+  },
+  lessonEmptyTitle: {
+    fontSize: 24,
+    fontWeight: "600",
+    color: "#666",
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  lessonEmptySubtitle: {
+    fontSize: 16,
+    color: "#999",
+    textAlign: "center",
+    marginBottom: 32,
   },
 });
