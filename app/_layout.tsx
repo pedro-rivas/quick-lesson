@@ -27,8 +27,8 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={styles.gestureHandler}>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="skia" options={{ headerShown: false }} />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index"/>
           <Stack.Screen name="+not-found" />
         </Stack>
         <StatusBar style="auto" />

@@ -4,9 +4,11 @@ import QuickTipsSection from "@/components/QuickTipsSection";
 import QuickVocabularySection from "@/components/QuickVocabularySection";
 import { AVAILABLE_LANGUAGES } from "@/constants/languages";
 import useTranslation from "@/hooks/useTranslation";
+import { useLessonStore } from "@/store/lessonStore";
 import { AntDesign } from "@expo/vector-icons";
 import { GoogleGenAI } from "@google/genai";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import { router } from "expo-router";
 import React, { useEffect } from "react";
 import {
   ActivityIndicator,
@@ -36,6 +38,7 @@ export default function HomeScreen() {
   const [tips, setTips] = React.useState([]);
   const [explanation, setExplanation] = React.useState("");
 
+  const { addLesson } = useLessonStore();
   const t = useTranslation();
 
   // const bottomSheetRef = React.useRef<BottomSheet>(null);
@@ -86,8 +89,11 @@ export default function HomeScreen() {
         contents,
       });
 
-      setPhrases(JSON.parse(response.text).phrases);
-      setVocabulary(JSON.parse(response.text).vocabulary);
+      const generatedPhrases = JSON.parse(response.text).phrases;
+      const generatedVocabulary = JSON.parse(response.text).vocabulary;
+
+      setPhrases(generatedPhrases);
+      setVocabulary(generatedVocabulary);
 
       const tipsResponse = await ai.models.generateContent({
         model,
@@ -102,12 +108,27 @@ export default function HomeScreen() {
         contents,
       });
 
+      let generatedTips = [];
       if (tipsResponse && tipsResponse.text) {
-        setTips(JSON.parse(tipsResponse.text).relevantGrammar);
+        generatedTips = JSON.parse(tipsResponse.text).relevantGrammar;
+        setTips(generatedTips);
       } else {
-        setTips([]); // Default to empty array if text is undefined
+        setTips([]);
       }
+
+      // Save the lesson to the store
+      const lessonId = addLesson({
+        title: `${selectedLanguage} for ${topic}`,
+        language: selectedLanguage,
+        topic: topic,
+        phrases: generatedPhrases,
+        vocabulary: generatedVocabulary,
+        relevantGrammar: generatedTips,
+      });
+
+      console.log("Lesson saved with ID:", lessonId);
     } catch (error) {
+      console.error("Error generating lesson:", error);
     } finally {
       setLoading(false);
     }
@@ -115,7 +136,7 @@ export default function HomeScreen() {
 
   return (
     <QuickSafeAreaView>
-      <ScrollView style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1, paddingHorizontal: 16 }}>
         {selectedLanguage ? (
           <Text style={styles.title}>
             <Text style={styles.bigTitle}>
@@ -166,9 +187,22 @@ export default function HomeScreen() {
               ]}
             >
               <Text style={styles.buttonText}>Generate</Text>
+
             </Pressable>
           </View>
         ) : null}
+
+<Pressable
+              onPress={() => {
+                router.push("/lessons");
+              }}
+              style={[
+                styles.button,
+              ]}
+            >
+              <Text style={styles.buttonText}>Ir a lecciones</Text>
+              
+            </Pressable>
 
         {/* Vocabulary Section */}
         <QuickVocabularySection vocabulary={vocabulary} />
