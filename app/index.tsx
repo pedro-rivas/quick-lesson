@@ -1,9 +1,10 @@
 import QuickSafeAreaView from "@/components/layout/QuickSafeAreaView";
 import LessonCard from "@/components/LessonCard";
-import { AVAILABLE_LANGUAGES } from "@/constants/languages";
+import LessonEmptyState from "@/components/LessonEmptyState";
+import LessonGeneratorForm from "@/components/LessonGeneratorForm";
+import QuickButton from "@/components/QuickButton";
 import useTranslation from "@/hooks/useTranslation";
 import { GrammarTip, Lesson, Phrase, useLessonStore, VocabularyItem } from "@/store/lessonStore";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { GoogleGenAI } from "@google/genai";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
@@ -12,14 +13,11 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
-  View,
+  View
 } from "react-native";
-import RNPickerSelect, { Item } from "react-native-picker-select";
 import {
   termsConfig,
   termsPrompt,
@@ -37,6 +35,7 @@ export default function HomeScreen() {
   const [vocabulary, setVocabulary] = React.useState<VocabularyItem[]>([]);
   const [tips, setTips] = React.useState<GrammarTip[]>([]);
   const [explanation, setExplanation] = React.useState("");
+  const [showBottomSheet, setShowBottomSheet] = React.useState(false);
 
   const { addLesson, getAllLessons, removeLesson } = useLessonStore();
   const lessons = getAllLessons();
@@ -54,7 +53,7 @@ export default function HomeScreen() {
 
   const handleSheetChanges = (index: number) => {
     if (index === -1) {
-      setExplanation("");
+      setShowBottomSheet(false);
     }
   };
 
@@ -178,42 +177,15 @@ export default function HomeScreen() {
 
         {/* Language and Topic Selection */}
         {!loading ? (
-          <View>
-            <RNPickerSelect
-              onValueChange={(_, index) =>
-                setSelectedLanguage(AVAILABLE_LANGUAGES[index - 1]?.label || "")
-              }
-              items={[...AVAILABLE_LANGUAGES] as Item[]}
-            >
-              <View style={styles.picker}>
-                <Text style={styles.pickerLabel}>
-                  {!selectedLanguage ? "Select Language" : selectedLanguage}
-                </Text>
-                <AntDesign name={"down"} size={16} color="#0b57d0" />
-              </View>
-            </RNPickerSelect>
-
-            <TextInput
-              placeholder="Taking a taxi"
-              onChangeText={(text) => setTopic(text)}
-              style={styles.input}
-              onSubmitEditing={() => generate()}
-              autoFocus
-            />
-
-            <Pressable
-              onPress={() => generate()}
-              disabled={!topic || !selectedLanguage}
-              style={[
-                styles.button,
-                !topic || !selectedLanguage ? { opacity: 0.5 } : { opacity: 1 },
-              ]}
-            >
-              <Text style={styles.buttonText}>Generate</Text>
-            </Pressable>
-          </View>
+          <LessonGeneratorForm
+            selectedLanguage={selectedLanguage}
+            onSelectLanguage={setSelectedLanguage}
+            topic={topic}
+            onTopicChange={setTopic}
+            onGenerate={generate}
+            isGenerating={loading}
+          />
         ) : null}
-
 
         {loading ? <ActivityIndicator size="large" color="#0b57d0" style={{ marginTop: 20 }}/> : null}
 
@@ -227,13 +199,7 @@ export default function HomeScreen() {
           </View>
           
           {lessons.length === 0 && !loading ? (
-            <View style={styles.lessonEmptyState}>
-              <MaterialIcons name="school" size={64} color="#ccc" />
-              <Text style={styles.lessonEmptyTitle}>No lessons yet</Text>
-              <Text style={styles.lessonEmptySubtitle}>
-                Generate your first lesson using the form above.
-              </Text>
-            </View>
+            <LessonEmptyState />
           ) : (
             <FlatList
               data={lessons}
@@ -248,6 +214,12 @@ export default function HomeScreen() {
               showsVerticalScrollIndicator={false}
               contentContainerStyle={styles.lessonListContainer}
               scrollEnabled={false}
+              ListFooterComponent={()=> (
+                <QuickButton
+                  onPress={()=> {setShowBottomSheet(true)}}
+                  title="Generate"
+                />
+              )}
             />
           )}
         </View>
@@ -255,16 +227,24 @@ export default function HomeScreen() {
 
       </ScrollView>
 
-      {explanation ? (
+      {showBottomSheet ? (
         <BottomSheet
           //ref={bottomSheetRef}
           onChange={handleSheetChanges}
           enablePanDownToClose={true}
-          handleIndicatorStyle={{ backgroundColor: "#fff" }}
-          backgroundStyle={{ backgroundColor: "#0b57d0" }}
+          // handleIndicatorStyle={{ backgroundColor: "#fff" }}
+          // backgroundStyle={{ backgroundColor: "#0b57d0" }}
+          //keyboardBehavior={'fillParent'}
         >
           <BottomSheetView style={styles.bottomSheetView}>
-            <Text style={{ color: "#fff", fontSize: 18 }}>{explanation}</Text>
+          <LessonGeneratorForm
+            selectedLanguage={selectedLanguage}
+            onSelectLanguage={setSelectedLanguage}
+            topic={topic}
+            onTopicChange={setTopic}
+            onGenerate={generate}
+            isGenerating={loading}
+          />
           </BottomSheetView>
         </BottomSheet>
       ) : null}
@@ -284,47 +264,14 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     color: "#222",
   },
-  picker: {
-    backgroundColor: "#f0f4f9",
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  pickerLabel: {
-    fontSize: 18,
-    marginRight: 4,
-  },
   bigTitle: {
     color: "#0b57d0",
     fontSize: 36,
   },
-  input: {
-    backgroundColor: "#f0f4f9",
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    fontSize: 18,
-  },
-  button: {
-    backgroundColor: "#0b57d0",
-    paddingHorizontal: 16,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    height: 50,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
   bottomSheetView: {
     flex: 1,
     padding: 24,
-    backgroundColor: "#0b57d0",
+    // backgroundColor: "#0b57d0",
   },
   lessonsSectionContainer: {
     marginTop: 32,
@@ -344,25 +291,5 @@ const styles = StyleSheet.create({
   },
   lessonListContainer: {
     paddingBottom: 20,
-  },
-  lessonEmptyState: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 32,
-    minHeight: 200,
-  },
-  lessonEmptyTitle: {
-    fontSize: 24,
-    fontWeight: "600",
-    color: "#666",
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  lessonEmptySubtitle: {
-    fontSize: 16,
-    color: "#999",
-    textAlign: "center",
-    marginBottom: 32,
   },
 });
