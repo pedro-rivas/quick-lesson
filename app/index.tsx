@@ -4,20 +4,25 @@ import LessonEmptyState from "@/components/LessonEmptyState";
 import LessonGeneratorForm from "@/components/LessonGeneratorForm";
 import QuickButton from "@/components/QuickButton";
 import useTranslation from "@/hooks/useTranslation";
-import { GrammarTip, Lesson, Phrase, useLessonStore, VocabularyItem } from "@/store/lessonStore";
+import {
+  Lesson,
+  useLessonStore
+} from "@/store/lessonStore";
 import { GoogleGenAI } from "@google/genai";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
-import React, { useEffect } from "react";
+import React from "react";
 import {
   ActivityIndicator,
   Alert,
   FlatList,
+  KeyboardAvoidingView,
+  Platform, // Import Pressable
   ScrollView,
   StyleSheet,
   Text,
-  View
+  View,
 } from "react-native";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import {
   termsConfig,
   termsPrompt,
@@ -31,34 +36,17 @@ export default function HomeScreen() {
   const [selectedLanguage, setSelectedLanguage] = React.useState("");
   const [topic, setTopic] = React.useState("");
   const [loading, setLoading] = React.useState(false);
-  const [phrases, setPhrases] = React.useState<Phrase[]>([]);
-  const [vocabulary, setVocabulary] = React.useState<VocabularyItem[]>([]);
-  const [tips, setTips] = React.useState<GrammarTip[]>([]);
-  const [explanation, setExplanation] = React.useState("");
-  const [showBottomSheet, setShowBottomSheet] = React.useState(false);
+  const [showLessonForm, setShowCreateLessonFrom] = React.useState(false);
 
   const { addLesson, getAllLessons, removeLesson } = useLessonStore();
   const lessons = getAllLessons();
   const t = useTranslation();
 
-  // const bottomSheetRef = React.useRef<BottomSheet>(null);
-
-  useEffect(() => {
-    // textToSpeech("Havaalanına gidelim", "tr-TR").then((uri) => {
-    //   console.log("Audio file saved at: ", uri);
-    //   const player = createAudioPlayer(uri);
-    //   player.play();
-    // });
-  }, []);
-
-  const handleSheetChanges = (index: number) => {
-    if (index === -1) {
-      setShowBottomSheet(false);
-    }
-  };
 
   const generate = async () => {
     try {
+      if (!selectedLanguage || !topic) return;
+      setShowCreateLessonFrom(false);
       setLoading(true);
 
       const ai = new GoogleGenAI({
@@ -92,9 +80,6 @@ export default function HomeScreen() {
       const generatedPhrases = JSON.parse(response.text).phrases;
       const generatedVocabulary = JSON.parse(response.text).vocabulary;
 
-      setPhrases(generatedPhrases);
-      setVocabulary(generatedVocabulary);
-
       const tipsResponse = await ai.models.generateContent({
         model,
         config: {
@@ -111,9 +96,7 @@ export default function HomeScreen() {
       let generatedTips = [];
       if (tipsResponse && tipsResponse.text) {
         generatedTips = JSON.parse(tipsResponse.text).relevantGrammar;
-        setTips(generatedTips);
-      } else {
-        setTips([]);
+
       }
 
       // Save the lesson to the store
@@ -176,7 +159,7 @@ export default function HomeScreen() {
         )}
 
         {/* Language and Topic Selection */}
-        {!loading ? (
+        {!loading && !lessons.length ? (
           <LessonGeneratorForm
             selectedLanguage={selectedLanguage}
             onSelectLanguage={setSelectedLanguage}
@@ -187,67 +170,76 @@ export default function HomeScreen() {
           />
         ) : null}
 
-        {loading ? <ActivityIndicator size="large" color="#0b57d0" style={{ marginTop: 20 }}/> : null}
+        {loading ? (
+          <ActivityIndicator
+            size="large"
+            color="#0b57d0"
+            style={{ marginTop: 20 }}
+          />
+        ) : null}
 
         {/* --- My Lessons Section --- */}
         <View style={styles.lessonsSectionContainer}>
           <View style={styles.lessonsHeader}>
             <Text style={styles.lessonsTitle}>My Lessons</Text>
             {lessons.length > 0 && (
-              <Text style={styles.lessonsSubtitle}>{lessons.length} lesson{lessons.length !== 1 ? 's' : ''}</Text>
+              <Text style={styles.lessonsSubtitle}>
+                {lessons.length} lesson{lessons.length !== 1 ? "s" : ""}
+              </Text>
             )}
           </View>
-          
+
           {lessons.length === 0 && !loading ? (
             <LessonEmptyState />
           ) : (
             <FlatList
               data={lessons}
               renderItem={({ item }) => (
-                <LessonCard 
-                  lesson={item} 
-                  onView={handleViewLesson} 
-                  onDelete={handleDeleteLesson} 
+                <LessonCard
+                  lesson={item}
+                  onView={handleViewLesson}
+                  onDelete={handleDeleteLesson}
                 />
               )}
               keyExtractor={(item) => item.id}
               showsVerticalScrollIndicator={false}
               contentContainerStyle={styles.lessonListContainer}
               scrollEnabled={false}
-              ListFooterComponent={()=> (
-                <QuickButton
-                  onPress={()=> {setShowBottomSheet(true)}}
-                  title="Generate"
-                />
-              )}
             />
           )}
         </View>
         {/* --- End My Lessons Section --- */}
-
       </ScrollView>
 
-      {showBottomSheet ? (
-        <BottomSheet
-          //ref={bottomSheetRef}
-          onChange={handleSheetChanges}
-          enablePanDownToClose={true}
-          // handleIndicatorStyle={{ backgroundColor: "#fff" }}
-          // backgroundStyle={{ backgroundColor: "#0b57d0" }}
-          //keyboardBehavior={'fillParent'}
-        >
-          <BottomSheetView style={styles.bottomSheetView}>
-          <LessonGeneratorForm
-            selectedLanguage={selectedLanguage}
-            onSelectLanguage={setSelectedLanguage}
-            topic={topic}
-            onTopicChange={setTopic}
-            onGenerate={generate}
-            isGenerating={loading}
-          />
-          </BottomSheetView>
-        </BottomSheet>
-      ) : null}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        {showLessonForm ? (
+          <Animated.View
+            entering={FadeIn}
+            exiting={FadeOut}
+          >
+            <LessonGeneratorForm
+              selectedLanguage={selectedLanguage}
+              onSelectLanguage={setSelectedLanguage}
+              topic={topic}
+              onTopicChange={setTopic}
+              onGenerate={generate}
+              isGenerating={loading}
+              onClose={() => setShowCreateLessonFrom(false)}
+            />
+          </Animated.View>
+        ) : (
+          <View style={{ padding: 16, }}>
+            <QuickButton
+              onPress={() => {
+                setShowCreateLessonFrom(true);
+              }}
+              title="New Lesson"
+            />
+          </View>
+        )}
+      </KeyboardAvoidingView>
     </QuickSafeAreaView>
   );
 }
