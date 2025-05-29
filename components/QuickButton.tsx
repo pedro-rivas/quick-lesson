@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, TextStyle, ViewStyle } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, TextStyle, ViewStyle } from 'react-native';
 
 interface QuickButtonProps {
   onPress: () => void;
@@ -7,9 +7,10 @@ interface QuickButtonProps {
   title: string;
   style?: ViewStyle;
   textStyle?: TextStyle;
+  loading?: boolean;
 }
 
-const QuickButton: React.FC<QuickButtonProps> = ({ onPress, disabled, title, style, textStyle }) => {
+const QuickButton: React.FC<QuickButtonProps> = ({ onPress, disabled, title, style, textStyle, loading }) => {
   return (
     <Pressable
       onPress={onPress}
@@ -20,7 +21,13 @@ const QuickButton: React.FC<QuickButtonProps> = ({ onPress, disabled, title, sty
         style,
       ]}
     >
-      <Text style={[styles.buttonText, textStyle]}>{title}</Text>
+      {
+        loading ? (
+          <ActivityIndicator size="small" color="#fff" />
+        ) : (
+          <Text style={[styles.buttonText, textStyle]}>{title}</Text>
+        )
+      }
     </Pressable>
   );
 };

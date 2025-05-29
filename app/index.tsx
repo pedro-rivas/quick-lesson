@@ -4,15 +4,11 @@ import LessonEmptyState from "@/components/LessonEmptyState";
 import LessonGeneratorForm from "@/components/LessonGeneratorForm";
 import QuickButton from "@/components/QuickButton";
 import useTranslation from "@/hooks/useTranslation";
-import {
-  Lesson,
-  useLessonStore
-} from "@/store/lessonStore";
+import { Lesson, useLessonStore } from "@/store/lessonStore";
 import { GoogleGenAI } from "@google/genai";
 import { router } from "expo-router";
 import React from "react";
 import {
-  ActivityIndicator,
   Alert,
   FlatList,
   KeyboardAvoidingView,
@@ -41,7 +37,6 @@ export default function HomeScreen() {
   const { addLesson, getAllLessons, removeLesson } = useLessonStore();
   const lessons = getAllLessons();
   const t = useTranslation();
-
 
   const generate = async () => {
     try {
@@ -96,7 +91,6 @@ export default function HomeScreen() {
       let generatedTips = [];
       if (tipsResponse && tipsResponse.text) {
         generatedTips = JSON.parse(tipsResponse.text).relevantGrammar;
-
       }
 
       // Save the lesson to the store
@@ -110,6 +104,7 @@ export default function HomeScreen() {
       });
 
       console.log("Lesson saved with ID:", lessonId);
+      setTopic("");
     } catch (error) {
       console.error("Error generating lesson:", error);
     } finally {
@@ -138,6 +133,15 @@ export default function HomeScreen() {
   const handleViewLesson = (lesson: Lesson) => {
     router.push(`/lessons/${lesson.id}` as any);
   };
+  const renderItem = ({ item }: { item: Lesson }) => {
+    return (
+      <LessonCard
+        lesson={item}
+        onView={handleViewLesson}
+        onDelete={handleDeleteLesson}
+      />
+    );
+  };
 
   return (
     <QuickSafeAreaView>
@@ -151,32 +155,11 @@ export default function HomeScreen() {
                 : ""}{" "}
               for
             </Text>
-            {"\n"}
-            {topic}
+            {topic ? "\n" + topic : ""}
           </Text>
         ) : (
           <Text style={styles.title}>{t("screens.home.quickLesson")}</Text>
         )}
-
-        {/* Language and Topic Selection */}
-        {!loading && !lessons.length ? (
-          <LessonGeneratorForm
-            selectedLanguage={selectedLanguage}
-            onSelectLanguage={setSelectedLanguage}
-            topic={topic}
-            onTopicChange={setTopic}
-            onGenerate={generate}
-            isGenerating={loading}
-          />
-        ) : null}
-
-        {loading ? (
-          <ActivityIndicator
-            size="large"
-            color="#0b57d0"
-            style={{ marginTop: 20 }}
-          />
-        ) : null}
 
         {/* --- My Lessons Section --- */}
         <View style={styles.lessonsSectionContainer}>
@@ -194,13 +177,7 @@ export default function HomeScreen() {
           ) : (
             <FlatList
               data={lessons}
-              renderItem={({ item }) => (
-                <LessonCard
-                  lesson={item}
-                  onView={handleViewLesson}
-                  onDelete={handleDeleteLesson}
-                />
-              )}
+              renderItem={renderItem}
               keyExtractor={(item) => item.id}
               showsVerticalScrollIndicator={false}
               contentContainerStyle={styles.lessonListContainer}
@@ -215,10 +192,7 @@ export default function HomeScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         {showLessonForm ? (
-          <Animated.View
-            entering={FadeIn}
-            exiting={FadeOut}
-          >
+          <Animated.View entering={FadeIn} exiting={FadeOut}>
             <LessonGeneratorForm
               selectedLanguage={selectedLanguage}
               onSelectLanguage={setSelectedLanguage}
@@ -230,12 +204,14 @@ export default function HomeScreen() {
             />
           </Animated.View>
         ) : (
-          <View style={{ padding: 16, }}>
+          <View style={{ padding: 16 }}>
             <QuickButton
               onPress={() => {
                 setShowCreateLessonFrom(true);
               }}
               title="New Lesson"
+              loading={loading}
+              disabled={loading}
             />
           </View>
         )}
