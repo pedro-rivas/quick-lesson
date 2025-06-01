@@ -6,7 +6,7 @@ import QuickButton from "@/components/QuickButton";
 import useTranslation from "@/hooks/useTranslation";
 import { Lesson, useLessonStore } from "@/store/lessonStore";
 import { GoogleGenAI } from "@google/genai";
-import { router } from "expo-router";
+import { Redirect, router } from "expo-router";
 import React from "react";
 import {
   Alert,
@@ -24,7 +24,7 @@ import {
   termsPrompt,
   tipsConfig,
   tipsPrompt,
-} from "../api/gemini";
+} from "../../api/gemini";
 
 const studentLanguage = "spanish";
 
@@ -37,6 +37,10 @@ export default function HomeScreen() {
   const { addLesson, getAllLessons, removeLesson } = useLessonStore();
   const lessons = getAllLessons();
   const t = useTranslation();
+
+  if (true) {
+    return <Redirect href={"/(auth)/Landing"} />;
+  }
 
   const generate = async () => {
     try {
@@ -133,6 +137,7 @@ export default function HomeScreen() {
   const handleViewLesson = (lesson: Lesson) => {
     router.push(`/lessons/${lesson.id}` as any);
   };
+
   const renderItem = ({ item }: { item: Lesson }) => {
     return (
       <LessonCard

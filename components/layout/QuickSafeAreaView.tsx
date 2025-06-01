@@ -1,9 +1,10 @@
 import React, { useMemo } from "react";
-import { StyleSheet, View, } from "react-native";
+import { StyleSheet, View, ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface QuickSafeAreaViewProps {
   children: React.ReactNode;
+  styles?: ViewStyle;
 }
 
 /**
@@ -11,12 +12,12 @@ interface QuickSafeAreaViewProps {
  *
  * @param children - The content to be rendered inside the screen layout.
  */
-const QuickSafeAreaView = ({ children }: QuickSafeAreaViewProps) => {
+const QuickSafeAreaView = ({ children, styles: customStyles }: QuickSafeAreaViewProps) => {
   const insets = useSafeAreaInsets();
 
   const styles = useMemo(
     () =>
-      StyleSheet.create({
+      StyleSheet.create({ 
         container: {
           flex: 1,
           paddingTop: insets.top,
@@ -26,9 +27,9 @@ const QuickSafeAreaView = ({ children }: QuickSafeAreaViewProps) => {
     [insets]
   );
 
-  return <View style={styles.container}>{children}</View>;
+  return <View style={[styles.container, customStyles]}>{children}</View>;
 };
 
 QuickSafeAreaView.displayName = "QuickSafeAreaView";
 
-export default QuickSafeAreaView;
+export default React.memo(QuickSafeAreaView);

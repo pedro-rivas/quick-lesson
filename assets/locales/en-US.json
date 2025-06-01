@@ -1,7 +1,4 @@
 {
-    "screens": {
-        "home": {
-            "quickLesson": "Quick Lesson"
-        }
-    }
+     "Quick Lesson": "Quick Lesson",
+            "Learn a new language in minutes.": "Learn a new language in minutes."
 }

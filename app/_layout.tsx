@@ -5,7 +5,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Slot } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -27,10 +27,11 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={styles.gestureHandler}>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack screenOptions={{ headerShown: false }}>
+        <Slot />
+        {/* <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="index"/>
           <Stack.Screen name="+not-found" />
-        </Stack>
+        </Stack> */}
         <StatusBar style="auto" />
       </ThemeProvider>
     </GestureHandlerRootView>
