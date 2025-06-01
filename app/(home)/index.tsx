@@ -1,5 +1,5 @@
 import { createLesson } from "@/api/gemini";
-import QuickSafeAreaView from "@/components/layout/QuickSafeAreaView";
+import QuickSafeAreaView from "@/components/layout/SafeAreaView";
 import LessonCard from "@/components/LessonCard";
 import LessonEmptyState from "@/components/LessonEmptyState";
 import LessonGeneratorForm from "@/components/LessonGeneratorForm";

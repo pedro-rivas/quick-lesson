@@ -2,7 +2,7 @@ import useTranslation from "@/hooks/useTranslation";
 import React, { useEffect, useRef, useState } from "react";
 import { TextProps } from "react-native";
 import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
-import * as QuickLayout from "./QuickLayout";
+import * as QuickLayout from "./Layout";
 
 interface QuickTextProps extends TextProps {}
 

@@ -11,6 +11,8 @@ interface LayoutProps extends ViewProps {
   alignItems?: "flex-start" | "flex-end" | "center" | "stretch" | "baseline";
   flex?: number;
   gap?: number;
+  flexWrap?: "wrap" | "nowrap" | "wrap-reverse";
+  flexDirection?: "row" | "column" | "row-reverse" | "column-reverse";
 }
 
 export const View = ({ children, ...props }: LayoutProps) => {
@@ -56,6 +58,7 @@ export const Column = ({ children, style, ...props }: LayoutProps) => {
           alignItems: props.alignItems,
           flex: props.flex,
           gap: props.gap,
+          flexWrap: props.flexWrap,
         },
         style,
       ]}

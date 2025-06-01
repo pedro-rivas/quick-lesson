@@ -1,4 +1,4 @@
-import * as QuickText from "@/components/QuickText";
+import * as QuickText from "@/components/Text";
 import React, { useEffect } from "react";
 import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 import Animated, {
@@ -101,7 +101,7 @@ const MatchCard =({
       justifyContent: "center",
       alignItems: "center",
       flexGrow: 1,
-      minWidth: Dimensions.get("window").width / 2 - 32,
+      width: Dimensions.get("window").width / 2 - 32,
     },
     selected: {
       backgroundColor: "#0b57d0",
