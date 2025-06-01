@@ -1,3 +1,4 @@
+import { createLesson } from "@/api/gemini";
 import QuickSafeAreaView from "@/components/layout/QuickSafeAreaView";
 import LessonCard from "@/components/LessonCard";
 import LessonEmptyState from "@/components/LessonEmptyState";
@@ -5,7 +6,6 @@ import LessonGeneratorForm from "@/components/LessonGeneratorForm";
 import QuickButton from "@/components/QuickButton";
 import useTranslation from "@/hooks/useTranslation";
 import { Lesson, useLessonStore } from "@/store/lessonStore";
-import { GoogleGenAI } from "@google/genai";
 import { router } from "expo-router";
 import React from "react";
 import {
@@ -19,12 +19,6 @@ import {
   View,
 } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-import {
-  termsConfig,
-  termsPrompt,
-  tipsConfig,
-  tipsPrompt,
-} from "../../api/gemini";
 
 const studentLanguage = "spanish";
 
@@ -38,79 +32,24 @@ export default function HomeScreen() {
   const lessons = getAllLessons();
   const t = useTranslation();
 
-  // if (true) {
-  //   return <Redirect href={"/(auth)/Landing"} />;
-  // }
-
   const generate = async () => {
     try {
       if (!selectedLanguage || !topic) return;
       setShowCreateLessonFrom(false);
       setLoading(true);
 
-      const ai = new GoogleGenAI({
-        apiKey: process.env.EXPO_PUBLIC_GEMINI_API_KEY,
+    
+      const lesson = await createLesson({
+        studentLanguage,
+        selectedLanguage,
+        topic,
       });
-      const model = "gemini-2.0-flash";
-      const contents = [
-        {
-          role: "user",
-          parts: [
-            {
-              text: `${selectedLanguage} for ${topic}`,
-            },
-          ],
-        },
-      ];
+     
+      addLesson(lesson);
 
-      const response: any = await ai.models.generateContent({
-        model,
-        config: {
-          systemInstruction: [
-            {
-              text: termsPrompt(studentLanguage, selectedLanguage),
-            },
-          ],
-          ...termsConfig,
-        },
-        contents,
-      });
-
-      const generatedPhrases = JSON.parse(response.text).phrases;
-      const generatedVocabulary = JSON.parse(response.text).vocabulary;
-
-      const tipsResponse = await ai.models.generateContent({
-        model,
-        config: {
-          systemInstruction: [
-            {
-              text: tipsPrompt(studentLanguage, selectedLanguage),
-            },
-          ],
-          ...tipsConfig,
-        },
-        contents,
-      });
-
-      let generatedTips = [];
-      if (tipsResponse && tipsResponse.text) {
-        generatedTips = JSON.parse(tipsResponse.text).relevantGrammar;
-      }
-
-      // Save the lesson to the store
-      const lessonId = addLesson({
-        title: `${selectedLanguage} for ${topic}`,
-        language: selectedLanguage,
-        topic: topic,
-        phrases: generatedPhrases,
-        vocabulary: generatedVocabulary,
-        relevantGrammar: generatedTips,
-      });
-
-      console.log("Lesson saved with ID:", lessonId);
       setTopic("");
-    } catch (error) {
-      console.error("Error generating lesson:", error);
+    } catch (error: any) {
+      Alert.alert(t("Something went wrong"), error.message);
     } finally {
       setLoading(false);
     }
@@ -163,7 +102,7 @@ export default function HomeScreen() {
             {topic ? "\n" + topic : ""}
           </Text>
         ) : (
-          <Text style={styles.title}>{t("screens.home.quickLesson")}</Text>
+          <Text style={styles.title}>{t("Quick Lesson")}</Text>
         )}
 
         {/* --- My Lessons Section --- */}
@@ -187,6 +126,7 @@ export default function HomeScreen() {
               showsVerticalScrollIndicator={false}
               contentContainerStyle={styles.lessonListContainer}
               scrollEnabled={false}
+              windowSize={9}
             />
           )}
         </View>

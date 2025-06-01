@@ -1,11 +1,12 @@
 {
-     "Quick Lesson": "Quick Lesson",
-            "Learn a new language in minutes.": "Learn a new language in minutes.",
-            "Taking a Taxi": "Taking a  taxi",
-            "Ordering a pizza": "Ordering a pizza",
-            "Booking a hotel": "Booking a hotel",
-            "a trip to the beach": "a trip to the beach",
-            "For": "For",
-            "Continue With Google": "Continue With Google",
-            "Continue With Apple": "Continue With Apple"
+  "Quick Lesson": "Quick Lesson",
+  "Learn a new language in minutes.": "Learn a new language in minutes.",
+  "Taking a Taxi": "Taking a  taxi",
+  "Ordering a pizza": "Ordering a pizza",
+  "Booking a hotel": "Booking a hotel",
+  "a trip to the beach": "a trip to the beach",
+  "For": "For",
+  "Continue With Google": "Continue With Google",
+  "Continue With Apple": "Continue With Apple",
+  "Something went wrong": "Something went wrong"
 }

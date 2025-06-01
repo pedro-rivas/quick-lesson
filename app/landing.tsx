@@ -1,4 +1,3 @@
-// App.tsx
 import QuickSafeAreaView from "@/components/layout/QuickSafeAreaView";
 import QuickButton from "@/components/QuickButton";
 import * as QuickLayout from "@/components/QuickLayout";
@@ -6,7 +5,7 @@ import * as QuickText from "@/components/QuickText";
 import useTranslation from "@/hooks/useTranslation";
 import { useSession } from "@/providers/AuthContext";
 import React, { useMemo } from "react";
-import { StyleSheet } from "react-native";
+import { Alert, StyleSheet } from "react-native";
 // see https://www.uisources.com/explainer/duolingo-onboarding
 
 // const { width: screenWidth } = Dimensions.get("window");
@@ -104,11 +103,15 @@ export default function LandingPage() {
   }, []);
 
   const handleContinueWithGoogle = async () => {
-    signIn("google").then(() => {});
+    signIn("google").catch((error) => {
+      Alert.alert(t("Something went wrong"), error.message);
+    });
   };
 
   const handleContinueWithApple = () => {
-    signIn("apple").then(() => {});
+    signIn("apple").catch((error) => {
+      Alert.alert(t("Something went wrong"), error.message);
+    });
   };
 
   return (
