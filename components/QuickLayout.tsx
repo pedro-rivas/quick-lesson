@@ -10,6 +10,7 @@ interface LayoutProps extends ViewProps {
     | "space-evenly";
   alignItems?: "flex-start" | "flex-end" | "center" | "stretch" | "baseline";
   flex?: number;
+  gap?: number;
 }
 
 export const View = ({ children, ...props }: LayoutProps) => {
@@ -19,6 +20,7 @@ export const View = ({ children, ...props }: LayoutProps) => {
         justifyContent: props.justifyContent,
         alignItems: props.alignItems,
         flex: props.flex,
+        gap: props.gap,
       }}
       {...props}
     >
@@ -27,15 +29,16 @@ export const View = ({ children, ...props }: LayoutProps) => {
   );
 };
 
-export const Row = ({ children, ...props }: LayoutProps) => {
+export const Row = ({ children, style, ...props }: LayoutProps) => {
   return (
     <RNView
-      style={{
+      style={[{
         flexDirection: "row",
         justifyContent: props.justifyContent,
         alignItems: props.alignItems,
         flex: props.flex,
-      }}
+        gap: props.gap,
+      }, style]}
       {...props}
     >
       {children}
@@ -51,6 +54,7 @@ export const Column = ({ children, ...props }: LayoutProps) => {
         justifyContent: props.justifyContent,
         alignItems: props.alignItems,
         flex: props.flex,
+        gap: props.gap,
       }}
       {...props}
     >

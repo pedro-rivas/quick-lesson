@@ -21,12 +21,25 @@ export const LandingHeader = ({ children, ...props }: QuickTextProps) => {
   );
 };
 
+export const Subheading = ({ children, ...props }: QuickTextProps) => {
+  return (
+    <DefaultText
+      style={{
+        fontSize: 20,
+        fontWeight: "bold",
+      }}
+      {...props}
+    >
+      {children}
+    </DefaultText>
+  );
+};
+
 export const BodyText = ({ children, ...props }: QuickTextProps) => {
   return (
     <DefaultText
       style={{
         fontSize: 16,
-        color: "white",
       }}
       {...props}
     >

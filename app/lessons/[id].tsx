@@ -1,4 +1,6 @@
 import QuickSafeAreaView from "@/components/layout/QuickSafeAreaView";
+import QuickButton from "@/components/QuickButton";
+import * as QuickLayout from "@/components/QuickLayout";
 import QuickPhrasesSection from "@/components/QuickPhrasesSection";
 import QuickTipsSection from "@/components/QuickTipsSection";
 import QuickVocabularySection from "@/components/QuickVocabularySection";
@@ -8,19 +10,19 @@ import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
 export default function LessonDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { getLessonById, removeLesson } = useLessonStore();
   const [explanation, setExplanation] = useState("");
-  
+
   const lesson = getLessonById(id!);
 
   if (!lesson) {
@@ -33,10 +35,7 @@ export default function LessonDetailScreen() {
             <Text style={styles.errorSubtitle}>
               This lesson may have been deleted or doesn't exist.
             </Text>
-            <Pressable 
-              style={styles.backButton} 
-              onPress={() => router.back()}
-            >
+            <Pressable style={styles.backButton} onPress={() => router.back()}>
               <Text style={styles.backButtonText}>Go Back</Text>
             </Pressable>
           </View>
@@ -89,7 +88,7 @@ export default function LessonDetailScreen() {
           <Pressable onPress={() => router.back()} style={styles.backIcon}>
             <AntDesign name="left" size={24} color="#0b57d0" />
           </Pressable>
-          
+
           <Pressable onPress={handleDeleteLesson} style={styles.deleteIcon}>
             <MaterialIcons name="delete" size={24} color="#ff5252" />
           </Pressable>
@@ -103,7 +102,9 @@ export default function LessonDetailScreen() {
               <View style={styles.languageContainer}>
                 <Text style={styles.languageText}>{lesson.language}</Text>
               </View>
-              <Text style={styles.dateText}>{formatDate(lesson.createdAt)}</Text>
+              <Text style={styles.dateText}>
+                {formatDate(lesson.createdAt)}
+              </Text>
             </View>
           </View>
 
@@ -120,7 +121,9 @@ export default function LessonDetailScreen() {
             </View>
             <View style={styles.statDivider} />
             <View style={styles.stat}>
-              <Text style={styles.statNumber}>{lesson.relevantGrammar.length}</Text>
+              <Text style={styles.statNumber}>
+                {lesson.relevantGrammar.length}
+              </Text>
               <Text style={styles.statLabel}>Grammar Tips</Text>
             </View>
           </View>
@@ -128,8 +131,18 @@ export default function LessonDetailScreen() {
           {/* Content Sections */}
           <QuickVocabularySection vocabulary={lesson.vocabulary} />
           <QuickPhrasesSection phrases={lesson.phrases} />
-          <QuickTipsSection tips={lesson.relevantGrammar} setExplanation={setExplanation} />
+          <QuickTipsSection
+            tips={lesson.relevantGrammar}
+            setExplanation={setExplanation}
+          />
         </ScrollView>
+
+        <QuickLayout.View style={{ padding: 16 }}>
+          <QuickButton
+            title="Practice"
+            onPress={() => router.push(`/practice/${id}` as any)}
+          />
+        </QuickLayout.View>
 
         {explanation ? (
           <BottomSheet
