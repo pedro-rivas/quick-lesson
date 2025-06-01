@@ -35,12 +35,15 @@ export const Subheading = ({ children, ...props }: QuickTextProps) => {
   );
 };
 
-export const BodyText = ({ children, ...props }: QuickTextProps) => {
+export const BodyText = ({ children, style, ...props }: QuickTextProps) => {
   return (
     <DefaultText
-      style={{
-        fontSize: 16,
-      }}
+      style={[
+        {
+          fontSize: 16,
+        },
+        style,
+      ]}
       {...props}
     >
       {children}

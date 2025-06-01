@@ -46,16 +46,19 @@ export const Row = ({ children, style, ...props }: LayoutProps) => {
   );
 };
 
-export const Column = ({ children, ...props }: LayoutProps) => {
+export const Column = ({ children, style, ...props }: LayoutProps) => {
   return (
     <RNView
-      style={{
-        flexDirection: "column",
-        justifyContent: props.justifyContent,
-        alignItems: props.alignItems,
-        flex: props.flex,
-        gap: props.gap,
-      }}
+      style={[
+        {
+          flexDirection: "column",
+          justifyContent: props.justifyContent,
+          alignItems: props.alignItems,
+          flex: props.flex,
+          gap: props.gap,
+        },
+        style,
+      ]}
       {...props}
     >
       {children}
