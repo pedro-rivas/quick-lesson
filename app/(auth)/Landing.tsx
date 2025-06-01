@@ -3,7 +3,6 @@ import QuickSafeAreaView from "@/components/layout/QuickSafeAreaView";
 import QuickButton from "@/components/QuickButton";
 import * as QuickLayout from "@/components/QuickLayout";
 import * as QuickText from "@/components/QuickText";
-import { LandingHeader } from "@/components/QuickText";
 import useTranslation from "@/hooks/useTranslation";
 import React from "react";
 import { StyleSheet } from "react-native";
@@ -94,19 +93,45 @@ import { StyleSheet } from "react-native";
 export default function LandingPage() {
   const t = useTranslation();
 
+  const PLACE_HOLDER_LESSONS = [
+    t("Taking a Taxi"),
+    t("Ordering a pizza"),
+    t("Booking a hotel"),
+    t("a trip to the beach"),
+  ];
+
+  const handleContinueWithGoogle = () => {
+    console.log("Continue With Google");
+  };
+
+  const handleContinueWithApple = () => {
+    console.log("Continue With Apple");
+  };
+
   return (
     <QuickSafeAreaView styles={styles.container}>
       <QuickLayout.View flex={1} justifyContent="space-between">
         <QuickLayout.Spacer />
         <QuickLayout.Column justifyContent="center" alignItems="center">
-          <LandingHeader>{t("Quick Lesson")}</LandingHeader>
-          <QuickText.AnimatedText 
-          text={[t("Learn a new language in minutes."), t("Learn a new language in minutes.")]} />
+          <QuickText.LandingHeader>{t("Quick Lesson")}</QuickText.LandingHeader>
+          <QuickLayout.Spacer size="s" />
+          <QuickText.AnimatedText
+            style={styles.placeholder}
+            text={PLACE_HOLDER_LESSONS}
+          />
         </QuickLayout.Column>
         <QuickLayout.Column>
-          <QuickButton title="Get Started" onPress={() => {}} />
+          <QuickButton
+            secondary
+            title={t("Continue With Google")}
+            onPress={handleContinueWithGoogle}
+          />
           <QuickLayout.Spacer />
-          <QuickButton title="Get Started" onPress={() => {}} />
+          <QuickButton
+            secondary
+            title={t("Continue With Apple")}
+            onPress={handleContinueWithApple}
+          />
         </QuickLayout.Column>
       </QuickLayout.View>
     </QuickSafeAreaView>
@@ -118,5 +143,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#23b1fc",
     paddingHorizontal: 20,
+  },
+  placeholder: {
+    fontSize: 18,
+    color: "white",
   },
 });

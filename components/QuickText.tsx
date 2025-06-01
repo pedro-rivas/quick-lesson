@@ -1,12 +1,16 @@
-import React, { useEffect, useState } from "react";
+import useTranslation from "@/hooks/useTranslation";
+import React, { useEffect, useRef, useState } from "react";
 import { TextProps } from "react-native";
 import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
+import * as QuickLayout from "./QuickLayout";
 
-export const LandingHeader = ({ children, ...props }: TextProps) => {
+interface QuickTextProps extends TextProps {}
+
+export const LandingHeader = ({ children, ...props }: QuickTextProps) => {
   return (
     <DefaultText
       style={{
-        fontSize: 34,
+        fontSize: 40,
         fontWeight: "bold",
         color: "white",
       }}
@@ -17,7 +21,7 @@ export const LandingHeader = ({ children, ...props }: TextProps) => {
   );
 };
 
-export const BodyText = ({ children, ...props }: TextProps) => {
+export const BodyText = ({ children, ...props }: QuickTextProps) => {
   return (
     <DefaultText
       style={{
@@ -31,7 +35,7 @@ export const BodyText = ({ children, ...props }: TextProps) => {
   );
 };
 
-const DefaultText = ({ children, ...props }: TextProps) => {
+const DefaultText = ({ children, ...props }: QuickTextProps) => {
   return (
     <Animated.Text style={props.style} {...props}>
       {children}
@@ -41,15 +45,26 @@ const DefaultText = ({ children, ...props }: TextProps) => {
 
 const ANIMATED_TEXT_DURATION = 1000;
 
-export const AnimatedText = ({ text }: { text: string[] }) => {
+export const AnimatedText = ({
+  text,
+  ...props
+}: { text: string[] } & TextProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const t = useTranslation();
+  const interval = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     animatedText();
+
+    return () => {
+      if (interval.current) {
+        clearInterval(interval.current);
+      }
+    };
   }, []);
 
   const animatedText = () => {
-    setInterval(() => {
+    interval.current = setInterval(() => {
       setCurrentIndex((currentIndex) => {
         if (currentIndex === text.length - 1) {
           return 0;
@@ -61,7 +76,16 @@ export const AnimatedText = ({ text }: { text: string[] }) => {
 
   return (
     <>
-      <DefaultText key={currentIndex} entering={FadeInDown} exiting={FadeOutUp}>
+      <DefaultText style={[props.style, { fontSize: 14, opacity: 0.8 }]}>
+        {t("For")}
+      </DefaultText>
+      <QuickLayout.Spacer size="s" />
+      <DefaultText
+        key={currentIndex}
+        entering={FadeInDown}
+        exiting={FadeOutUp}
+        {...props}
+      >
         {text[currentIndex]}
       </DefaultText>
     </>

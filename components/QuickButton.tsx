@@ -1,5 +1,12 @@
-import React from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, TextStyle, ViewStyle } from 'react-native';
+import React from "react";
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextStyle,
+  ViewStyle,
+} from "react-native";
 
 interface QuickButtonProps {
   onPress: () => void;
@@ -8,37 +15,55 @@ interface QuickButtonProps {
   style?: ViewStyle;
   textStyle?: TextStyle;
   loading?: boolean;
+  secondary?: boolean;
 }
 
-const QuickButton: React.FC<QuickButtonProps> = ({ onPress, disabled, title, style, textStyle, loading }) => {
+const QuickButton: React.FC<QuickButtonProps> = ({
+  onPress,
+  disabled,
+  title,
+  style,
+  textStyle,
+  loading,
+  secondary,
+}) => {
+  const buttonStyle = secondary ? styles.secondaryButton : styles.button;
+  const buttonTextStyle = secondary ? styles.secondaryButtonText : styles.buttonText;
+
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled}
       style={[
-        styles.button,
+        buttonStyle,
         disabled ? styles.disabledButton : styles.enabledButton,
         style,
       ]}
     >
-      {
-        loading ? (
-          <ActivityIndicator size="small" color="#fff" />
-        ) : (
-          <Text style={[styles.buttonText, textStyle]}>{title}</Text>
-        )
-      }
+      {loading ? (
+        <ActivityIndicator size="small" color="#fff" />
+      ) : (
+        <Text style={[buttonTextStyle, textStyle]}>{title}</Text>
+      )}
     </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#0b57d0',
+    backgroundColor: "#0b57d0",
     paddingHorizontal: 16,
     borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
+    height: 50,
+  },
+  secondaryButton: {
+    backgroundColor: "#fff",
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
     height: 50,
   },
   disabledButton: {
@@ -48,10 +73,15 @@ const styles = StyleSheet.create({
     opacity: 1,
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
+  },
+  secondaryButtonText: {
+    color: "#23b1fc",
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });
 
-export default QuickButton; 
+export default QuickButton;

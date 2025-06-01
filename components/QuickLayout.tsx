@@ -59,6 +59,17 @@ export const Column = ({ children, ...props }: LayoutProps) => {
   );
 };
 
-export const Spacer = ({ size = 16 }: { size?: number }) => {
-  return <RNView style={{ height: size, width: size }} />;
+
+const SPACER_SIZE = {
+  s: 8,
+  m: 16,
+  l: 24,
+};
+
+export const Spacer = ({
+  size = "m",
+}: {
+  size?: keyof typeof SPACER_SIZE;
+}) => {
+  return <RNView style={{ height: SPACER_SIZE[size], width: SPACER_SIZE[size] }} />;
 };
