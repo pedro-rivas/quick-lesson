@@ -12,7 +12,7 @@ import {
   Alert,
   FlatList,
   KeyboardAvoidingView,
-  Platform, // Import Pressable
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -38,13 +38,12 @@ export default function HomeScreen() {
       setShowCreateLessonFrom(false);
       setLoading(true);
 
-    
       const lesson = await createLesson({
         studentLanguage,
         selectedLanguage,
         topic,
       });
-     
+
       addLesson(lesson);
 
       setTopic("");

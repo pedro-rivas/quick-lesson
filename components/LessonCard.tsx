@@ -1,7 +1,8 @@
-import { Lesson } from '@/store/lessonStore'; // Assuming Lesson type is here
-import { AntDesign, MaterialIcons } from '@expo/vector-icons';
-import React from 'react';
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Lesson } from "@/store/lessonStore"; // Assuming Lesson type is here
+import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { useTheme } from "@react-navigation/native";
+import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 interface LessonCardProps {
   lesson: Lesson;
@@ -17,37 +18,25 @@ const formatDate = (date: Date) => {
   });
 };
 
-const LessonCard: React.FC<LessonCardProps> = ({ lesson, onView, onDelete }) => {
-  const handleDelete = () => {
-    Alert.alert(
-      "Delete Lesson",
-      `Are you sure you want to delete "${lesson.title}"?`,
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => onDelete(lesson.id, lesson.title),
-        },
-      ]
-    );
-  };
+const LessonCard: React.FC<LessonCardProps> = ({
+  lesson,
+  onView,
+  onDelete,
+}) => {
+  const { colors } = useTheme();
 
   return (
     <Pressable
-      style={styles.lessonCard}
+      style={[styles.lessonCard, { borderColor: colors.border }]}
       onPress={() => onView(lesson)}
     >
       <View style={styles.lessonCardContent}>
         <View style={styles.lessonCardHeader}>
-          <Text style={styles.lessonTitleText} numberOfLines={2}> 
+          <Text style={styles.lessonTitleText} numberOfLines={2}>
             {lesson.title}
           </Text>
           <Pressable
-            onPress={handleDelete} // Use the internal handleDelete
+            onPress={() => onDelete(lesson.id, lesson.title)}
             style={styles.lessonDeleteButton}
           >
             <MaterialIcons name="delete" size={20} color="#ff5252" />
@@ -56,12 +45,16 @@ const LessonCard: React.FC<LessonCardProps> = ({ lesson, onView, onDelete }) => 
 
         <View style={styles.lessonCardDetails}>
           <Text style={styles.lessonLanguageText}>{lesson.language}</Text>
-          <Text style={styles.lessonDateText}>{formatDate(lesson.createdAt)}</Text>
+          <Text style={styles.lessonDateText}>
+            {formatDate(lesson.createdAt)}
+          </Text>
         </View>
 
         <View style={styles.lessonStatsContainer}>
           <View style={styles.lessonStat}>
-            <Text style={styles.lessonStatNumber}>{lesson.vocabulary.length}</Text>
+            <Text style={styles.lessonStatNumber}>
+              {lesson.vocabulary.length}
+            </Text>
             <Text style={styles.lessonStatLabel}>Vocabulary</Text>
           </View>
           <View style={styles.lessonStat}>
@@ -69,12 +62,19 @@ const LessonCard: React.FC<LessonCardProps> = ({ lesson, onView, onDelete }) => 
             <Text style={styles.lessonStatLabel}>Phrases</Text>
           </View>
           <View style={styles.lessonStat}>
-            <Text style={styles.lessonStatNumber}>{lesson.relevantGrammar.length}</Text>
+            <Text style={styles.lessonStatNumber}>
+              {lesson.relevantGrammar.length}
+            </Text>
             <Text style={styles.lessonStatLabel}>Grammar</Text>
           </View>
         </View>
       </View>
-      <AntDesign name="right" size={16} color="#999" style={styles.lessonChevron} />
+      <AntDesign
+        name="right"
+        size={16}
+        color="#999"
+        style={styles.lessonChevron}
+      />
     </Pressable>
   );
 };
@@ -92,6 +92,8 @@ const styles = StyleSheet.create({
     elevation: 3,
     flexDirection: "row",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#ebebeb",
   },
   lessonCardContent: {
     flex: 1,
@@ -153,4 +155,6 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LessonCard; 
+LessonCard.displayName = "LessonCard";
+
+export default React.memo(LessonCard);

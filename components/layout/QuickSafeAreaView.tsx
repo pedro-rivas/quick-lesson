@@ -1,3 +1,4 @@
+import { useTheme } from "@react-navigation/native";
 import React, { useMemo } from "react";
 import { StyleSheet, View, ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -14,6 +15,7 @@ interface QuickSafeAreaViewProps {
  */
 const QuickSafeAreaView = ({ children, styles: customStyles }: QuickSafeAreaViewProps) => {
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
 
   const styles = useMemo(
     () =>
@@ -22,9 +24,10 @@ const QuickSafeAreaView = ({ children, styles: customStyles }: QuickSafeAreaView
           flex: 1,
           paddingTop: insets.top,
           paddingBottom: insets.bottom,
+          backgroundColor: colors.background,
         },
       }),
-    [insets]
+    [insets, colors]
   );
 
   return <View style={[styles.container, customStyles]}>{children}</View>;
