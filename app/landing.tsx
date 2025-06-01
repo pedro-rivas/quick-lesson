@@ -4,15 +4,9 @@ import QuickButton from "@/components/QuickButton";
 import * as QuickLayout from "@/components/QuickLayout";
 import * as QuickText from "@/components/QuickText";
 import useTranslation from "@/hooks/useTranslation";
-import { supabase } from "@/lib/supabase";
-import React from "react";
+import { useSession } from "@/providers/AuthContext";
+import React, { useMemo } from "react";
 import { StyleSheet } from "react-native";
-
-import { makeRedirectUri } from "expo-auth-session";
-import * as QueryParams from "expo-auth-session/build/QueryParams";
-import * as WebBrowser from "expo-web-browser";
-
-const redirectTo = makeRedirectUri();
 // see https://www.uisources.com/explainer/duolingo-onboarding
 
 // const { width: screenWidth } = Dimensions.get("window");
@@ -97,64 +91,24 @@ const redirectTo = makeRedirectUri();
 // };
 
 export default function LandingPage() {
+  const { signIn } = useSession();
   const t = useTranslation();
 
-  const PLACE_HOLDER_LESSONS = [
-    t("Taking a Taxi"),
-    t("Ordering a pizza"),
-    t("Booking a hotel"),
-    t("a trip to the beach"),
-  ];
-
-  const createSessionFromUrl = async (url: string) => {
-    const { params, errorCode } = QueryParams.getQueryParams(url);
-    if (errorCode) throw new Error(errorCode);
-    const { access_token, refresh_token } = params;
-    if (!access_token) return;
-    const { data, error } = await supabase.auth.setSession({
-      access_token,
-      refresh_token,
-    });
-    if (error) throw error;
-    return data.session;
-  };
+  const PLACE_HOLDER_LESSONS = useMemo(() => {
+    return [
+      t("Taking a Taxi"),
+      t("Ordering a pizza"),
+      t("Booking a hotel"),
+      t("a trip to the beach"),
+    ];
+  }, []);
 
   const handleContinueWithGoogle = async () => {
-    // console.log("Continue With Google");
-    // const {
-    //   data: { session },
-    //   error,
-    // } = await supabase.auth.signUp({ email: "test@google.com", password: "123456" });
-    // console.log(session, error);
-
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo,
-        skipBrowserRedirect: true,
-      },
-    });
-
-    console.log(data, error);
-
-    if (error) throw error;
-
-    const res = await WebBrowser.openAuthSessionAsync(
-      data?.url ?? "",
-      redirectTo
-    );
-
-    console.log(res);
-
-    if (res.type === "success") {
-      const { url } = res;
-      const session = await createSessionFromUrl(url);
-      console.log(session);
-    }
+    signIn("google").then(() => {});
   };
 
   const handleContinueWithApple = () => {
-    console.log("Continue With Apple");
+    signIn("apple").then(() => {});
   };
 
   return (

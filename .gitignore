@@ -47,3 +47,7 @@ commit-review.html
 
 # Cursor
 .cursor
+
+
+# Android
+*.keystore

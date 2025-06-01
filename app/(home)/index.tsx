@@ -6,7 +6,7 @@ import QuickButton from "@/components/QuickButton";
 import useTranslation from "@/hooks/useTranslation";
 import { Lesson, useLessonStore } from "@/store/lessonStore";
 import { GoogleGenAI } from "@google/genai";
-import { Redirect, router } from "expo-router";
+import { router } from "expo-router";
 import React from "react";
 import {
   Alert,
@@ -38,9 +38,9 @@ export default function HomeScreen() {
   const lessons = getAllLessons();
   const t = useTranslation();
 
-  if (true) {
-    return <Redirect href={"/(auth)/Landing"} />;
-  }
+  // if (true) {
+  //   return <Redirect href={"/(auth)/Landing"} />;
+  // }
 
   const generate = async () => {
     try {
