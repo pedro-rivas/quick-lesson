@@ -2,7 +2,8 @@
 import QuickSafeAreaView from "@/components/layout/QuickSafeAreaView";
 import QuickButton from "@/components/QuickButton";
 import * as QuickLayout from "@/components/QuickLayout";
-import { BodyText, LandingHeader } from "@/components/QuickText";
+import * as QuickText from "@/components/QuickText";
+import { LandingHeader } from "@/components/QuickText";
 import useTranslation from "@/hooks/useTranslation";
 import React from "react";
 import { StyleSheet } from "react-native";
@@ -99,7 +100,8 @@ export default function LandingPage() {
         <QuickLayout.Spacer />
         <QuickLayout.Column justifyContent="center" alignItems="center">
           <LandingHeader>{t("Quick Lesson")}</LandingHeader>
-          <BodyText>{t("Learn a new language in minutes.")}</BodyText>
+          <QuickText.AnimatedText 
+          text={[t("Learn a new language in minutes."), t("Learn a new language in minutes.")]} />
         </QuickLayout.Column>
         <QuickLayout.Column>
           <QuickButton title="Get Started" onPress={() => {}} />

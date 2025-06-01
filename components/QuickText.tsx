@@ -1,5 +1,6 @@
-import React from "react";
-import { Text, TextProps } from "react-native";
+import React, { useEffect, useState } from "react";
+import { TextProps } from "react-native";
+import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
 
 export const LandingHeader = ({ children, ...props }: TextProps) => {
   return (
@@ -32,8 +33,37 @@ export const BodyText = ({ children, ...props }: TextProps) => {
 
 const DefaultText = ({ children, ...props }: TextProps) => {
   return (
-    <Text style={props.style} {...props}>
+    <Animated.Text style={props.style} {...props}>
       {children}
-    </Text>
+    </Animated.Text>
+  );
+};
+
+const ANIMATED_TEXT_DURATION = 1000;
+
+export const AnimatedText = ({ text }: { text: string[] }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    animatedText();
+  }, []);
+
+  const animatedText = () => {
+    setInterval(() => {
+      setCurrentIndex((currentIndex) => {
+        if (currentIndex === text.length - 1) {
+          return 0;
+        }
+        return currentIndex + 1;
+      });
+    }, ANIMATED_TEXT_DURATION);
+  };
+
+  return (
+    <>
+      <DefaultText key={currentIndex} entering={FadeInDown} exiting={FadeOutUp}>
+        {text[currentIndex]}
+      </DefaultText>
+    </>
   );
 };
