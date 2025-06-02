@@ -49,6 +49,7 @@ const MatchWordsPage = ({
   topic,
   onComplete,
 }: MatchWordsPageProps) => {
+  
   const initialVocabulary = useMemo(() => {
     const pairs: Word[] = (lesson || [])
       .map((v) => {
@@ -206,7 +207,7 @@ const MatchWordsPage = ({
   }, [allMatched]);
 
   return (
-    <List.ScrollView  style={styles.container}>
+    <List.ScrollView style={styles.container}>
       <Text.Subheading>{subheading}</Text.Subheading>
       <Layout.Spacer />
       <Text.BodyText>{topic}</Text.BodyText>
