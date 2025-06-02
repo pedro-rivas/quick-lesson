@@ -31,6 +31,25 @@ export const View = ({ children, ...props }: LayoutProps) => {
   );
 };
 
+export const Header = ({ children, style, ...props }: LayoutProps) => {
+  return (
+    <RNView
+      style={[
+        {
+          flexDirection: 'row',
+          height: 50,
+          paddingHorizontal: 16,
+          alignItems: 'center',
+        },
+        style,
+      ]}
+      {...props}
+    >
+      {children}
+    </RNView>
+  );
+}
+
 export const Row = ({ children, style, ...props }: LayoutProps) => {
   return (
     <RNView

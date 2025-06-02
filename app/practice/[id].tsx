@@ -1,11 +1,12 @@
 import AnimatedBottomContainer from "@/components/AnimatedBottomContainer";
+import * as Button from "@/components/Button";
 import * as Layout from "@/components/Layout";
 import SafeAreaView from "@/components/layout/SafeAreaView";
 import MatchWordsPage from "@/components/MatchWordsPage";
 import QuickButton from "@/components/QuickButton";
 import * as Text from "@/components/Text";
 import { useLessonStore } from "@/store/lessonStore";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useState } from "react";
 import { StyleSheet } from "react-native";
 
@@ -21,8 +22,20 @@ export default function PracticeScreenPage() {
     setShowComplete(true);
   }, []);
 
+  const goBack = useCallback(() => {
+    router.back();
+  }, []);
+
   return (
     <SafeAreaView>
+      <Layout.Header>
+        <Button.Icon
+          name={"arrow.backward"}
+          size={24}
+          color={"black"}
+          onPress={goBack}
+        />
+      </Layout.Header>
       <MatchWordsPage
         lesson={lesson!.vocabulary}
         subheading="Tap the matching pairs"

@@ -1,5 +1,5 @@
 import * as QuickText from "@/components/Text";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 import Animated, {
   Easing,
@@ -22,12 +22,16 @@ const MatchCard =({
     selected,
     matched,
     error,
+    disabled,
+    hint,
     onPress,
   }: {
     word: string;
     selected: boolean;
     matched: boolean;
+    disabled: boolean;
     error: boolean;
+    hint: boolean;
     onPress: () => void;
   })  => {
     // shared value for rotation
@@ -35,8 +39,15 @@ const MatchCard =({
   
     // whenever `error` becomes true, run the wobble sequence
     useEffect(() => {
-      if (error) {
-        rotation.value = withSequence(
+      if (error || hint) {
+        wobble();
+      }
+        
+    }, [error, hint, rotation]);
+
+    const wobble = useCallback(() => {
+      'worklet';
+      rotation.value = withSequence(
           // start by rotating to -ANGLE
           withTiming(-ANGLE, { duration: 50, easing: EASING }),
           // wobble back and forth 7 times
@@ -51,13 +62,12 @@ const MatchCard =({
           // finally return to 0
           withTiming(0, { duration: 50, easing: EASING })
         );
-      }
-    }, [error, rotation]);
+    }, [rotation]);
+    
   
     // apply rotation to the card’s style
     const animatedStyle = useAnimatedStyle(() => ({
       transform: [{ rotateZ: `${rotation.value}deg` }],
-
     }));
   
     return (
@@ -67,10 +77,12 @@ const MatchCard =({
           selected && styles.selected,
           matched && styles.matched,
           error && styles.error,
+          disabled && styles.disabled,
+         // hint && { backgroundColor: '#d7ffb8'},
           animatedStyle,
         ]}
         onPress={onPress}
-        disabled={matched}
+        disabled={matched || disabled}
       >
         <View>
           <QuickText.BodyText
@@ -97,6 +109,7 @@ const MatchCard =({
       borderRadius: 16,
       backgroundColor: "#fff",
       borderWidth: 1,
+      borderBottomWidth: 2,
       borderColor: "#ebebeb",
       justifyContent: "center",
       alignItems: "center",
@@ -114,6 +127,9 @@ const MatchCard =({
       backgroundColor: "#ff0000",
       borderColor: "#ff0000",
     },
+    disabled: {
+      opacity: 0.5,
+    },
   });
   
   MatchCard.displayName = "MatchCard";
@@ -121,5 +137,7 @@ const MatchCard =({
   export default React.memo(MatchCard, (prevProps, nextProps) => {
     return  prevProps.selected === nextProps.selected &&
     prevProps.matched === nextProps.matched &&
-    prevProps.error === nextProps.error;
+    prevProps.error === nextProps.error &&
+    prevProps.disabled === nextProps.disabled &&
+    prevProps.hint === nextProps.hint
   });

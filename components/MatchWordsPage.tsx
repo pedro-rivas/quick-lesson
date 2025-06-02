@@ -4,10 +4,18 @@ import MatchCard from "@/components/MatchCard";
 import * as Text from "@/components/Text";
 import { Lesson } from "@/store/lessonStore";
 import * as Haptics from "expo-haptics";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { StyleSheet } from "react-native";
 
 const ERROR_DURATION = 800;
+const MATCH_DURATION = 600;
+const HINT_DELAY = 1500;
 
 function shuffleArray<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -24,24 +32,31 @@ interface Word {
   word: string;
   pair: string;
   error: boolean;
+  disabled: boolean;
+  hint: boolean;
 }
 
 interface MatchWordsPageProps {
-  lesson: Lesson['vocabulary'] | Lesson['phrases']
+  lesson: Lesson["vocabulary"];
   subheading: string;
   topic: string;
   onComplete: () => void;
 }
 
-const MatchWordsPage = ({ lesson, subheading, topic, onComplete }: MatchWordsPageProps) => {
+const MatchWordsPage = ({
+  lesson,
+  subheading,
+  topic,
+  onComplete,
+}: MatchWordsPageProps) => {
   const initialVocabulary = useMemo(() => {
     const pairs: Word[] = (lesson || [])
-    .map((v) => {
+      .map((v) => {
         return {
-            ...v,
-            word: ('term' in v ? v.term : v.phrase),
-        }
-    })
+          ...v,
+          word: v.term,
+        };
+      })
       .flatMap((v) => [
         {
           word: v.word,
@@ -49,6 +64,8 @@ const MatchWordsPage = ({ lesson, subheading, topic, onComplete }: MatchWordsPag
           selected: false,
           matched: false,
           error: false,
+          disabled: false,
+          hint: false,
         },
         {
           word: v.translation,
@@ -56,6 +73,8 @@ const MatchWordsPage = ({ lesson, subheading, topic, onComplete }: MatchWordsPag
           selected: false,
           matched: false,
           error: false,
+          disabled: false,
+          hint: false,
         },
       ])
       .filter((v) => v.word !== v.pair);
@@ -64,21 +83,84 @@ const MatchWordsPage = ({ lesson, subheading, topic, onComplete }: MatchWordsPag
 
   const [vocabulary, setVocabulary] = useState(initialVocabulary);
 
-  const shouldUnselect = useRef(false);
+  const shouldWait = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hintTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (shouldWait.current) return;
+
+    if (hintTimeout.current) {
+      clearTimeout(hintTimeout.current);
+    }
+
+    const selectedWords = vocabulary.filter((v) => v.selected);
+    const matchedWords = vocabulary.filter((v) => v.matched);
+    const errorWords = vocabulary.filter((v) => v.error);
+
+    // Clean up selected words after showing error state
+    if (errorWords.length === 2) {
+      shouldWait.current = setTimeout(() => {
+        setVocabulary((prev) =>
+          prev.map((v) => ({ ...v, selected: false, error: false, hint: false }))
+        );
+        shouldWait.current = null;
+      }, ERROR_DURATION);
+      return;
+    }
+
+    // Disable words that are matched
+    if (matchedWords.length === 2) {
+      shouldWait.current = setTimeout(() => {
+        setVocabulary((prev) =>
+          prev.map((v) => ({
+            ...v,
+            disabled: v.matched ? true : v.disabled,
+            matched: false,
+            selected: false,
+            error: false,
+            hint: false,
+          }))
+        );
+        shouldWait.current = null;
+      }, MATCH_DURATION);
+      return;
+    }
+
+    // Show hint
+    if (selectedWords.length === 1) {
+      hintTimeout.current = setTimeout(() => {
+        setVocabulary((prev) => {
+          return prev.map((v) => ({
+            ...v,
+            hint: v.word === selectedWords[0].pair ? true : false,
+          }));
+        });
+        shouldWait.current = null;
+      }, HINT_DELAY);
+    }
+  }, [vocabulary]);
 
   const handleSelect = useCallback((item: Word) => {
-    if (shouldUnselect.current) return;
+    if (shouldWait.current) return;
 
-    Haptics.selectionAsync();
+    if(hintTimeout.current) {
+      clearTimeout(hintTimeout.current);
+    }
+
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     setVocabulary((prev) => {
       let update = prev.map((v) =>
-        v.word === item.word ? { ...v, selected: !v.selected } : v
+        v.word === item.word ? { 
+          ...v, 
+          selected: !v.selected,
+        } : v
       );
 
       const selectedWords = update.filter((v) => v.selected);
 
       if (selectedWords.length === 2) {
+        // Match
         if (selectedWords[0].pair === selectedWords[1].word) {
           return update.map((v) => ({
             ...v,
@@ -90,22 +172,12 @@ const MatchWordsPage = ({ lesson, subheading, topic, onComplete }: MatchWordsPag
           }));
         }
 
-        // If not, deselect the words
-        shouldUnselect.current = true;
+        // No match
         return update.map((v) => ({ ...v, error: v.selected ? true : false }));
       }
 
       return update;
     });
-
-    if (shouldUnselect.current) {
-      setTimeout(() => {
-        setVocabulary((prev) =>
-          prev.map((v) => ({ ...v, selected: false, error: false }))
-        );
-        shouldUnselect.current = false;
-      }, ERROR_DURATION);
-    }
   }, []);
 
   const renderVocabulary = useCallback((vocabulary: Word[]) => {
@@ -116,23 +188,25 @@ const MatchWordsPage = ({ lesson, subheading, topic, onComplete }: MatchWordsPag
         selected={v.selected}
         matched={v.matched}
         error={v.error}
+        disabled={v.disabled}
+        hint={v.hint}
         onPress={() => handleSelect(v)}
       />
     ));
   }, []);
 
   const allMatched = useMemo(() => {
-    return vocabulary.every((v) => v.matched);
+    return vocabulary.every((v) => v.disabled || v.matched);
   }, [vocabulary]);
 
   useEffect(() => {
     if (allMatched) {
-        onComplete();
+      onComplete();
     }
-  }, [allMatched])
+  }, [allMatched]);
 
   return (
-    <List.ScrollView style={styles.container}>
+    <List.ScrollView  style={styles.container}>
       <Text.Subheading>{subheading}</Text.Subheading>
       <Layout.Spacer />
       <Text.BodyText>{topic}</Text.BodyText>
