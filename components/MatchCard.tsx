@@ -128,7 +128,7 @@ const MatchCard =({
       borderColor: "#ff0000",
     },
     disabled: {
-      opacity: 0.5,
+      opacity: 0.4,
     },
   });
   

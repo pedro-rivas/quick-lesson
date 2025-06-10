@@ -3,6 +3,7 @@ import * as List from "@/components/List";
 import MatchCard from "@/components/MatchCard";
 import * as Text from "@/components/Text";
 import { Lesson } from "@/store/lessonStore";
+import { shuffleArray } from "@/utils";
 import * as Haptics from "expo-haptics";
 import React, {
   useCallback,
@@ -17,15 +18,6 @@ const ERROR_DURATION = 800;
 const MATCH_DURATION = 600;
 const HINT_DELAY = 1500;
 
-function shuffleArray<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
 interface Word {
   selected: boolean;
   matched: boolean;
@@ -37,14 +29,14 @@ interface Word {
 }
 
 interface MatchWordsPageProps {
-  lesson: Lesson["vocabulary"];
+  vocabulary: Lesson["vocabulary"];
   subheading: string;
   topic: string;
   onComplete: () => void;
 }
 
 const MatchWordsPage = ({
-  lesson,
+  vocabulary: lesson,
   subheading,
   topic,
   onComplete,
@@ -225,5 +217,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
 });
+
+MatchWordsPage.displayName = "MatchWordsPage";
 
 export default React.memo(MatchWordsPage);
