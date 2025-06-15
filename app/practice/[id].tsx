@@ -130,8 +130,7 @@ export default function PracticeScreenPage() {
           return null;
         })}
       </PagerView>
-
-      <AnimatedBottomContainer show={showComplete}>
+      <AnimatedBottomContainer show={false}>
         <Text.Subheading style={{ color: "white" }}>{t('Great job!')}</Text.Subheading>
         <Layout.Spacer />
         <QuickButton title="Next" secondary onPress={onNextPage} />

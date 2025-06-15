@@ -1,3 +1,4 @@
+import React from "react";
 import { View as RNView, ViewProps } from "react-native";
 
 interface LayoutProps extends ViewProps {
@@ -31,7 +32,7 @@ export const View = ({ children, ...props }: LayoutProps) => {
   );
 };
 
-export const Header = ({ children, style, ...props }: LayoutProps) => {
+export const Header = React.memo(({ children, style, ...props }: LayoutProps) => {
   return (
     <RNView
       style={[
@@ -40,6 +41,8 @@ export const Header = ({ children, style, ...props }: LayoutProps) => {
           height: 50,
           paddingHorizontal: 16,
           alignItems: 'center',
+          borderBottomWidth: 1,
+          borderBottomColor: '#ebebeb',
         },
         style,
       ]}
@@ -48,7 +51,7 @@ export const Header = ({ children, style, ...props }: LayoutProps) => {
       {children}
     </RNView>
   );
-}
+})
 
 export const Row = ({ children, style, ...props }: LayoutProps) => {
   return (

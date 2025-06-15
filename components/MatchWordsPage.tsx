@@ -1,10 +1,9 @@
 import * as Layout from "@/components/Layout";
 import * as List from "@/components/List";
-import MatchCard from "@/components/MatchCard";
 import * as Text from "@/components/Text";
+import WordButton from "@/components/WordButton";
 import { Lesson } from "@/store/lessonStore";
 import { shuffleArray } from "@/utils";
-import * as Haptics from "expo-haptics";
 import React, {
   useCallback,
   useEffect,
@@ -14,9 +13,9 @@ import React, {
 } from "react";
 import { StyleSheet } from "react-native";
 
-const ERROR_DURATION = 800;
+export const ERROR_DURATION = 800;
 const MATCH_DURATION = 600;
-const HINT_DELAY = 1500;
+export const HINT_DELAY = 1600;
 
 interface Word {
   selected: boolean;
@@ -140,8 +139,6 @@ const MatchWordsPage = ({
       clearTimeout(hintTimeout.current);
     }
 
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
     setVocabulary((prev) => {
       let update = prev.map((v) =>
         v.word === item.word ? { 
@@ -175,7 +172,7 @@ const MatchWordsPage = ({
 
   const renderVocabulary = useCallback((vocabulary: Word[]) => {
     return vocabulary.map((v, index) => (
-      <MatchCard
+      <WordButton
         key={v.word + index}
         word={v.word}
         selected={v.selected}

@@ -35,6 +35,40 @@ export const Subheading = ({ children, style, ...props }: QuickTextProps) => {
   );
 };
 
+export const H3 = ({ children, style, ...props }: QuickTextProps) => {
+  return (
+    <DefaultText
+      style={[
+        {
+          fontSize: 20,
+          fontWeight: "bold",
+        },
+        style,
+      ]}
+      {...props}
+    >
+      {children}
+    </DefaultText>
+  );
+}
+
+export const H4 = ({ children, style, ...props }: QuickTextProps) => {
+  return (
+    <DefaultText
+      style={[
+        {
+          fontSize: 18,
+          fontWeight: "bold",
+        },
+        style,
+      ]}
+      {...props}
+    >
+      {children}
+    </DefaultText>
+  );
+}
+
 export const BodyText = ({ children, style, ...props }: QuickTextProps) => {
   return (
     <DefaultText
