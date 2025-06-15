@@ -63,18 +63,14 @@ export default function PracticeScreenPage() {
     const secondWordExercise = wordExercises.slice(firstCount);
 
     return [
-       ...firstWordExercise.map((exercise) => ({
+      {
+        type:  LessonType.MATCH_WORDS,
+        vocabulary: firstVocabularyLesson,
+      },
+      ...firstWordExercise.map((exercise) => ({
         type: LessonType.COMPLETE_WORDS,
         exercise,
       })),
-      {
-        type:  LessonType.MATCH_WORDS,
-        exercise: firstVocabularyLesson,
-      },
-      // ...firstWordExercise.map((exercise) => ({
-      //   type: LessonType.COMPLETE_WORDS,
-      //   exercise,
-      // })),
       {
         type: LessonType.MATCH_WORDS,
         vocabulary: secondVocabularyLesson,
@@ -100,7 +96,7 @@ export default function PracticeScreenPage() {
         ref={pagerRef}
         style={styles.pagerContainer}
         initialPage={0}
-        scrollEnabled={false}
+        scrollEnabled={true}
       >
         {exercises.map((exercise, index) => {
           if (exercise.type === LessonType.MATCH_WORDS) {
