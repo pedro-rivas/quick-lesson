@@ -1,7 +1,12 @@
 import useTranslation from "@/hooks/useTranslation";
 import React, { useEffect, useRef, useState } from "react";
 import { TextProps } from "react-native";
-import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
+import Animated, {
+  FadeIn,
+  FadeInDown,
+  FadeOut,
+  FadeOutUp,
+} from "react-native-reanimated";
 import * as QuickLayout from "./Layout";
 
 interface QuickTextProps extends TextProps {}
@@ -24,10 +29,13 @@ export const LandingHeader = ({ children, ...props }: QuickTextProps) => {
 export const Subheading = ({ children, style, ...props }: QuickTextProps) => {
   return (
     <DefaultText
-      style={[{
-        fontSize: 20,
-        fontWeight: "bold",
-      }, style]}
+      style={[
+        {
+          fontSize: 20,
+          fontWeight: "bold",
+        },
+        style,
+      ]}
       {...props}
     >
       {children}
@@ -50,7 +58,7 @@ export const H3 = ({ children, style, ...props }: QuickTextProps) => {
       {children}
     </DefaultText>
   );
-}
+};
 
 export const H4 = ({ children, style, ...props }: QuickTextProps) => {
   return (
@@ -67,7 +75,7 @@ export const H4 = ({ children, style, ...props }: QuickTextProps) => {
       {children}
     </DefaultText>
   );
-}
+};
 
 export const BodyText = ({ children, style, ...props }: QuickTextProps) => {
   return (
@@ -94,11 +102,29 @@ const DefaultText = ({ children, ...props }: QuickTextProps) => {
 };
 
 const ANIMATED_TEXT_DURATION = 1000;
+const TEXT_ANIMATION = {
+  default: {
+    entering: FadeInDown,
+    exiting: FadeOutUp,
+  },
+  fade: {
+    entering: FadeIn,
+    exiting: FadeOut,
+  },
+};
 
 export const AnimatedText = ({
   text,
+  texOnly = false,
+  speed = ANIMATED_TEXT_DURATION,
+  animation = "default",
   ...props
-}: { text: string[] } & TextProps) => {
+}: {
+  text: string[];
+  texOnly?: boolean;
+  speed?: number;
+  animation?: "default" | "fade";
+} & TextProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const t = useTranslation();
   const interval = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -121,19 +147,27 @@ export const AnimatedText = ({
         }
         return currentIndex + 1;
       });
-    }, ANIMATED_TEXT_DURATION);
+    }, speed);
   };
+
+  const { entering, exiting } = TEXT_ANIMATION[animation];
 
   return (
     <>
-      <DefaultText style={[props.style, { fontSize: 14, opacity: 0.8 }]}>
-        {t("For")}
-      </DefaultText>
-      <QuickLayout.Spacer size="s" />
+      {texOnly ? null : (
+        <>
+          <DefaultText style={[props.style, { fontSize: 14, opacity: 0.8 }]}>
+            {t("For")}
+          </DefaultText>
+          <QuickLayout.Spacer size="s" />
+        </>
+      )}
+
       <DefaultText
         key={currentIndex}
-        entering={FadeInDown}
-        exiting={FadeOutUp}
+        // @ts-ignore
+        entering={entering}
+        exiting={exiting}
         {...props}
       >
         {text[currentIndex]}

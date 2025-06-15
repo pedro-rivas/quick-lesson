@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { HINT_DELAY } from "./MatchWordsPage";
+import QuickSpeechButton from "./SpeechButton";
 import WordButton from "./WordButton";
 
 const cleanWord = (word: string) => {
@@ -26,6 +27,7 @@ const CompleteTheWordPage = ({
   onComplete,
 }: CompleteTheWordPageProps) => {
   const word = exercise.word.term;
+  const translatedWord = exercise.word.translation;
 
   const { width } = useWindowDimensions();
 
@@ -90,7 +92,7 @@ const CompleteTheWordPage = ({
     if (!nextLetter) {
       return;
     }
-        
+
     shouldWait.current = true;
 
     hintTimeout.current = setTimeout(() => {
@@ -183,7 +185,19 @@ const CompleteTheWordPage = ({
       <Layout.Column>
         <Text.Subheading>{subheading}</Text.Subheading>
         <Layout.Spacer />
-        <Text.BodyText>{word}</Text.BodyText>
+        <Layout.Row alignItems="center">
+          <QuickSpeechButton text={word}/>
+          <Layout.Spacer size={'s'}/>
+          <Text.AnimatedText
+            text={[word, translatedWord]}
+            texOnly
+            speed={5000}
+            animation={"fade"}
+            style={{
+              fontSize: 18,
+            }}
+          />
+        </Layout.Row>
         <Layout.Spacer />
         <Layout.Row style={styles.wordContainer} flexWrap="wrap" gap={8}>
           <WordsPlaceholder word={cleanWord(word)} />

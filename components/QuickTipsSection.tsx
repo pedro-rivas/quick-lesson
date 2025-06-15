@@ -1,7 +1,7 @@
 import { AntDesign } from '@expo/vector-icons';
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import QuickSpeechButton from './QuickSpeechButton';
+import QuickSpeechButton from './SpeechButton';
 
 interface Example {
   sentence: string;

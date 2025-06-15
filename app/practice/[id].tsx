@@ -4,6 +4,7 @@ import CompleteTheWordPage from "@/components/CompleteTheWordPage";
 import * as Layout from "@/components/Layout";
 import SafeAreaView from "@/components/layout/SafeAreaView";
 import MatchWordsPage from "@/components/MatchWordsPage";
+import ProgressBar from "@/components/ProgressBar";
 import QuickButton from "@/components/QuickButton";
 import * as Text from "@/components/Text";
 import useTranslation from "@/hooks/useTranslation";
@@ -51,7 +52,6 @@ export default function PracticeScreenPage() {
   const exercises = useMemo(() => {
     if (!lesson?.vocabulary) return [];
 
-
     // Vocabulary - Match Words
     const vocab = lesson.vocabulary
     const firstCount = Math.floor(vocab.length / 2);
@@ -82,6 +82,10 @@ export default function PracticeScreenPage() {
     ].filter(Boolean);
   }, [lesson]);
 
+  const progress = useMemo(() => {
+    return Math.round((page * 100) /  exercises.length);
+  }, [page, exercises.length]);
+
   return (
     <SafeAreaView>
       <Layout.Header>
@@ -91,12 +95,14 @@ export default function PracticeScreenPage() {
           color={"black"}
           onPress={goBack}
         />
+        <Layout.Spacer/>
+        <ProgressBar progress={progress} />
       </Layout.Header>
       <PagerView
         ref={pagerRef}
         style={styles.pagerContainer}
-        initialPage={0}
-        scrollEnabled={true}
+        initialPage={1}
+        scrollEnabled={false}
       >
         {exercises.map((exercise, index) => {
           if (exercise.type === LessonType.MATCH_WORDS) {
@@ -117,7 +123,6 @@ export default function PracticeScreenPage() {
                 key={`page-${index}`}
                 exercise={exercise.exercise}
                 subheading={t('Complete the word')}
-                topic={t('Vocabulary')}
                 onComplete={handleComplete}
               />
             );
@@ -126,7 +131,10 @@ export default function PracticeScreenPage() {
           return null;
         })}
       </PagerView>
-      <AnimatedBottomContainer show={false}>
+      <Layout.Row padding={16}>
+        <QuickButton title="Skip" onPress={onNextPage} style={{ width:'100%'}} secondary/>
+      </Layout.Row>
+      <AnimatedBottomContainer show={showComplete}>
         <Text.Subheading style={{ color: "white" }}>{t('Great job!')}</Text.Subheading>
         <Layout.Spacer />
         <QuickButton title="Next" secondary onPress={onNextPage} />
