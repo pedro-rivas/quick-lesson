@@ -1,4 +1,4 @@
-import QuickButton from "@/components/QuickButton";
+import QuickButton from "@/components/Button";
 import { AVAILABLE_LANGUAGES } from "@/constants/languages"; // Assuming this path is correct
 import { AntDesign } from "@expo/vector-icons";
 import React from "react";

@@ -34,7 +34,7 @@ const CompleteTheWordPage = ({
   const initalLetters = useMemo(() => {
     return exercise.letters.map((l) => ({
       id: Date.now() + Math.random().toString(36).substring(2, 15),
-      word: l,
+      word: l.toLocaleLowerCase(),
       pair: "",
       selected: false,
       matched: false,

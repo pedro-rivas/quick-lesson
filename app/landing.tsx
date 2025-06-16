@@ -1,6 +1,6 @@
+import QuickButton from "@/components/Button";
 import * as QuickLayout from "@/components/Layout";
 import QuickSafeAreaView from "@/components/layout/SafeAreaView";
-import QuickButton from "@/components/QuickButton";
 import * as QuickText from "@/components/Text";
 import useTranslation from "@/hooks/useTranslation";
 import { useSession } from "@/providers/AuthContext";

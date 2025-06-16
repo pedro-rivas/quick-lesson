@@ -1,9 +1,9 @@
 import { createLesson } from "@/api/gemini";
+import QuickButton from "@/components/Button";
 import QuickSafeAreaView from "@/components/layout/SafeAreaView";
 import LessonCard from "@/components/LessonCard";
 import LessonEmptyState from "@/components/LessonEmptyState";
 import LessonGeneratorForm from "@/components/LessonGeneratorForm";
-import QuickButton from "@/components/QuickButton";
 import useTranslation from "@/hooks/useTranslation";
 import { Lesson, useLessonStore } from "@/store/lessonStore";
 import { router } from "expo-router";

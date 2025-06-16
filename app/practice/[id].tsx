@@ -1,11 +1,10 @@
 import AnimatedBottomContainer from "@/components/AnimatedBottomContainer";
-import * as Button from "@/components/Button";
+import Button, { IconButton } from "@/components/Button";
 import CompleteTheWordPage from "@/components/CompleteTheWordPage";
 import * as Layout from "@/components/Layout";
 import SafeAreaView from "@/components/layout/SafeAreaView";
 import MatchWordsPage from "@/components/MatchWordsPage";
 import ProgressBar from "@/components/ProgressBar";
-import QuickButton from "@/components/QuickButton";
 import * as Text from "@/components/Text";
 import useTranslation from "@/hooks/useTranslation";
 import { useLessonStore } from "@/store/lessonStore";
@@ -89,9 +88,8 @@ export default function PracticeScreenPage() {
   return (
     <SafeAreaView>
       <Layout.Header>
-        <Button.Icon
-          name={"arrow.backward"}
-          size={24}
+        <IconButton
+          name={"chevron.left"}
           color={"black"}
           onPress={goBack}
         />
@@ -132,12 +130,12 @@ export default function PracticeScreenPage() {
         })}
       </PagerView>
       <Layout.Row padding={16}>
-        <QuickButton title="Skip" onPress={onNextPage} style={{ width:'100%'}} secondary/>
+        <Button title="Skip" onPress={onNextPage} style={{ width:'100%'}} secondary/>
       </Layout.Row>
       <AnimatedBottomContainer show={showComplete}>
         <Text.Subheading style={{ color: "white" }}>{t('Great job!')}</Text.Subheading>
         <Layout.Spacer />
-        <QuickButton title="Next" secondary onPress={onNextPage} />
+        <Button title="Next" secondary onPress={onNextPage} />
       </AnimatedBottomContainer>
     </SafeAreaView>
   );

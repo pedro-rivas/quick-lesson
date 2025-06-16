@@ -1,6 +1,5 @@
-import { textToSpeech } from "@/lib/texToSpeech";
+import useSpeech from "@/hooks/useSeech";
 import { AntDesign } from "@expo/vector-icons";
-import { createAudioPlayer } from "expo-audio";
 import React, { useCallback } from "react";
 import { ActivityIndicator, Pressable } from "react-native";
 
@@ -20,32 +19,11 @@ interface SpeechButtonProps {
  */
 const SpeechButton = ({ text }: SpeechButtonProps) => {
   const [loading, setLoading] = React.useState(false);
+  const speech = useSpeech(text);
 
   const handlePress = useCallback(() => {
-    setLoading(true);
-    textToSpeech(text, "tr-TR")
-      .then(speak)
-      .catch((error) => {
-        console.error("Error generating speech: ", error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    speech.play();
   }, [text]);
-
-  const speak = useCallback((uri: string, tries = 1) => {
-    try {
-      const player = createAudioPlayer(uri);
-      player.play();
-    } catch (error) {
-      console.log("Error playing audio: ", error);
-      if (tries < 3) {
-        setTimeout(() => {
-          speak(uri, tries + 1);
-        }, 300);
-      }
-    }
-  }, []);
 
   return (
     <Pressable onPress={handlePress}>

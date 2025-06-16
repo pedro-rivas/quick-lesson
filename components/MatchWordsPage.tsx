@@ -15,7 +15,7 @@ import { StyleSheet } from "react-native";
 
 export const ERROR_DURATION = 800;
 const MATCH_DURATION = 600;
-export const HINT_DELAY = 1600;
+export const HINT_DELAY = 1000;
 
 interface Word {
   selected: boolean;

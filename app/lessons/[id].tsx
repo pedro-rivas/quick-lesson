@@ -1,6 +1,6 @@
+import QuickButton from "@/components/Button";
 import * as QuickLayout from "@/components/Layout";
 import QuickSafeAreaView from "@/components/layout/SafeAreaView";
-import QuickButton from "@/components/QuickButton";
 import QuickPhrasesSection from "@/components/QuickPhrasesSection";
 import QuickTipsSection from "@/components/QuickTipsSection";
 import QuickVocabularySection from "@/components/QuickVocabularySection";
