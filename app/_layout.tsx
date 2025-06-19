@@ -5,7 +5,7 @@ import { SplashScreenController } from "@/splash";
 import { DarkTheme, LightTheme } from "@/theme";
 import { ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { StyleSheet } from "react-native";
+import { StatusBar, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { RootNavigator } from "@/navigation";
@@ -24,6 +24,7 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={styles.gestureHandler}>
+      <StatusBar backgroundColor={colorScheme === "dark" ? 'black' : 'white'} barStyle={colorScheme === "dark" ? 'light-content' : 'dark-content'} />
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : LightTheme}>
         <SessionProvider>
           <SplashScreenController />

@@ -1,4 +1,4 @@
-import QuickButton from "@/components/Button";
+import QuickButton from "@/components/buttons/Button";
 import * as QuickLayout from "@/components/Layout";
 import QuickSafeAreaView from "@/components/layout/SafeAreaView";
 import QuickPhrasesSection from "@/components/QuickPhrasesSection";
@@ -15,8 +15,9 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  View,
+  View
 } from "react-native";
+
 
 export default function LessonDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();

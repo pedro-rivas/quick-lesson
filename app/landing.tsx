@@ -1,4 +1,4 @@
-import QuickButton from "@/components/Button";
+import QuickButton from "@/components/buttons/Button";
 import * as QuickLayout from "@/components/Layout";
 import QuickSafeAreaView from "@/components/layout/SafeAreaView";
 import * as QuickText from "@/components/Text";

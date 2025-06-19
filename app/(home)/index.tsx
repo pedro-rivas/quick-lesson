@@ -1,22 +1,22 @@
 import { createLesson } from "@/api/gemini";
-import QuickButton from "@/components/Button";
+import QuickButton from "@/components/buttons/Button";
 import QuickSafeAreaView from "@/components/layout/SafeAreaView";
 import LessonCard from "@/components/LessonCard";
 import LessonEmptyState from "@/components/LessonEmptyState";
 import LessonGeneratorForm from "@/components/LessonGeneratorForm";
+import * as List from "@/components/List";
 import useTranslation from "@/hooks/useTranslation";
 import { Lesson, useLessonStore } from "@/store/lessonStore";
 import { router } from "expo-router";
-import React from "react";
+import React, { useCallback } from "react";
 import {
   Alert,
-  FlatList,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
-  View,
+  View
 } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
@@ -76,7 +76,7 @@ export default function HomeScreen() {
     router.push(`/lessons/${lesson.id}` as any);
   };
 
-  const renderItem = ({ item }: { item: Lesson }) => {
+  const renderItem = useCallback(({ item }: { item: Lesson }) => {
     return (
       <LessonCard
         lesson={item}
@@ -84,7 +84,7 @@ export default function HomeScreen() {
         onDelete={handleDeleteLesson}
       />
     );
-  };
+  }, []);
 
   return (
     <QuickSafeAreaView>
@@ -118,7 +118,7 @@ export default function HomeScreen() {
           {lessons.length === 0 && !loading ? (
             <LessonEmptyState />
           ) : (
-            <FlatList
+            <List.FlatList
               data={lessons}
               renderItem={renderItem}
               keyExtractor={(item) => item.id}

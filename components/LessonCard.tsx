@@ -1,8 +1,19 @@
 import { Lesson } from "@/store/lessonStore"; // Assuming Lesson type is here
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { useTheme } from "@react-navigation/native";
+import * as Haptics from "expo-haptics";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import Animated, {
+  interpolate,
+  interpolateColor,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+} from "react-native-reanimated";
+import IconButton from "./buttons/IconButton";
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+const MIN_SCALE = 0.99;
 
 interface LessonCardProps {
   lesson: Lesson;
@@ -25,22 +36,74 @@ const LessonCard: React.FC<LessonCardProps> = ({
 }) => {
   const { colors } = useTheme();
 
+  const pressed = useSharedValue(0);
+  const alreadyPressed = useSharedValue(false);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        scale: interpolate(pressed.value, [0, 1], [1, MIN_SCALE]),
+      },
+    ],
+    borderColor: colors.border,
+    borderBottomWidth: interpolate(pressed.value, [0, 1], [2, 1]),
+    backgroundColor: interpolateColor(
+      pressed.value,
+      [0, 1],
+      ["#fff", "rgba(245, 245, 245, 0.4)"]
+    ),
+  }));
+
+  const iconAnimatedStyle = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(
+      pressed.value,
+      [0, 1],
+      ["#fff", "rgba(245, 245, 245, 0.4)"]
+    ),
+  }));
+
+  const onPressIn = () => {
+    "worklet";
+    pressed.value = 1;
+    runOnJS(vibrate)();
+  };
+
+  const onPressOut = () => {
+    "worklet";
+    pressed.value = 0;
+    if (alreadyPressed.value) return;
+    alreadyPressed.value = true;
+    runOnJS(onPressed)();
+  };
+
+  const onPressed = () => {
+    onView(lesson);
+    setTimeout(() => {
+      alreadyPressed.value = false;
+    }, 1500);
+  }
+
+  const vibrate = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
   return (
-    <Pressable
-      style={[styles.lessonCard, { borderColor: colors.border }]}
-      onPress={() => onView(lesson)}
+    <AnimatedPressable
+      style={[styles.lessonCard, animatedStyle]}
+      onPressIn={onPressIn}
+      onPressOut={onPressOut}
     >
       <View style={styles.lessonCardContent}>
         <View style={styles.lessonCardHeader}>
           <Text style={styles.lessonTitleText} numberOfLines={2}>
             {lesson.title}
           </Text>
-          <Pressable
+          <IconButton
             onPress={() => onDelete(lesson.id, lesson.title)}
-            style={styles.lessonDeleteButton}
-          >
-            <MaterialIcons name="delete" size={20} color="#ff5252" />
-          </Pressable>
+            name={"delete"}
+            color="#ff5252"
+            animatedStyle={iconAnimatedStyle}
+          />
         </View>
 
         <View style={styles.lessonCardDetails}>
@@ -69,31 +132,17 @@ const LessonCard: React.FC<LessonCardProps> = ({
           </View>
         </View>
       </View>
-      <AntDesign
-        name="right"
-        size={16}
-        color="#999"
-        style={styles.lessonChevron}
-      />
-    </Pressable>
+    </AnimatedPressable>
   );
 };
 
 const styles = StyleSheet.create({
   lessonCard: {
-    backgroundColor: "#fff",
     borderRadius: 16,
-    padding: 16,
     marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#ebebeb",
   },
   lessonCardContent: {
     flex: 1,
@@ -101,7 +150,11 @@ const styles = StyleSheet.create({
   lessonCardHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-start",
+    alignItems: "center",
+    padding: 16,
+    paddingTop: 8,
+    paddingRight: 8,
+    paddingBottom: 0,
     marginBottom: 8,
   },
   lessonTitleText: {
@@ -119,6 +172,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 12,
+    paddingHorizontal: 16,
   },
   lessonLanguageText: {
     fontSize: 14,
@@ -136,6 +190,7 @@ const styles = StyleSheet.create({
   lessonStatsContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
+    paddingBottom: 16,
   },
   lessonStat: {
     alignItems: "center",
