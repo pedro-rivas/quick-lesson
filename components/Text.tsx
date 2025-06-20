@@ -1,6 +1,6 @@
 import useTranslation from "@/hooks/useTranslation";
 import React, { useEffect, useRef, useState } from "react";
-import { TextProps } from "react-native";
+import { TextProps as RNTextProps } from "react-native";
 import Animated, {
   FadeIn,
   FadeInDown,
@@ -9,9 +9,11 @@ import Animated, {
 } from "react-native-reanimated";
 import * as QuickLayout from "./Layout";
 
-interface QuickTextProps extends TextProps {}
+interface TextProps extends RNTextProps {
+  bold?: boolean;
+}
 
-export const LandingHeader = ({ children, ...props }: QuickTextProps) => {
+export const LandingHeader = ({ children, ...props }: TextProps) => {
   return (
     <DefaultText
       style={{
@@ -26,7 +28,7 @@ export const LandingHeader = ({ children, ...props }: QuickTextProps) => {
   );
 };
 
-export const Subheading = ({ children, style, ...props }: QuickTextProps) => {
+export const Subheading = ({ children, style, ...props }: TextProps) => {
   return (
     <DefaultText
       style={[
@@ -43,7 +45,24 @@ export const Subheading = ({ children, style, ...props }: QuickTextProps) => {
   );
 };
 
-export const H3 = ({ children, style, ...props }: QuickTextProps) => {
+export const H2 = ({ children, style, ...props }: TextProps) => {
+  return (
+    <DefaultText
+      style={[
+        {
+          fontSize: 24,
+          fontWeight: "bold",
+        },
+        style,
+      ]}
+      {...props}
+    >
+      {children}
+    </DefaultText>
+  );
+};
+
+export const H3 = ({ children, style, ...props }: TextProps) => {
   return (
     <DefaultText
       style={[
@@ -60,7 +79,7 @@ export const H3 = ({ children, style, ...props }: QuickTextProps) => {
   );
 };
 
-export const H4 = ({ children, style, ...props }: QuickTextProps) => {
+export const H4 = ({ children, style, ...props }: TextProps) => {
   return (
     <DefaultText
       style={[
@@ -77,12 +96,13 @@ export const H4 = ({ children, style, ...props }: QuickTextProps) => {
   );
 };
 
-export const BodyText = ({ children, style, ...props }: QuickTextProps) => {
+export const Body = ({ children, style, ...props }: TextProps) => {
   return (
     <DefaultText
       style={[
         {
           fontSize: 16,
+          fontWeight: props.bold ? "bold" : "normal",
         },
         style,
       ]}
@@ -93,7 +113,7 @@ export const BodyText = ({ children, style, ...props }: QuickTextProps) => {
   );
 };
 
-const DefaultText = ({ children, ...props }: QuickTextProps) => {
+const DefaultText = ({ children, ...props }: TextProps) => {
   return (
     <Animated.Text style={props.style} {...props}>
       {children}

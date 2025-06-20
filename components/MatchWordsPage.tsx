@@ -199,7 +199,7 @@ const MatchWordsPage = ({
     <List.ScrollView style={styles.container}>
       <Text.Subheading>{subheading}</Text.Subheading>
       <Layout.Spacer />
-      <Text.BodyText>{topic}</Text.BodyText>
+      <Text.Body>{topic}</Text.Body>
       <Layout.Spacer />
       <Layout.Row gap={16} flexWrap="wrap">
         {renderVocabulary(vocabulary)}

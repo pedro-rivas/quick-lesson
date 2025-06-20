@@ -3,9 +3,9 @@ import Button from "@/components/buttons/Button";
 import IconButton from "@/components/buttons/IconButton";
 import CompleteTheWordPage from "@/components/CompleteTheWordPage";
 import * as Layout from "@/components/Layout";
-import SafeAreaView from "@/components/layout/SafeAreaView";
 import MatchWordsPage from "@/components/MatchWordsPage";
 import ProgressBar from "@/components/ProgressBar";
+import SafeAreaView from "@/components/SafeAreaView";
 import useTranslation from "@/hooks/useTranslation";
 import { useLessonStore } from "@/store/lessonStore";
 import * as lessonUtils from "@/utils/lessons";
@@ -108,6 +108,7 @@ export default function PracticeScreenPage() {
         <Layout.Spacer />
         <ProgressBar progress={progress} />
       </Layout.Header>
+ 
       <PagerView
         ref={pagerRef}
         style={styles.pagerContainer}

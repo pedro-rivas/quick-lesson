@@ -1,10 +1,10 @@
 import { createLesson } from "@/api/gemini";
 import QuickButton from "@/components/buttons/Button";
-import QuickSafeAreaView from "@/components/layout/SafeAreaView";
 import LessonCard from "@/components/LessonCard";
 import LessonEmptyState from "@/components/LessonEmptyState";
 import LessonGeneratorForm from "@/components/LessonGeneratorForm";
 import * as List from "@/components/List";
+import QuickSafeAreaView from "@/components/SafeAreaView";
 import useTranslation from "@/hooks/useTranslation";
 import { Lesson, useLessonStore } from "@/store/lessonStore";
 import { router } from "expo-router";
@@ -54,7 +54,7 @@ export default function HomeScreen() {
     }
   };
 
-  const handleDeleteLesson = (id: string, title: string) => {
+  const handleDeleteLesson = useCallback((id: string, title: string) => {
     Alert.alert(
       "Delete Lesson",
       `Are you sure you want to delete "${title}"?`,
@@ -70,11 +70,11 @@ export default function HomeScreen() {
         },
       ]
     );
-  };
+  }, [])
 
-  const handleViewLesson = (lesson: Lesson) => {
+  const handleViewLesson = useCallback((lesson: Lesson) => {
     router.push(`/lessons/${lesson.id}` as any);
-  };
+  }, []);
 
   const renderItem = useCallback(({ item }: { item: Lesson }) => {
     return (
@@ -129,7 +129,6 @@ export default function HomeScreen() {
             />
           )}
         </View>
-        {/* --- End My Lessons Section --- */}
       </ScrollView>
 
       <KeyboardAvoidingView
@@ -173,7 +172,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: "bold",
-    marginBottom: 24,
+    marginVertical: 24,
     color: "#222",
   },
   bigTitle: {
@@ -186,7 +185,7 @@ const styles = StyleSheet.create({
     // backgroundColor: "#0b57d0",
   },
   lessonsSectionContainer: {
-    marginTop: 32,
+
   },
   lessonsHeader: {
     marginBottom: 24,

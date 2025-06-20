@@ -1,23 +1,19 @@
-import QuickButton from "@/components/buttons/Button";
-import * as QuickLayout from "@/components/Layout";
-import QuickSafeAreaView from "@/components/layout/SafeAreaView";
-import QuickPhrasesSection from "@/components/QuickPhrasesSection";
-import QuickTipsSection from "@/components/QuickTipsSection";
-import QuickVocabularySection from "@/components/QuickVocabularySection";
+import * as Layout from "@/components/Layout";
+import LessonNotFound from "@/components/LessonNotFound";
+import * as List from "@/components/List";
+import Pager from "@/components/Pager";
+import PhrasesSection from "@/components/QuickPhrasesSection";
+import TipsSection from "@/components/QuickTipsSection";
+import VocabularySection from "@/components/QuickVocabularySection";
+import SafeAreaView from "@/components/SafeAreaView";
+import { TabBar } from "@/components/TabBar";
+import Button from "@/components/buttons/Button";
+import IconButton from "@/components/buttons/IconButton";
 import { useLessonStore } from "@/store/lessonStore";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useState } from "react";
-import {
-  Alert,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View
-} from "react-native";
-
+import React, { useCallback, useState } from "react";
+import { Alert, StyleSheet, Text } from "react-native";
 
 export default function LessonDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -27,25 +23,10 @@ export default function LessonDetailScreen() {
   const lesson = getLessonById(id!);
 
   if (!lesson) {
-    return (
-      <QuickSafeAreaView>
-        <View style={styles.container}>
-          <View style={styles.errorContainer}>
-            <MaterialIcons name="error-outline" size={64} color="#ff5252" />
-            <Text style={styles.errorTitle}>Lesson not found</Text>
-            <Text style={styles.errorSubtitle}>
-              This lesson may have been deleted or doesn't exist.
-            </Text>
-            <Pressable style={styles.backButton} onPress={() => router.back()}>
-              <Text style={styles.backButtonText}>Go Back</Text>
-            </Pressable>
-          </View>
-        </View>
-      </QuickSafeAreaView>
-    );
+    return <LessonNotFound />;
   }
 
-  const handleDeleteLesson = () => {
+  const handleDeleteLesson = useCallback(() => {
     Alert.alert(
       "Delete Lesson",
       `Are you sure you want to delete "${lesson.title}"?`,
@@ -64,39 +45,85 @@ export default function LessonDetailScreen() {
         },
       ]
     );
-  };
+  }, [lesson, removeLesson, router]);
 
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
-  const handleSheetChanges = (index: number) => {
+  const handleSheetChanges = useCallback((index: number) => {
     if (index === -1) {
       setExplanation("");
     }
-  };
+  }, []);
+
+  const handleBackPress = useCallback(() => {
+    router.back();
+  }, []);
+
+  const pages = [
+    {
+      type: "vocabulary",
+      content: <VocabularySection vocabulary={lesson.vocabulary} />,
+    },
+    {
+      type: "phrases",
+      content: <PhrasesSection phrases={lesson.phrases} />,
+    },
+    {
+      type: "tips",
+      content: (
+        <TipsSection
+          tips={lesson.relevantGrammar}
+          setExplanation={setExplanation}
+        />
+      ),
+    },
+  ];
 
   return (
-    <QuickSafeAreaView>
-      <View style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Pressable onPress={() => router.back()} style={styles.backIcon}>
-            <AntDesign name="left" size={24} color="#0b57d0" />
-          </Pressable>
+    <SafeAreaView>
+      <Layout.Header style={{
+        paddingHorizontal: 8,
+        borderBottomWidth: 0,
+      }}>
+        <IconButton onPress={handleBackPress} name={"arrow-back"} />
+        <Text style={styles.title} numberOfLines={1}>{lesson.title + 'df dsfdsf dsf sd'}</Text>
+        <IconButton
+          onPress={handleDeleteLesson}
+          name={"delete"}
+          color="#ff5252"
+        />
+      </Layout.Header>
 
-          <Pressable onPress={handleDeleteLesson} style={styles.deleteIcon}>
-            <MaterialIcons name="delete" size={24} color="#ff5252" />
-          </Pressable>
-        </View>
+      <Pager
+        initialPage={0}
+        renderTabBar={(props) => (
+          <TabBar
+            items={[
+              { title: "Vocabulary" },
+              { title: "Phrases" },
+              { title: "Tips" },
+            ].map((section) => section.title)}
+            {...props}
+          />
+        )}
+      >
+        {pages.map((page, index) => (
+          <List.ScrollView
+            key={index}
+            style={{ flex: 1, padding: 16 }}
+            showsVerticalScrollIndicator={false}
+          >
+            {page.content}
+          </List.ScrollView>
+        ))}
+      </Pager>
+      <Layout.Footer>
+        <Button
+          title="Practice"
+          onPress={() => router.push(`/practice/${id}` as any)}
+        />
+      </Layout.Footer>
 
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          {/* Lesson Info */}
+      {/* 
+  
           <View style={styles.lessonInfo}>
             <Text style={styles.title}>{lesson.title}</Text>
             <View style={styles.metaContainer}>
@@ -109,56 +136,29 @@ export default function LessonDetailScreen() {
             </View>
           </View>
 
-          {/* Stats */}
-          <View style={styles.statsCard}>
-            <View style={styles.stat}>
-              <Text style={styles.statNumber}>{lesson.vocabulary.length}</Text>
-              <Text style={styles.statLabel}>Vocabulary Terms</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.stat}>
-              <Text style={styles.statNumber}>{lesson.phrases.length}</Text>
-              <Text style={styles.statLabel}>Phrases</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.stat}>
-              <Text style={styles.statNumber}>
-                {lesson.relevantGrammar.length}
-              </Text>
-              <Text style={styles.statLabel}>Grammar Tips</Text>
-            </View>
-          </View>
 
-          {/* Content Sections */}
-          <QuickVocabularySection vocabulary={lesson.vocabulary} />
-          <QuickPhrasesSection phrases={lesson.phrases} />
-          <QuickTipsSection
-            tips={lesson.relevantGrammar}
-            setExplanation={setExplanation}
-          />
-        </ScrollView>
+
 
         <QuickLayout.View style={{ padding: 16 }}>
           <QuickButton
             title="Practice"
             onPress={() => router.push(`/practice/${id}` as any)}
           />
-        </QuickLayout.View>
+        </QuickLayout.View> */}
 
-        {explanation ? (
-          <BottomSheet
-            onChange={handleSheetChanges}
-            enablePanDownToClose={true}
-            handleIndicatorStyle={{ backgroundColor: "#fff" }}
-            backgroundStyle={{ backgroundColor: "#0b57d0" }}
-          >
-            <BottomSheetView style={styles.bottomSheetView}>
-              <Text style={{ color: "#fff", fontSize: 18 }}>{explanation}</Text>
-            </BottomSheetView>
-          </BottomSheet>
-        ) : null}
-      </View>
-    </QuickSafeAreaView>
+      {explanation ? (
+        <BottomSheet
+          onChange={handleSheetChanges}
+          enablePanDownToClose={true}
+          handleIndicatorStyle={{ backgroundColor: "#fff" }}
+          backgroundStyle={{ backgroundColor: "#0b57d0" }}
+        >
+          <BottomSheetView style={styles.bottomSheetView}>
+            <Text style={{ color: "#fff", fontSize: 18 }}>{explanation}</Text>
+          </BottomSheetView>
+        </BottomSheet>
+      ) : null}
+    </SafeAreaView>
   );
 }
 
@@ -173,12 +173,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
-  backIcon: {
-    padding: 8,
-  },
-  deleteIcon: {
-    padding: 8,
-  },
   content: {
     flex: 1,
     paddingHorizontal: 16,
@@ -187,10 +181,11 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   title: {
-    fontSize: 28,
+    fontSize: 18,
     fontWeight: "bold",
     color: "#222",
-    marginBottom: 12,
+    flexShrink: 1,
+    marginHorizontal:16,
   },
   metaContainer: {
     flexDirection: "row",
@@ -211,70 +206,6 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 14,
     color: "#666",
-  },
-  statsCard: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 24,
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  stat: {
-    alignItems: "center",
-    flex: 1,
-  },
-  statDivider: {
-    width: 1,
-    height: 40,
-    backgroundColor: "#e0e0e0",
-  },
-  statNumber: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#0b57d0",
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: "#666",
-    textAlign: "center",
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 32,
-  },
-  errorTitle: {
-    fontSize: 24,
-    fontWeight: "600",
-    color: "#ff5252",
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  errorSubtitle: {
-    fontSize: 16,
-    color: "#999",
-    textAlign: "center",
-    marginBottom: 32,
-  },
-  backButton: {
-    backgroundColor: "#0b57d0",
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 16,
-  },
-  backButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
   },
   bottomSheetView: {
     flex: 1,

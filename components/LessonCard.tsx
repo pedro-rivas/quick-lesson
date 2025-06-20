@@ -1,3 +1,4 @@
+import useTranslation from "@/hooks/useTranslation";
 import { Lesson } from "@/store/lessonStore"; // Assuming Lesson type is here
 import { useTheme } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
@@ -35,9 +36,9 @@ const LessonCard: React.FC<LessonCardProps> = ({
   onDelete,
 }) => {
   const { colors } = useTheme();
+  const t = useTranslation();
 
   const pressed = useSharedValue(0);
-  const alreadyPressed = useSharedValue(false);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
@@ -62,26 +63,21 @@ const LessonCard: React.FC<LessonCardProps> = ({
     ),
   }));
 
-  const onPressIn = () => {
-    "worklet";
-    pressed.value = 1;
-    runOnJS(vibrate)();
-  };
-
   const onPressOut = () => {
     "worklet";
     pressed.value = 0;
-    if (alreadyPressed.value) return;
-    alreadyPressed.value = true;
-    runOnJS(onPressed)();
   };
 
-  const onPressed = () => {
-    onView(lesson);
-    setTimeout(() => {
-      alreadyPressed.value = false;
-    }, 1500);
-  }
+  const handlePress = () => {
+    "worklet";
+    pressed.value = 1;
+    runOnJS(vibrate)();
+    runOnJS(onView)(lesson);
+  };
+
+  const handleDelete = () => {
+    onDelete(lesson.id, lesson.title);
+  };
 
   const vibrate = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -89,9 +85,9 @@ const LessonCard: React.FC<LessonCardProps> = ({
 
   return (
     <AnimatedPressable
-      style={[styles.lessonCard, animatedStyle]}
-      onPressIn={onPressIn}
+      onPress={handlePress}
       onPressOut={onPressOut}
+      style={[styles.lessonCard, animatedStyle]}
     >
       <View style={styles.lessonCardContent}>
         <View style={styles.lessonCardHeader}>
@@ -99,7 +95,7 @@ const LessonCard: React.FC<LessonCardProps> = ({
             {lesson.title}
           </Text>
           <IconButton
-            onPress={() => onDelete(lesson.id, lesson.title)}
+            onPress={handleDelete}
             name={"delete"}
             color="#ff5252"
             animatedStyle={iconAnimatedStyle}
@@ -118,17 +114,17 @@ const LessonCard: React.FC<LessonCardProps> = ({
             <Text style={styles.lessonStatNumber}>
               {lesson.vocabulary.length}
             </Text>
-            <Text style={styles.lessonStatLabel}>Vocabulary</Text>
+            <Text style={styles.lessonStatLabel}>{t("Vocabulary")}</Text>
           </View>
           <View style={styles.lessonStat}>
             <Text style={styles.lessonStatNumber}>{lesson.phrases.length}</Text>
-            <Text style={styles.lessonStatLabel}>Phrases</Text>
+            <Text style={styles.lessonStatLabel}>{t("Phrases")}</Text>
           </View>
           <View style={styles.lessonStat}>
             <Text style={styles.lessonStatNumber}>
               {lesson.relevantGrammar.length}
             </Text>
-            <Text style={styles.lessonStatLabel}>Grammar</Text>
+            <Text style={styles.lessonStatLabel}>{t("Grammar")}</Text>
           </View>
         </View>
       </View>

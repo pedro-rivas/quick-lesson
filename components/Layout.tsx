@@ -15,74 +15,50 @@ interface LayoutProps extends ViewProps {
   flexWrap?: "wrap" | "nowrap" | "wrap-reverse";
   flexDirection?: "row" | "column" | "row-reverse" | "column-reverse";
   padding?: number;
+  paddingHorizontal?: number;
 }
 
-export const View = ({ children, ...props }: LayoutProps) => {
-  return (
-    <RNView
-      style={{
-        justifyContent: props.justifyContent,
-        alignItems: props.alignItems,
-        flex: props.flex,
-        gap: props.gap,
-      }}
-      {...props}
-    >
-      {children}
-    </RNView>
-  );
+export const Header = React.memo(
+  ({ children, style, ...props }: LayoutProps) => {
+    return (
+      <RNView
+        style={[
+          {
+            flexDirection: "row",
+            height: 50,
+            paddingHorizontal: 16,
+            alignItems: "center",
+            justifyContent: "space-between",
+            borderBottomWidth: 1,
+            borderBottomColor: "#ebebeb",
+            width: "100%",
+          },
+          style,
+        ]}
+        {...props}
+      >
+        {children}
+      </RNView>
+    );
+  }
+);
+
+export const Footer = ({ ...props }: LayoutProps) => {
+  return <View flexDirection={"row"} padding={16} {...props} />;
 };
 
-export const Header = React.memo(({ children, style, ...props }: LayoutProps) => {
+export const View = ({ children, style, ...props }: LayoutProps) => {
   return (
     <RNView
       style={[
         {
-          flexDirection: 'row',
-          height: 50,
-          paddingHorizontal: 16,
-          alignItems: 'center',
-          borderBottomWidth: 1,
-          borderBottomColor: '#ebebeb',
-        },
-        style,
-      ]}
-      {...props}
-    >
-      {children}
-    </RNView>
-  );
-})
-
-export const Row = ({ children, style, ...props }: LayoutProps) => {
-  return (
-    <RNView
-      style={[{
-        flexDirection: "row",
-        justifyContent: props.justifyContent,
-        alignItems: props.alignItems,
-        flex: props.flex,
-        gap: props.gap,
-        padding: props.padding,
-      }, style]}
-      {...props}
-    >
-      {children}
-    </RNView>
-  );
-};
-
-export const Column = ({ children, style, ...props }: LayoutProps) => {
-  return (
-    <RNView
-      style={[
-        {
-          flexDirection: "column",
           justifyContent: props.justifyContent,
           alignItems: props.alignItems,
           flex: props.flex,
           gap: props.gap,
-          flexWrap: props.flexWrap,
+          padding: props.padding,
+          paddingHorizontal: props.paddingHorizontal,
+          flexDirection: props.flexDirection || "column",
         },
         style,
       ]}
@@ -93,6 +69,13 @@ export const Column = ({ children, style, ...props }: LayoutProps) => {
   );
 };
 
+export const Row = ({ ...props }: LayoutProps) => {
+  return <View flexDirection={"row"} {...props} />;
+};
+
+export const Column = ({ ...props }: LayoutProps) => {
+  return <View flexDirection={"column"} {...props} />;
+};
 
 const SPACER_SIZE = {
   s: 8,
@@ -100,10 +83,8 @@ const SPACER_SIZE = {
   l: 24,
 };
 
-export const Spacer = ({
-  size = "m",
-}: {
-  size?: keyof typeof SPACER_SIZE;
-}) => {
-  return <RNView style={{ height: SPACER_SIZE[size], width: SPACER_SIZE[size] }} />;
+export const Spacer = ({ size = "m" }: { size?: keyof typeof SPACER_SIZE }) => {
+  return (
+    <RNView style={{ height: SPACER_SIZE[size], width: SPACER_SIZE[size] }} />
+  );
 };
