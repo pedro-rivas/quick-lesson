@@ -1,7 +1,17 @@
+import { BUTTON_ICON_HIT_SLOP, BUTTON_ICON_SIZE } from "@/constants/style";
 import useSpeech from "@/hooks/useSeech";
+import { commonStyles as cs } from "@/styles/common";
 import { AntDesign } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import React, { useCallback } from "react";
-import { ActivityIndicator, Pressable } from "react-native";
+import { Pressable } from "react-native";
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+} from "react-native-reanimated";
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 interface SpeechButtonProps {
   text: string;
@@ -18,21 +28,48 @@ interface SpeechButtonProps {
  * Otherwise, a sound icon is displayed.
  */
 const SpeechButton = ({ text }: SpeechButtonProps) => {
-  const [loading, setLoading] = React.useState(false);
   const speech = useSpeech(text);
+
+  const pressed = useSharedValue(0);
 
   const handlePress = useCallback(() => {
     speech.play();
   }, [text]);
 
+  const vibrate = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  }, []);
+
+  const onPressIn = useCallback(() => {
+    "worklet";
+    pressed.value = 1;
+    runOnJS(vibrate)();
+  }, []);
+
+  const onPressOut = useCallback(() => {
+    "worklet";
+    pressed.value = 0;
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pressed.value ? 0.9 : 1 }],
+  }));
+
   return (
-    <Pressable onPress={handlePress}>
-      {loading ? (
-        <ActivityIndicator size="small" color="#1a237e" />
-      ) : (
-        <AntDesign name={'sound'} size={20} color="#1a237e" />
-      )}
-    </Pressable>
+    <AnimatedPressable
+      style={[animatedStyle, cs.speechButton]}
+      onPress={handlePress}
+      onPressIn={onPressIn}
+      onPressOut={onPressOut}
+      hitSlop={BUTTON_ICON_HIT_SLOP}
+      disabled={speech.loading}
+    >
+      <AntDesign
+        name={"sound"}
+        size={BUTTON_ICON_SIZE}
+        color={speech.loading ? "#eee" : "#1a237e"}
+      />
+    </AnimatedPressable>
   );
 };
 

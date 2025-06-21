@@ -1,3 +1,4 @@
+import { BUTTON_ICON_HEIGHT } from "@/constants/style";
 import { StyleSheet } from "react-native";
 
 const commonStyles = StyleSheet.create({
@@ -18,7 +19,14 @@ const commonStyles = StyleSheet.create({
   },
   borderRadius16: {
     borderRadius: 16,
-  }
+  },
+  speechButton: {
+    height: BUTTON_ICON_HEIGHT,
+    width: BUTTON_ICON_HEIGHT,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: BUTTON_ICON_HEIGHT,
+  },
 });
 
 export { commonStyles };

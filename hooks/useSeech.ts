@@ -3,29 +3,35 @@ import { useAudioPlayer } from "expo-audio";
 import React, { useEffect } from "react";
 
 const useSpeech = (text: string) => {
-  const [audioSource, setAudioSource] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState<boolean>(true);
 
-  const player = useAudioPlayer(audioSource);
+  const player = useAudioPlayer();
 
   useEffect(() => {
     textToSpeech(text, "tr-TR")
       .then((val) => {
-        setAudioSource(val);
+        player.replace(val);
       })
       .catch((error) => {
         console.error("Error generating speech: ", error);
       })
-      .finally(() => {});
+      .finally(() => {
+        setLoading(false);
+      });
   }, [text]);
 
   const play = React.useCallback(() => {
-    if (audioSource) {
-       player.seekTo(0);
+    try {
+      player.seekTo(0);
+      player.play();
+    } catch (error) {
+      console.error("Error playing audio: ", error);
     }
-  }, [audioSource, player]);
+  }, [player]);
 
   return {
     play,
+    loading,
   };
 };
 

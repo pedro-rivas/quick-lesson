@@ -1,3 +1,4 @@
+import { BUTTON_ICON_HEIGHT, BUTTON_ICON_HIT_SLOP, BUTTON_ICON_SIZE } from "@/constants/style";
 import * as Haptics from "expo-haptics";
 import React from "react";
 import { Pressable, StyleProp, TextStyle, ViewStyle } from "react-native";
@@ -12,9 +13,6 @@ import { IconSymbol } from "../ui/IconSymbol";
 import { IconSymbolName } from "../ui/icons";
 
 const MIN_SCALE = 0.98;
-const BUTTON_ICON_SIZE = 24;
-const BUTTON_ICON_HEIGHT = 40;
-const BUTTON_ICON_HIT_SLOP = { top: 10, bottom: 10, left: 10, right: 10 };
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
