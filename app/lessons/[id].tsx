@@ -9,22 +9,35 @@ import { TabBar } from "@/components/TabBar";
 import VocabularySection from "@/components/VocabularySection";
 import Button from "@/components/buttons/Button";
 import IconButton from "@/components/buttons/IconButton";
+import useTranslation from "@/hooks/useTranslation";
 import { useLessonStore } from "@/store/lessonStore";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Alert, StyleSheet, Text } from "react-native";
 
 export default function LessonDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+
   const { getLessonById, removeLesson } = useLessonStore();
   const [explanation, setExplanation] = useState("");
 
   const lesson = getLessonById(id!);
 
+  const t = useTranslation();
+
   if (!lesson) {
     return <LessonNotFound />;
   }
+
+  const sections = useMemo(
+    () => [
+      { title: t("Vocabulary") },
+      { title: t("Phrases") },
+      { title: t("Tips") },
+    ],
+    []
+  );
 
   const handleDeleteLesson = useCallback(() => {
     Alert.alert(
@@ -57,7 +70,7 @@ export default function LessonDetailScreen() {
     router.back();
   }, []);
 
-  const pages = [
+  const pages = useMemo(()=>([
     {
       type: "vocabulary",
       content: <VocabularySection vocabulary={lesson.vocabulary} />,
@@ -75,16 +88,20 @@ export default function LessonDetailScreen() {
         />
       ),
     },
-  ];
+  ]),[lesson]);
 
   return (
     <SafeAreaView>
-      <Layout.Header style={{
-        paddingHorizontal: 8,
-        borderBottomWidth: 0,
-      }}>
+      <Layout.Header
+        style={{
+          paddingHorizontal: 8,
+          borderBottomWidth: 0,
+        }}
+      >
         <IconButton onPress={handleBackPress} name={"arrow-back"} />
-        <Text style={styles.title} numberOfLines={1}>{lesson.title}</Text>
+        <Text style={styles.title} numberOfLines={1}>
+          {lesson.title}
+        </Text>
         <IconButton
           onPress={handleDeleteLesson}
           name={"delete"}
@@ -95,14 +112,7 @@ export default function LessonDetailScreen() {
       <Pager
         initialPage={0}
         renderTabBar={(props) => (
-          <TabBar
-            items={[
-              { title: "Vocabulary" },
-              { title: "Phrases" },
-              { title: "Tips" },
-            ].map((section) => section.title)}
-            {...props}
-          />
+          <TabBar items={sections.map((section) => section.title)} {...props} />
         )}
       >
         {pages.map((page, index) => (
@@ -161,27 +171,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#222",
     flexShrink: 1,
-    marginHorizontal:16,
-  },
-  metaContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  languageContainer: {
-    backgroundColor: "#e3f2fd",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  languageText: {
-    fontSize: 14,
-    color: "#0b57d0",
-    fontWeight: "600",
-  },
-  dateText: {
-    fontSize: 14,
-    color: "#666",
+    marginHorizontal: 16,
   },
   bottomSheetView: {
     flex: 1,

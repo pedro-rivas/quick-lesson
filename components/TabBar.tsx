@@ -389,13 +389,13 @@ function TabBarItem({
 
   const style = useAnimatedStyle(() => {
     if (!_WORKLET) {
-      return {opacity: 0.7}
+      return {opacity: 0.5}
     }
     return {
       opacity: interpolate(
         dragProgress.get(),
         [index - 1, index, index + 1],
-        [0.7, 1, 0.7],
+        [0.5, 1, 0.5],
         'clamp',
       ),
     }
@@ -424,7 +424,6 @@ function TabBarItem({
         accessibilityRole="tab">
         <Animated.View style={[style, styles.itemInner]}>
           <Text
-
             style={[styles.itemText]}
             onLayout={handleTextLayout}>
             {item}
@@ -456,6 +455,8 @@ const styles = StyleSheet.create({
   },
   itemText: {
     lineHeight: 20,
+    fontSize: 15,
+    fontWeight: 'bold',
     textAlign: 'center',
   },
   outerBottomBorder: {

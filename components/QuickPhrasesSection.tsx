@@ -1,6 +1,11 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import QuickSpeechButton from './SpeechButton';
+import useTranslation from "@/hooks/useTranslation";
+import { commonStyles as cs } from "@/styles/common";
+import { spacing } from "@/styles/spacing";
+import { useTheme } from "@react-navigation/native";
+import React from "react";
+import * as Layout from "./Layout";
+import SpeechButton from "./SpeechButton";
+import * as Text from "./Text";
 
 interface Phrase {
   phrase: string;
@@ -8,7 +13,7 @@ interface Phrase {
   translation: string;
 }
 
-interface QuickPhrasesSectionProps {
+interface PhrasesSectionProps {
   phrases: Phrase[];
 }
 
@@ -23,73 +28,71 @@ interface QuickPhrasesSectionProps {
  *
  * @returns A React element displaying the phrases, or `null` if no phrases are provided.
  */
-const QuickPhrasesSection: React.FC<QuickPhrasesSectionProps> = ({ phrases }) => {
+const PhrasesSection: React.FC<PhrasesSectionProps> = ({ phrases }) => {
   if (!phrases || phrases.length === 0) {
     return null;
   }
 
+  const t = useTranslation();
+  const theme = useTheme();
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.sectionTitle}>Phrases</Text>
-      {phrases.map((phrase, idx) => (
-        <View key={idx} style={styles.card}>
-          <View>
-            <Text style={styles.term}>{phrase.phrase}</Text>
-            {phrase.transliteration ? (
-              <Text style={styles.transliteration}>
-                {phrase.transliteration}
-              </Text>
-            ) : null}
-            <Text style={styles.translation}>{phrase.translation}</Text>
-          </View>
-          <QuickSpeechButton text={phrase.phrase} />
-        </View>
-      ))}
-    </View>
+    <Layout.Column>
+      <Text.H4 bold>{`${phrases.length} ${t("Phrases")}`}</Text.H4>
+      <Layout.Column
+        mb={spacing.m}
+        mt={spacing.m}
+        style={[
+          cs.border2,
+          cs.borderRadius16,
+          {
+            borderColor: theme.colors.border,
+          },
+        ]}
+      >
+        {phrases.map((phrase, idx) => (
+          <Layout.Row
+            key={idx}
+            alignItems={"center"}
+            padding={spacing.s}
+            style={[
+              idx !== phrases.length - 1 && cs.borderBottom2,
+              { borderColor: theme.colors.border },
+            ]}
+          >
+            <SpeechButton text={phrase.phrase} />
+            <Layout.Column ml={12}>
+              <Layout.Column mb={4}>
+                <Text.Body bold>{phrase.phrase}</Text.Body>
+                {phrase?.transliteration ? (
+                  <Layout.Row>
+                    {phrase.transliteration.split("").map((l) => (
+                      <Text.Caption
+                        style={[
+                          cs.borderBottom1,
+                          {
+                            borderColor: theme.colors.primary,
+                            marginRight: 2,
+                          },
+                        ]}
+                      >
+                        {l}
+                      </Text.Caption>
+                    ))}
+                  </Layout.Row>
+                ) : null}
+              </Layout.Column>
+              <Text.Caption style={cs.opacity70}>
+                {phrase.translation}
+              </Text.Caption>
+            </Layout.Column>
+          </Layout.Row>
+        ))}
+      </Layout.Column>
+    </Layout.Column>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 32,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    color: '#222',
-  },
-  card: {
-    backgroundColor: '#eaf1fb',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  term: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1a237e',
-    marginBottom: 4,
-  },
-  transliteration: {
-    fontSize: 16,
-    color: '#5c6bc0',
-    marginBottom: 4,
-  },
-  translation: {
-    fontSize: 16,
-    color: '#333',
-  },
-});
+PhrasesSection.displayName = "PhrasesSection";
 
-QuickPhrasesSection.displayName = 'QuickPhrasesSection';
-
-export default QuickPhrasesSection; 
+export default React.memo(PhrasesSection);
