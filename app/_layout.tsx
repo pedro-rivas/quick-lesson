@@ -8,7 +8,10 @@ import { useFonts } from "expo-font";
 import { StatusBar, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
+import { getBestLocale } from "@/i18n";
 import { RootNavigator } from "@/navigation";
+import { useUserStore } from "@/store/userStore";
+import { useEffect } from "react";
 import "react-native-reanimated";
 
 export default function RootLayout() {
@@ -16,6 +19,14 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
+
+  const { setLanguage, setPreferredLanguage } = useUserStore()
+
+  useEffect(() => {
+    const lang = getBestLocale()
+    setLanguage(lang);
+    setPreferredLanguage(lang);
+  }, []);
 
   if (!loaded) {
     // Async font loading only occurs in development.

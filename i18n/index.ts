@@ -1,6 +1,7 @@
 import english from "@/assets/locales/en-US.json";
 import spanish from "@/assets/locales/es-ES.json";
 import turkish from "@/assets/locales/tr-TR.json";
+import { LanguageCode } from "@/constants/languages";
 import * as Localization from "expo-localization";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
@@ -13,18 +14,18 @@ const resources: { [key: string]: { translation: typeof english } } = {
 };
 
 // map any languageCode to your canonical locale
-const fallbackMap: Record<string, string> = {
+const fallbackMap: Record<string, LanguageCode> = {
   en: "en-US",
   es: "es-ES",
   tr: "tr-TR",
 };
 
-const getBestLocale = () => {
+export const getBestLocale = () => {
   const [{ languageTag, languageCode }] = Localization.getLocales();
-  console.log({ languageTag, languageCode });
+
   // try the exact tag first
   if (languageTag && resources[languageTag]) {
-    return languageTag;
+    return languageTag as LanguageCode;
   }
   // else map base code → canonical
   if (languageCode && fallbackMap[languageCode]) {

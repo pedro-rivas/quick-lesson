@@ -7,6 +7,7 @@ import * as List from "@/components/List";
 import QuickSafeAreaView from "@/components/SafeAreaView";
 import useTranslation from "@/hooks/useTranslation";
 import { Lesson, useLessonStore } from "@/store/lessonStore";
+import { useUserStore } from "@/store/userStore";
 import { router } from "expo-router";
 import React, { useCallback } from "react";
 import {
@@ -20,8 +21,6 @@ import {
 } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
-const studentLanguage = "spanish";
-
 export default function HomeScreen() {
   const [selectedLanguage, setSelectedLanguage] = React.useState("");
   const [topic, setTopic] = React.useState("");
@@ -29,8 +28,12 @@ export default function HomeScreen() {
   const [showLessonForm, setShowCreateLessonFrom] = React.useState(false);
 
   const { addLesson, getAllLessons, removeLesson } = useLessonStore();
+  const { getUserPreferences } = useUserStore()
+  const userPreferences = getUserPreferences();
+  const userLanguage = userPreferences.preferredLanguage
   const lessons = getAllLessons();
   const t = useTranslation();
+  
 
   const generate = async () => {
     try {
@@ -39,7 +42,7 @@ export default function HomeScreen() {
       setLoading(true);
 
       const lesson = await createLesson({
-        studentLanguage,
+        studentLanguage: userLanguage,
         selectedLanguage,
         topic,
       });

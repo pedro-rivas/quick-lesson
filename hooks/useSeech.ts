@@ -1,14 +1,15 @@
-import { textToSpeech } from "@/lib/texToSpeech";
+import { LanguageCode } from "@/constants/languages";
+import { textToSpeech } from "@/lib/texToSpeech"; // Adjust the import path as necessary
 import { useAudioPlayer } from "expo-audio";
 import React, { useEffect } from "react";
 
-const useSpeech = (text: string) => {
+const useSpeech = (text: string, langCode: LanguageCode) => {
   const [loading, setLoading] = React.useState<boolean>(true);
 
   const player = useAudioPlayer();
 
   useEffect(() => {
-    textToSpeech(text, "tr-TR")
+    textToSpeech(text, langCode)
       .then((val) => {
         player.replace(val);
       })

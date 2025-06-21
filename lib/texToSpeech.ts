@@ -1,5 +1,5 @@
 import { BUCKET, ELEVEN_LABS_API_KEY, TABLE_NAME } from "@/constants/config";
-import { AVAILABLE_LANGUAGES, LanguageCode } from "@/constants/languages";
+import { LANGUAGES, LanguageCode } from "@/constants/languages";
 import { sanitizeFilename } from "@/utils";
 import { decode } from "base64-arraybuffer";
 import * as FileSystem from "expo-file-system";
@@ -20,8 +20,8 @@ export const textToSpeech = async (
   text: string,
   lang: LanguageCode
 ): Promise<string> => {
-  const languageCode = AVAILABLE_LANGUAGES.find((l) => l.code === lang)?.code;
-  if (!languageCode) {
+
+  if (!LANGUAGES[lang]) {
     throw new Error(`Unsupported language: ${lang}`);
   }
 

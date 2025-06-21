@@ -1,3 +1,4 @@
+import { LanguageCode } from "@/constants/languages";
 import { BUTTON_ICON_HIT_SLOP, BUTTON_ICON_SIZE } from "@/constants/style";
 import useSpeech from "@/hooks/useSeech";
 import { commonStyles as cs } from "@/styles/common";
@@ -15,6 +16,7 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 interface SpeechButtonProps {
   text: string;
+  langCode: LanguageCode;
 }
 
 /**
@@ -27,8 +29,8 @@ interface SpeechButtonProps {
  * While the speech is being generated and played, a loading indicator is shown.
  * Otherwise, a sound icon is displayed.
  */
-const SpeechButton = ({ text }: SpeechButtonProps) => {
-  const speech = useSpeech(text);
+const SpeechButton = ({ text, langCode }: SpeechButtonProps) => {
+  const speech = useSpeech(text, langCode);
 
   const pressed = useSharedValue(0);
 

@@ -1,5 +1,6 @@
 import QuickButton from "@/components/buttons/Button";
-import { AVAILABLE_LANGUAGES } from "@/constants/languages"; // Assuming this path is correct
+import { AVAILABLE_LANGUAGES, LanguageCode, LANGUAGES } from "@/constants/languages"; // Assuming this path is correct
+import { useUserStore } from "@/store/userStore";
 import { AntDesign } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
@@ -25,13 +26,23 @@ const LessonGeneratorForm: React.FC<LessonGeneratorFormProps> = ({
   isGenerating,
   onClose,
 }) => {
+  const { setLearningLanguage } = useUserStore();
+
+  const handleLanguageChange = (langCode: LanguageCode) => {
+    // Update the learning language in the user store
+    setLearningLanguage(langCode);
+    // Call the parent's onSelectLanguage callback
+    onSelectLanguage(LANGUAGES[langCode].label);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.formContent}>
         <RNPickerSelect
-          onValueChange={(_, index) =>
-            onSelectLanguage(AVAILABLE_LANGUAGES[index - 1]?.label || "")
-          }
+          onValueChange={(_, index) => {
+            const langCode = AVAILABLE_LANGUAGES[index - 1]?.code || "";
+            handleLanguageChange(langCode);
+          }}
           items={[...AVAILABLE_LANGUAGES] as Item[]}
           disabled={isGenerating}
         >
