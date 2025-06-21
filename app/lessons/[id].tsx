@@ -84,11 +84,11 @@ export default function LessonDetailScreen() {
     () => [
       {
         type: "vocabulary",
-        content: <VocabularySection vocabulary={lesson.vocabulary} />,
+        content: <VocabularySection vocabulary={lesson.vocabulary} langCode={lesson.langCode} />,
       },
       {
         type: "phrases",
-        content: <PhrasesSection phrases={lesson.phrases} />,
+        content: <PhrasesSection phrases={lesson.phrases} langCode={lesson.langCode}/>,
       },
       {
         type: "tips",
@@ -96,6 +96,7 @@ export default function LessonDetailScreen() {
           <TipsSection
             tips={lesson.relevantGrammar}
             setExplanation={openExplanation}
+            langCode={lesson.langCode}
           />
         ),
       },

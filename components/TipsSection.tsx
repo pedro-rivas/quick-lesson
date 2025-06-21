@@ -1,3 +1,4 @@
+import { LanguageCode } from "@/constants/languages";
 import useTranslation from "@/hooks/useTranslation";
 import { commonStyles as cs } from "@/styles/common";
 import { spacing } from "@/styles/spacing";
@@ -22,6 +23,7 @@ export interface Tip {
 
 interface TipsSectionProps {
   tips: Tip[];
+  langCode: LanguageCode;
   setExplanation: (tipExample: TipExample) => void;
 }
 
@@ -34,7 +36,7 @@ interface TipsSectionProps {
  *
  * @returns A React element displaying the tips and their examples, or null if no tips are provided.
  */
-const TipsSection: React.FC<TipsSectionProps> = ({ tips, setExplanation }) => {
+const TipsSection: React.FC<TipsSectionProps> = ({ tips, langCode, setExplanation }) => {
   if (!tips || tips.length === 0) {
     return null;
   }
@@ -77,7 +79,7 @@ const TipsSection: React.FC<TipsSectionProps> = ({ tips, setExplanation }) => {
                 <View style={styles.examplesRow}>
                   {tip.examples.map((ex, exIdx: number) => (
                     <View key={exIdx} style={styles.exampleCard}>
-                      <SpeechButton text={ex.sentence} />
+                      <SpeechButton text={ex.sentence}langCode={langCode}/>
                       <Pressable
                         onPress={() => setExplanation(ex)}
                         style={{ flex: 1 }}

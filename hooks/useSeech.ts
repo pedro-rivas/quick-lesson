@@ -11,6 +11,7 @@ const useSpeech = (text: string, langCode: LanguageCode) => {
   useEffect(() => {
     textToSpeech(text, langCode)
       .then((val) => {
+        console.log("Generated speech: ", val);
         player.replace(val);
       })
       .catch((error) => {

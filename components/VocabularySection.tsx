@@ -1,3 +1,4 @@
+import { LanguageCode } from "@/constants/languages";
 import useTranslation from "@/hooks/useTranslation";
 import { commonStyles } from "@/styles/common";
 import { spacing } from "@/styles/spacing";
@@ -15,6 +16,7 @@ interface VocabularyItem {
 
 interface VocabularySectionProps {
   vocabulary: VocabularyItem[];
+  langCode: LanguageCode
 }
 
 /**
@@ -26,6 +28,7 @@ interface VocabularySectionProps {
  */
 const VocabularySection: React.FC<VocabularySectionProps> = ({
   vocabulary,
+  langCode,
 }) => {
   const theme = useTheme();
   const t = useTranslation();
@@ -58,7 +61,7 @@ const VocabularySection: React.FC<VocabularySectionProps> = ({
               { borderColor: theme.colors.border },
             ]}
           >
-            <SpeechButton text={vocab.term} />
+            <SpeechButton text={vocab.term} langCode={langCode}/>
             <Layout.Column ml={12}>
               <Layout.Column mb={4}>
                 <Text.Body bold>{vocab.term}</Text.Body>

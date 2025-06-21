@@ -5,6 +5,7 @@ import LessonEmptyState from "@/components/LessonEmptyState";
 import LessonGeneratorForm from "@/components/LessonGeneratorForm";
 import * as List from "@/components/List";
 import QuickSafeAreaView from "@/components/SafeAreaView";
+import { LanguageCode, LANGUAGES } from "@/constants/languages";
 import useTranslation from "@/hooks/useTranslation";
 import { Lesson, useLessonStore } from "@/store/lessonStore";
 import { useUserStore } from "@/store/userStore";
@@ -22,7 +23,7 @@ import {
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 export default function HomeScreen() {
-  const [selectedLanguage, setSelectedLanguage] = React.useState("");
+  const [selectedLanguage, setSelectedLanguage] = React.useState<LanguageCode | null>(null);
   const [topic, setTopic] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [showLessonForm, setShowCreateLessonFrom] = React.useState(false);
@@ -43,7 +44,7 @@ export default function HomeScreen() {
 
       const lesson = await createLesson({
         studentLanguage: userLanguage,
-        selectedLanguage,
+        learningLanguage: selectedLanguage,
         topic,
       });
 
@@ -89,15 +90,17 @@ export default function HomeScreen() {
     );
   }, []);
 
+  const selectedLanguageLabel = LANGUAGES?.[selectedLanguage] ? LANGUAGES?.[selectedLanguage].label  : null
+
   return (
     <QuickSafeAreaView>
       <ScrollView style={{ flex: 1, paddingHorizontal: 16 }}>
         {selectedLanguage ? (
           <Text style={styles.title}>
             <Text style={styles.bigTitle}>
-              {selectedLanguage
-                ? selectedLanguage.charAt(0).toUpperCase() +
-                  selectedLanguage.slice(1)
+              {selectedLanguageLabel
+                ? selectedLanguageLabel.charAt(0).toUpperCase() +
+                  selectedLanguageLabel.slice(1)
                 : ""}{" "}
               for
             </Text>

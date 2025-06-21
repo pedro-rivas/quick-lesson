@@ -1,3 +1,4 @@
+import { LanguageCode } from "@/constants/languages";
 import useTranslation from "@/hooks/useTranslation";
 import { commonStyles as cs } from "@/styles/common";
 import { spacing } from "@/styles/spacing";
@@ -15,6 +16,7 @@ interface Phrase {
 
 interface PhrasesSectionProps {
   phrases: Phrase[];
+    langCode: LanguageCode
 }
 
 /**
@@ -28,7 +30,7 @@ interface PhrasesSectionProps {
  *
  * @returns A React element displaying the phrases, or `null` if no phrases are provided.
  */
-const PhrasesSection: React.FC<PhrasesSectionProps> = ({ phrases }) => {
+const PhrasesSection: React.FC<PhrasesSectionProps> = ({ phrases, langCode }) => {
   if (!phrases || phrases.length === 0) {
     return null;
   }
@@ -60,7 +62,7 @@ const PhrasesSection: React.FC<PhrasesSectionProps> = ({ phrases }) => {
               { borderColor: theme.colors.border },
             ]}
           >
-            <SpeechButton text={phrase.phrase} />
+            <SpeechButton text={phrase.phrase} langCode={langCode}/>
             <Layout.Column ml={12}>
               <Layout.Column mb={4}>
                 <Text.Body bold>{phrase.phrase}</Text.Body>

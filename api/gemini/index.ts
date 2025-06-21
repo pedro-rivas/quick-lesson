@@ -1,3 +1,4 @@
+import { LanguageCode, LANGUAGES } from "@/constants/languages";
 import { GenerateContentParameters, GoogleGenAI } from "@google/genai";
 import { termsPrompt, tipsPrompt } from "./prompts";
 import { termsConfig, tipsConfig } from "./schemas";
@@ -25,14 +26,21 @@ export const generateContent = async ({
 };
 
 export const createLesson = async ({
-  studentLanguage,
-  selectedLanguage,
+  studentLanguage: studentLanguageCode,
+  learningLanguage: learningLanguageCode,
   topic,
 }: {
-  studentLanguage: string;
-  selectedLanguage: string;
+  studentLanguage: LanguageCode;
+  learningLanguage:  LanguageCode;
   topic: string;
 }) => {
+  if(!LANGUAGES[studentLanguageCode] || !LANGUAGES[learningLanguageCode]) {
+    throw new Error("Invalid language code provided.");
+  }
+
+  const studentLanguage = LANGUAGES[studentLanguageCode].label;
+  const selectedLanguage = LANGUAGES[learningLanguageCode].label;
+  
   const contents = [
     {
       role: "user",
@@ -78,8 +86,9 @@ export const createLesson = async ({
   }
 
   return {
-    title: `${selectedLanguage} for ${topic}`,
+    title: `${topic}`,
     language: selectedLanguage,
+    langCode: learningLanguageCode,
     topic,
     phrases: generatedPhrases,
     vocabulary: generatedVocabulary,

@@ -1,3 +1,4 @@
+import { LanguageCode } from '@/constants/languages';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
@@ -36,6 +37,7 @@ export interface Lesson {
   vocabulary: VocabularyItem[];
   relevantGrammar: GrammarTip[];
   createdAt: Date;
+  langCode: LanguageCode
 }
 
 interface LessonStore {

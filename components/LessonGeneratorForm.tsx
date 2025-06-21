@@ -1,5 +1,5 @@
 import QuickButton from "@/components/buttons/Button";
-import { AVAILABLE_LANGUAGES, LanguageCode, LANGUAGES } from "@/constants/languages"; // Assuming this path is correct
+import { AVAILABLE_LANGUAGES, LanguageCode } from "@/constants/languages"; // Assuming this path is correct
 import { useUserStore } from "@/store/userStore";
 import { AntDesign } from "@expo/vector-icons";
 import React from "react";
@@ -8,8 +8,8 @@ import RNPickerSelect, { Item } from "react-native-picker-select";
 import QuickButtonIcon from "./QuickButtonIcon";
 
 interface LessonGeneratorFormProps {
-  selectedLanguage: string;
-  onSelectLanguage: (language: string) => void;
+  selectedLanguage: LanguageCode | null; // Use LanguageCode for type safety
+  onSelectLanguage: (language: LanguageCode) => void;
   topic: string;
   onTopicChange: (topic: string) => void;
   onGenerate: () => void;
@@ -32,7 +32,7 @@ const LessonGeneratorForm: React.FC<LessonGeneratorFormProps> = ({
     // Update the learning language in the user store
     setLearningLanguage(langCode);
     // Call the parent's onSelectLanguage callback
-    onSelectLanguage(LANGUAGES[langCode].label);
+    onSelectLanguage(langCode);
   };
 
   return (
