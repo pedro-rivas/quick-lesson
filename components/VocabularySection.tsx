@@ -80,7 +80,7 @@ const VocabularySection: React.FC<VocabularySectionProps> = ({
                   </Layout.Row>
                 ) : null}
               </Layout.Column>
-              <Text.Caption style={commonStyles.opacity70}>
+              <Text.Caption>
                 {vocab.translation}
               </Text.Caption>
             </Layout.Column>

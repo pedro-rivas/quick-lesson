@@ -82,9 +82,7 @@ const PhrasesSection: React.FC<PhrasesSectionProps> = ({ phrases }) => {
                   </Layout.Row>
                 ) : null}
               </Layout.Column>
-              <Text.Caption style={cs.opacity70}>
-                {phrase.translation}
-              </Text.Caption>
+              <Text.Caption>{phrase.translation}</Text.Caption>
             </Layout.Column>
           </Layout.Row>
         ))}

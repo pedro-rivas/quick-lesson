@@ -3,32 +3,38 @@ import LessonNotFound from "@/components/LessonNotFound";
 import * as List from "@/components/List";
 import Pager from "@/components/Pager";
 import PhrasesSection from "@/components/PhrasesSection";
-import TipsSection from "@/components/QuickTipsSection";
 import SafeAreaView from "@/components/SafeAreaView";
 import { TabBar } from "@/components/TabBar";
+import * as Text from "@/components/Text";
+import TipsSection, { TipExample } from "@/components/TipsSection";
 import VocabularySection from "@/components/VocabularySection";
 import Button from "@/components/buttons/Button";
 import IconButton from "@/components/buttons/IconButton";
 import useTranslation from "@/hooks/useTranslation";
 import { useLessonStore } from "@/store/lessonStore";
+import { spacing } from "@/styles/spacing";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import { useTheme } from "@react-navigation/native";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useCallback, useMemo, useState } from "react";
-import { Alert, StyleSheet, Text } from "react-native";
+import React, { useCallback, useMemo, useRef, useState } from "react";
+import { Alert, StyleSheet, } from "react-native";
 
 export default function LessonDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const { getLessonById, removeLesson } = useLessonStore();
-  const [explanation, setExplanation] = useState("");
+  const [example, setCurrentExample] = useState<TipExample | null>(null);
 
   const lesson = getLessonById(id!);
 
-  const t = useTranslation();
-
-  if (!lesson) {
+    if (!lesson) {
     return <LessonNotFound />;
   }
+
+  const t = useTranslation();
+  const theme = useTheme();
+
+  const bottomSheetRef = useRef<BottomSheet>(null);
 
   const sections = useMemo(
     () => [
@@ -62,12 +68,16 @@ export default function LessonDetailScreen() {
 
   const handleSheetChanges = useCallback((index: number) => {
     if (index === -1) {
-      setExplanation("");
+      setCurrentExample(null); // Reset current tip when the sheet is closed
     }
   }, []);
 
   const handleBackPress = useCallback(() => {
     router.back();
+  }, []);
+
+  const openExplanation = useCallback((tipExample: TipExample) => {
+    setCurrentExample(tipExample);
   }, []);
 
   const pages = useMemo(()=>([
@@ -84,7 +94,7 @@ export default function LessonDetailScreen() {
       content: (
         <TipsSection
           tips={lesson.relevantGrammar}
-          setExplanation={setExplanation}
+          setExplanation={openExplanation}
         />
       ),
     },
@@ -99,9 +109,9 @@ export default function LessonDetailScreen() {
         }}
       >
         <IconButton onPress={handleBackPress} name={"arrow-back"} />
-        <Text style={styles.title} numberOfLines={1}>
+        <Text.Body style={styles.title} numberOfLines={1}>
           {lesson.title}
-        </Text>
+        </Text.Body>
         <IconButton
           onPress={handleDeleteLesson}
           name={"delete"}
@@ -132,15 +142,19 @@ export default function LessonDetailScreen() {
         />
       </Layout.Footer>
 
-      {explanation ? (
+      {example ? (
         <BottomSheet
+          ref={bottomSheetRef}
           onChange={handleSheetChanges}
           enablePanDownToClose={true}
-          handleIndicatorStyle={{ backgroundColor: "#fff" }}
-          backgroundStyle={{ backgroundColor: "#0b57d0" }}
+          handleIndicatorStyle={{ backgroundColor: theme.colors.onPrimary }}
+          backgroundStyle={{ backgroundColor: theme.colors.primary }}
+          
         >
           <BottomSheetView style={styles.bottomSheetView}>
-            <Text style={{ color: "#fff", fontSize: 18 }}>{explanation}</Text>
+            <Text.H3 style={{ color: theme.colors.onPrimary, }}>{example.sentence}</Text.H3>
+            <Text.Body style={{ color: theme.colors.onPrimary, marginBottom: spacing.m, opacity: .7 }}>{example.translation}</Text.Body>
+            <Text.Body style={{ color: theme.colors.onPrimary, lineHeight: 22}}>{example.explanation}</Text.Body>
           </BottomSheetView>
         </BottomSheet>
       ) : null}

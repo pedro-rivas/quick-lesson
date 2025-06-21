@@ -9,6 +9,7 @@ export const DarkTheme = {
     ...NavigationDarkTheme.colors,
     background: "#121212",
     primary: "#0b57d0",
+    onPrimary: "#fff",
     border: "#333",
   },
 };
@@ -19,6 +20,7 @@ export const LightTheme = {
     ...NavigationDefaultTheme.colors,
     background: "#fff",
     primary: "#0b57d0",
+    onPrimary: "#fff",
     border: "#ebebeb",
   },
 };

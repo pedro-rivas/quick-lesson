@@ -120,6 +120,7 @@ export const Caption = ({ children, style, ...props }: TextProps) => {
         {
           fontSize: 14,
           fontWeight: props.bold ? "bold" : "normal",
+          color: "#5A6672",
         },
         style,
       ]}
