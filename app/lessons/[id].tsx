@@ -10,14 +10,14 @@ import TipsSection, { TipExample } from "@/components/TipsSection";
 import VocabularySection from "@/components/VocabularySection";
 import Button from "@/components/buttons/Button";
 import IconButton from "@/components/buttons/IconButton";
+import useTheme from "@/hooks/useTheme";
 import useTranslation from "@/hooks/useTranslation";
 import { useLessonStore } from "@/store/lessonStore";
 import { spacing } from "@/styles/spacing";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import { useTheme } from "@react-navigation/native";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useMemo, useRef, useState } from "react";
-import { Alert, StyleSheet, } from "react-native";
+import { Alert, StyleSheet } from "react-native";
 
 export default function LessonDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -27,7 +27,7 @@ export default function LessonDetailScreen() {
 
   const lesson = getLessonById(id!);
 
-    if (!lesson) {
+  if (!lesson) {
     return <LessonNotFound />;
   }
 
@@ -80,25 +80,28 @@ export default function LessonDetailScreen() {
     setCurrentExample(tipExample);
   }, []);
 
-  const pages = useMemo(()=>([
-    {
-      type: "vocabulary",
-      content: <VocabularySection vocabulary={lesson.vocabulary} />,
-    },
-    {
-      type: "phrases",
-      content: <PhrasesSection phrases={lesson.phrases} />,
-    },
-    {
-      type: "tips",
-      content: (
-        <TipsSection
-          tips={lesson.relevantGrammar}
-          setExplanation={openExplanation}
-        />
-      ),
-    },
-  ]),[lesson]);
+  const pages = useMemo(
+    () => [
+      {
+        type: "vocabulary",
+        content: <VocabularySection vocabulary={lesson.vocabulary} />,
+      },
+      {
+        type: "phrases",
+        content: <PhrasesSection phrases={lesson.phrases} />,
+      },
+      {
+        type: "tips",
+        content: (
+          <TipsSection
+            tips={lesson.relevantGrammar}
+            setExplanation={openExplanation}
+          />
+        ),
+      },
+    ],
+    [lesson]
+  );
 
   return (
     <SafeAreaView>
@@ -149,12 +152,34 @@ export default function LessonDetailScreen() {
           enablePanDownToClose={true}
           handleIndicatorStyle={{ backgroundColor: theme.colors.onPrimary }}
           backgroundStyle={{ backgroundColor: theme.colors.primary }}
-          
         >
           <BottomSheetView style={styles.bottomSheetView}>
-            <Text.H3 style={{ color: theme.colors.onPrimary, }}>{example.sentence}</Text.H3>
-            <Text.Body style={{ color: theme.colors.onPrimary, marginBottom: spacing.m, opacity: .7 }}>{example.translation}</Text.Body>
-            <Text.Body style={{ color: theme.colors.onPrimary, lineHeight: 22}}>{example.explanation}</Text.Body>
+            <Text.H3 style={{ color: theme.colors.onPrimary }}>
+              {example.sentence}
+            </Text.H3>
+            <Text.Body
+              style={{
+                color: theme.colors.onPrimary,
+                marginBottom: spacing.l,
+                opacity: 0.7,
+              }}
+            >
+              {example.translation}
+            </Text.Body>
+            <Text.Caption
+              style={{
+                color: theme.colors.onPrimary,
+                marginBottom: spacing.s,
+                opacity: 0.7,
+              }}
+            >
+              {"Explanation"}
+            </Text.Caption>
+            <Text.Body
+              style={{ color: theme.colors.onPrimary, lineHeight: 22 }}
+            >
+              {example.explanation}
+            </Text.Body>
           </BottomSheetView>
         </BottomSheet>
       ) : null}
