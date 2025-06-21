@@ -4,9 +4,9 @@ import * as List from "@/components/List";
 import Pager from "@/components/Pager";
 import PhrasesSection from "@/components/QuickPhrasesSection";
 import TipsSection from "@/components/QuickTipsSection";
-import VocabularySection from "@/components/QuickVocabularySection";
 import SafeAreaView from "@/components/SafeAreaView";
 import { TabBar } from "@/components/TabBar";
+import VocabularySection from "@/components/VocabularySection";
 import Button from "@/components/buttons/Button";
 import IconButton from "@/components/buttons/IconButton";
 import { useLessonStore } from "@/store/lessonStore";
@@ -84,7 +84,7 @@ export default function LessonDetailScreen() {
         borderBottomWidth: 0,
       }}>
         <IconButton onPress={handleBackPress} name={"arrow-back"} />
-        <Text style={styles.title} numberOfLines={1}>{lesson.title + 'df dsfdsf dsf sd'}</Text>
+        <Text style={styles.title} numberOfLines={1}>{lesson.title}</Text>
         <IconButton
           onPress={handleDeleteLesson}
           name={"delete"}
@@ -121,30 +121,6 @@ export default function LessonDetailScreen() {
           onPress={() => router.push(`/practice/${id}` as any)}
         />
       </Layout.Footer>
-
-      {/* 
-  
-          <View style={styles.lessonInfo}>
-            <Text style={styles.title}>{lesson.title}</Text>
-            <View style={styles.metaContainer}>
-              <View style={styles.languageContainer}>
-                <Text style={styles.languageText}>{lesson.language}</Text>
-              </View>
-              <Text style={styles.dateText}>
-                {formatDate(lesson.createdAt)}
-              </Text>
-            </View>
-          </View>
-
-
-
-
-        <QuickLayout.View style={{ padding: 16 }}>
-          <QuickButton
-            title="Practice"
-            onPress={() => router.push(`/practice/${id}` as any)}
-          />
-        </QuickLayout.View> */}
 
       {explanation ? (
         <BottomSheet

@@ -16,6 +16,10 @@ interface LayoutProps extends ViewProps {
   flexDirection?: "row" | "column" | "row-reverse" | "column-reverse";
   padding?: number;
   paddingHorizontal?: number;
+  ml?: number;
+  mr?: number;
+  mt?: number;
+  mb?: number;
 }
 
 export const Header = React.memo(
@@ -59,6 +63,10 @@ export const View = ({ children, style, ...props }: LayoutProps) => {
           padding: props.padding,
           paddingHorizontal: props.paddingHorizontal,
           flexDirection: props.flexDirection || "column",
+          marginLeft: props.ml,
+          marginRight: props.mr,
+          marginTop: props.mt,
+          marginBottom: props.mb,
         },
         style,
       ]}

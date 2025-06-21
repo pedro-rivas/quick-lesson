@@ -113,6 +113,23 @@ export const Body = ({ children, style, ...props }: TextProps) => {
   );
 };
 
+export const Caption = ({ children, style, ...props }: TextProps) => {
+  return (
+    <DefaultText
+      style={[
+        {
+          fontSize: 14,
+          fontWeight: props.bold ? "bold" : "normal",
+        },
+        style,
+      ]}
+      {...props}
+    >
+      {children}
+    </DefaultText>
+  );
+};
+
 const DefaultText = ({ children, ...props }: TextProps) => {
   return (
     <Animated.Text style={props.style} {...props}>
