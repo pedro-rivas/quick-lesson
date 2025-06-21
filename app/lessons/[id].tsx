@@ -2,11 +2,10 @@ import * as Layout from "@/components/Layout";
 import LessonNotFound from "@/components/LessonNotFound";
 import * as List from "@/components/List";
 import Pager from "@/components/Pager";
-import PhrasesSection from "@/components/PhrasesSection";
 import SafeAreaView from "@/components/SafeAreaView";
 import { TabBar } from "@/components/TabBar";
 import * as Text from "@/components/Text";
-import TipsSection, { TipExample } from "@/components/TipsSection";
+import { TipExample } from "@/components/TipsSection";
 import VocabularySection from "@/components/VocabularySection";
 import Button from "@/components/buttons/Button";
 import IconButton from "@/components/buttons/IconButton";
@@ -16,8 +15,12 @@ import { useLessonStore } from "@/store/lessonStore";
 import { spacing } from "@/styles/spacing";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Alert, StyleSheet } from "react-native";
+
+
+const TipsSection = React.lazy(() => import('@/components/TipsSection'));
+const PhrasesSection = React.lazy(() => import('@/components/PhrasesSection'));
 
 export default function LessonDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -27,15 +30,15 @@ export default function LessonDetailScreen() {
 
   const lesson = getLessonById(id!);
 
-  const t = useTranslation();
-  const theme = useTheme();
-
-
   if (!lesson) {
     return <LessonNotFound />;
   }
 
 
+  useEffect(() => {}, []);
+
+  const t = useTranslation();
+  const theme = useTheme();
 
   const bottomSheetRef = useRef<BottomSheet>(null);
 
