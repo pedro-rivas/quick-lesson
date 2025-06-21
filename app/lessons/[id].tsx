@@ -2,7 +2,7 @@ import * as Layout from "@/components/Layout";
 import LessonNotFound from "@/components/LessonNotFound";
 import * as List from "@/components/List";
 import Pager from "@/components/Pager";
-import PhrasesSection from "@/components/QuickPhrasesSection";
+import PhrasesSection from "@/components/PhrasesSection";
 import TipsSection from "@/components/QuickTipsSection";
 import SafeAreaView from "@/components/SafeAreaView";
 import { TabBar } from "@/components/TabBar";
