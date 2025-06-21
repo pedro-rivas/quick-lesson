@@ -3,6 +3,7 @@ import useTranslation from "@/hooks/useTranslation";
 import { commonStyles as cs } from "@/styles/common";
 import { spacing } from "@/styles/spacing";
 import { useTheme } from "@react-navigation/native";
+import { useAudioPlayer } from "expo-audio";
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import * as Layout from "./Layout";
@@ -36,13 +37,29 @@ interface TipsSectionProps {
  *
  * @returns A React element displaying the tips and their examples, or null if no tips are provided.
  */
-const TipsSection: React.FC<TipsSectionProps> = ({ tips, langCode, setExplanation }) => {
+const TipsSection: React.FC<TipsSectionProps> = ({
+  tips,
+  langCode,
+  setExplanation,
+}) => {
   if (!tips || tips.length === 0) {
     return null;
   }
 
   const theme = useTheme();
   const t = useTranslation();
+
+  const player = useAudioPlayer("");
+
+  const handlePress = (uri: string) => {
+    if (uri) {
+      player.replace(uri);
+      player.seekTo(0);
+      setTimeout(() => {
+        player.play();
+      }, 10);
+    }
+  };
 
   return (
     <Layout.Column>
@@ -79,7 +96,11 @@ const TipsSection: React.FC<TipsSectionProps> = ({ tips, langCode, setExplanatio
                 <View style={styles.examplesRow}>
                   {tip.examples.map((ex, exIdx: number) => (
                     <View key={exIdx} style={styles.exampleCard}>
-                      <SpeechButton text={ex.sentence}langCode={langCode}/>
+                      <SpeechButton
+                        text={ex.sentence}
+                        langCode={langCode}
+                        onPress={handlePress}
+                      />
                       <Pressable
                         onPress={() => setExplanation(ex)}
                         style={{ flex: 1 }}

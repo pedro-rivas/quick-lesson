@@ -17,6 +17,7 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 interface SpeechButtonProps {
   text: string;
   langCode: LanguageCode;
+  onPress: (uri: string) => void;
 }
 
 /**
@@ -29,14 +30,14 @@ interface SpeechButtonProps {
  * While the speech is being generated and played, a loading indicator is shown.
  * Otherwise, a sound icon is displayed.
  */
-const SpeechButton = ({ text, langCode }: SpeechButtonProps) => {
+const SpeechButton = ({ text, langCode, onPress }: SpeechButtonProps) => {
   const speech = useSpeech(text, langCode);
 
   const pressed = useSharedValue(0);
 
   const handlePress = useCallback(() => {
-    speech.play();
-  }, [text]);
+   onPress(speech.uri!);
+  }, [speech.uri]);
 
   const vibrate = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

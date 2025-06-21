@@ -3,6 +3,7 @@ import useTranslation from "@/hooks/useTranslation";
 import { commonStyles as cs } from "@/styles/common";
 import { spacing } from "@/styles/spacing";
 import { useTheme } from "@react-navigation/native";
+import { useAudioPlayer } from "expo-audio";
 import React from "react";
 import * as Layout from "./Layout";
 import SpeechButton from "./SpeechButton";
@@ -16,7 +17,7 @@ interface Phrase {
 
 interface PhrasesSectionProps {
   phrases: Phrase[];
-    langCode: LanguageCode
+  langCode: LanguageCode;
 }
 
 /**
@@ -30,13 +31,27 @@ interface PhrasesSectionProps {
  *
  * @returns A React element displaying the phrases, or `null` if no phrases are provided.
  */
-const PhrasesSection: React.FC<PhrasesSectionProps> = ({ phrases, langCode }) => {
+const PhrasesSection: React.FC<PhrasesSectionProps> = ({
+  phrases,
+  langCode,
+}) => {
   if (!phrases || phrases.length === 0) {
     return null;
   }
 
   const t = useTranslation();
   const theme = useTheme();
+  const player = useAudioPlayer("");
+
+  const handlePress = (uri: string) => {
+    if (uri) {
+      player.replace(uri);
+      player.seekTo(0);
+      setTimeout(() => {
+        player.play();
+      }, 10);
+    }
+  };
 
   return (
     <Layout.Column>
@@ -62,7 +77,11 @@ const PhrasesSection: React.FC<PhrasesSectionProps> = ({ phrases, langCode }) =>
               { borderColor: theme.colors.border },
             ]}
           >
-            <SpeechButton text={phrase.phrase} langCode={langCode}/>
+            <SpeechButton
+              text={phrase.phrase}
+              langCode={langCode}
+              onPress={handlePress}
+            />
             <Layout.Column ml={12}>
               <Layout.Column mb={4}>
                 <Text.Body bold>{phrase.phrase}</Text.Body>

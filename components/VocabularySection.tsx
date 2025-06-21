@@ -3,6 +3,7 @@ import useTranslation from "@/hooks/useTranslation";
 import { commonStyles } from "@/styles/common";
 import { spacing } from "@/styles/spacing";
 import { useTheme } from "@react-navigation/native";
+import { useAudioPlayer } from "expo-audio";
 import React from "react";
 import * as Layout from "./Layout";
 import SpeechButton from "./SpeechButton";
@@ -16,7 +17,7 @@ interface VocabularyItem {
 
 interface VocabularySectionProps {
   vocabulary: VocabularyItem[];
-  langCode: LanguageCode
+  langCode: LanguageCode;
 }
 
 /**
@@ -32,6 +33,17 @@ const VocabularySection: React.FC<VocabularySectionProps> = ({
 }) => {
   const theme = useTheme();
   const t = useTranslation();
+  const player = useAudioPlayer("");
+
+  const handlePress = (uri: string) => {
+    if (uri) {
+      player.replace(uri);
+      player.seekTo(0);
+      setTimeout(() => {
+        player.play();
+      }, 10);
+    }
+  };
 
   if (!vocabulary || vocabulary.length === 0) {
     return null;
@@ -61,7 +73,11 @@ const VocabularySection: React.FC<VocabularySectionProps> = ({
               { borderColor: theme.colors.border },
             ]}
           >
-            <SpeechButton text={vocab.term} langCode={langCode}/>
+            <SpeechButton
+              text={vocab.term}
+              langCode={langCode}
+              onPress={handlePress}
+            />
             <Layout.Column ml={12}>
               <Layout.Column mb={4}>
                 <Text.Body bold>{vocab.term}</Text.Body>
@@ -83,9 +99,7 @@ const VocabularySection: React.FC<VocabularySectionProps> = ({
                   </Layout.Row>
                 ) : null}
               </Layout.Column>
-              <Text.Caption>
-                {vocab.translation}
-              </Text.Caption>
+              <Text.Caption>{vocab.translation}</Text.Caption>
             </Layout.Column>
           </Layout.Row>
         ))}

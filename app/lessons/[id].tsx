@@ -27,12 +27,15 @@ export default function LessonDetailScreen() {
 
   const lesson = getLessonById(id!);
 
+  const t = useTranslation();
+  const theme = useTheme();
+
+
   if (!lesson) {
     return <LessonNotFound />;
   }
 
-  const t = useTranslation();
-  const theme = useTheme();
+
 
   const bottomSheetRef = useRef<BottomSheet>(null);
 
