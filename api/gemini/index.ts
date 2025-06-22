@@ -67,14 +67,12 @@ export const createLesson = async ({
     },
     contents,
   });
-
  
   const [termsResponse, tipsResponse] = await Promise.all([
     termsRequest,
     tipsRequest,
   ]);
 
-  
   const parsedTerms = JSON.parse(termsResponse?.text || "");
   const generatedPhrases = parsedTerms.phrases;
   const generatedVocabulary = parsedTerms.vocabulary;
@@ -93,5 +91,6 @@ export const createLesson = async ({
     phrases: generatedPhrases,
     vocabulary: generatedVocabulary,
     relevantGrammar: generatedTips,
+    studentLangCode: studentLanguageCode,
   };
 };

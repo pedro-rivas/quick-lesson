@@ -37,7 +37,8 @@ export interface Lesson {
   vocabulary: VocabularyItem[];
   relevantGrammar: GrammarTip[];
   createdAt: Date;
-  langCode: LanguageCode
+  langCode: LanguageCode,
+  studentLangCode: LanguageCode,
 }
 
 interface LessonStore {
