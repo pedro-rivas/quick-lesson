@@ -1,5 +1,6 @@
 import useTheme from "@/hooks/useTheme";
 import { commonStyles as cs } from "@/styles/common";
+import { spacing } from "@/styles/spacing";
 import React from "react";
 import { View as RNView, ViewProps } from "react-native";
 
@@ -27,21 +28,20 @@ interface LayoutProps extends ViewProps {
 
 export const Header = React.memo(
   ({ children, style, ...props }: LayoutProps) => {
-
     const theme = useTheme();
     return (
       <RNView
         style={[
+          cs.borderBottomWidth2,
           {
             flexDirection: "row",
             height: 50,
-            paddingHorizontal: 16,
+            paddingHorizontal: spacing.m,
             alignItems: "center",
             justifyContent: "space-between",
-            borderBottomColor:  theme.colors.border,
+            borderBottomColor: theme.colors.border,
             width: "100%",
           },
-          [cs.borderWidth2],
           style,
         ]}
         {...props}

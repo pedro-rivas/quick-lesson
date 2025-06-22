@@ -1,15 +1,18 @@
 import { BUTTON_ICON_HEIGHT } from "@/constants/style";
 import { StyleSheet } from "react-native";
 
+export const BORDER_WIDTH = 2;
+export const BORDER_RADIUS = 16;
+
 const commonStyles = StyleSheet.create({
   flex1: {
     flex: 1,
   },
   border2: {
-    borderWidth: 2,
+    borderWidth: BORDER_WIDTH,
   },
   borderBottom2: {
-    borderBottomWidth: 2,
+    borderBottomWidth: BORDER_WIDTH,
   },
   borderBottom1: {
     borderBottomWidth: 1,
@@ -17,11 +20,11 @@ const commonStyles = StyleSheet.create({
   opacity70: {
     opacity: 0.7,
   },
-  borderWidth2: {
-    borderBottomWidth: 2,
+  borderBottomWidth2: {
+    borderBottomWidth: BORDER_WIDTH,
   },
   borderRadius16: {
-    borderRadius: 16,
+    borderRadius: BORDER_RADIUS,
   },
   speechButton: {
     height: BUTTON_ICON_HEIGHT,
@@ -31,9 +34,9 @@ const commonStyles = StyleSheet.create({
     borderRadius: BUTTON_ICON_HEIGHT,
   },
   sectionList: {
-    borderWidth: 2,
-    borderRadius: 16,
-  }
+    borderWidth: BORDER_WIDTH,
+    borderRadius: BORDER_RADIUS,
+  },
 });
 
 export { commonStyles };

@@ -1,3 +1,4 @@
+import { commonStyles } from "@/styles/common";
 import { useTheme as useThemeNative } from "@react-navigation/native";
 
 const useTheme = () => {
@@ -11,6 +12,7 @@ const useTheme = () => {
             // @ts-ignore
             onPrimary: theme.colors.onPrimary,
         },
+        cs: commonStyles,
     };
 
 }

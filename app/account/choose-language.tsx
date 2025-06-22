@@ -1,17 +1,17 @@
 import { images } from "@/assets/images";
 import IconButton from "@/components/buttons/IconButton";
 import * as Layout from "@/components/Layout";
+import * as List from "@/components/List";
 import SafeAreaView from "@/components/SafeAreaView";
 import * as Text from "@/components/Text";
 import { LANGUAGES } from "@/constants/languages";
 import useTheme from "@/hooks/useTheme";
 import useTranslation from "@/hooks/useTranslation";
 import { useUserStore } from "@/store/userStore";
-import { commonStyles as cs } from "@/styles/common";
 import { spacing } from "@/styles/spacing";
 import { router } from "expo-router";
 import React, { useCallback, useMemo } from "react";
-import { FlatList, Image } from "react-native";
+import { Image, ListRenderItem } from "react-native";
 
 export default function ChooseLanguageScreen() {
   const { setLearningLanguage } = useUserStore();
@@ -29,6 +29,7 @@ export default function ChooseLanguageScreen() {
   const availableLanguages = useMemo(
     () =>
       Object.values(LANGUAGES).map((l) => ({
+        id: l.code,
         label: l.label,
         value: l.value,
         code: l.code,
@@ -42,6 +43,49 @@ export default function ChooseLanguageScreen() {
     [learningLanguage]
   );
 
+  const renderItem = useCallback<
+    ListRenderItem<(typeof availableLanguages)[number]>
+  >(
+    ({ item }) => {
+      return (
+        <Layout.Row
+          padding={spacing.m}
+          alignItems={"center"}
+          justifyContent="space-between"
+        >
+          <Layout.Row alignItems={"center"}>
+            <Image
+              source={item.image}
+              style={{
+                width: 64,
+                height: 48,
+                borderRadius: 4,
+                marginRight: spacing.m,
+              }}
+            />
+            <Text.Body bold>{item.label}</Text.Body>
+          </Layout.Row>
+          {item.isSelected ? (
+            <IconButton
+              name={"check-circle"}
+              size={34}
+              color={theme.colors.primary}
+              onPress={item.onPress}
+            />
+          ) : (
+            <IconButton
+              name={"radio-button-unchecked"}
+              size={34}
+              color={theme.colors.border}
+              onPress={item.onPress}
+            />
+          )}
+        </Layout.Row>
+      );
+    },
+    [theme]
+  );
+
   return (
     <SafeAreaView>
       <Layout.Header>
@@ -52,56 +96,7 @@ export default function ChooseLanguageScreen() {
       <Layout.Column padding={spacing.m}>
         <Text.Subheading>{t("What do you want to learn?")}</Text.Subheading>
         <Layout.Spacer size={"l"} />
-        <FlatList
-          data={availableLanguages}
-          contentContainerStyle={[
-            cs.sectionList,
-            {
-              borderColor: theme.colors.border,
-            },
-          ]}
-          renderItem={({ item }) => (
-            <Layout.Row
-              key={item.code}
-              padding={spacing.m}
-              alignItems={"center"}
-              justifyContent="space-between"
-            >
-              <Layout.Row alignItems={"center"}>
-                <Image
-                  source={item.image}
-                  style={{
-                    width: 64,
-                    height: 48,
-                    borderRadius: 4,
-                    marginRight: spacing.m,
-                  }}
-                />
-                <Text.Body bold>{item.label}</Text.Body>
-              </Layout.Row>
-              {item.isSelected ? (
-                <IconButton
-                  name={"check-circle"}
-                  size={34}
-                  color={theme.colors.primary}
-                  onPress={item.onPress}
-                />
-              ) : (
-                <IconButton
-                  name={"radio-button-unchecked"}
-                  size={34}
-                  color={theme.colors.border}
-                  onPress={item.onPress}
-                />
-              )}
-            </Layout.Row>
-          )}
-          ItemSeparatorComponent={() => (
-            <Layout.View
-              style={{ height: 2, backgroundColor: theme.colors.border }}
-            />
-          )}
-        />
+        <List.Section data={availableLanguages} renderItem={renderItem} />
       </Layout.Column>
     </SafeAreaView>
   );
