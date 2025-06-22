@@ -1,7 +1,7 @@
-import { LanguageCode } from '@/constants/languages';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import { LanguageCode } from "@/constants/languages";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 export interface UserPreferences {
   language: LanguageCode;
@@ -20,16 +20,16 @@ interface UserStore {
 }
 
 const initialState: UserPreferences = {
-      language: 'en-US',
-        learningLanguage: 'es-ES',
-        preferredLanguage: 'en-US',
-}
+  language: "en-US",
+  learningLanguage: "es-ES",
+  preferredLanguage: "en-US",
+};
 
 export const useUserStore = create<UserStore>()(
   persist(
     (set, get) => ({
       userPreferences: initialState,
-      
+
       setLanguage: (language: LanguageCode) => {
         set((state) => ({
           userPreferences: {
@@ -38,7 +38,7 @@ export const useUserStore = create<UserStore>()(
           },
         }));
       },
-      
+
       setLearningLanguage: (language: LanguageCode) => {
         set((state) => ({
           userPreferences: {
@@ -47,7 +47,7 @@ export const useUserStore = create<UserStore>()(
           },
         }));
       },
-      
+
       setPreferredLanguage: (language: LanguageCode) => {
         set((state) => ({
           userPreferences: {
@@ -56,7 +56,7 @@ export const useUserStore = create<UserStore>()(
           },
         }));
       },
-      
+
       updateUserPreferences: (preferences: Partial<UserPreferences>) => {
         set((state) => ({
           userPreferences: {
@@ -65,11 +65,11 @@ export const useUserStore = create<UserStore>()(
           },
         }));
       },
-      
+
       getUserPreferences: () => {
         return get().userPreferences;
       },
-      
+
       resetUserPreferences: () => {
         set((state) => ({
           userPreferences: initialState,
@@ -77,8 +77,8 @@ export const useUserStore = create<UserStore>()(
       },
     }),
     {
-      name: 'user-storage',
+      name: "user-storage",
       storage: createJSONStorage(() => AsyncStorage),
     }
   )
-); 
+);

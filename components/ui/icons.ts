@@ -2,10 +2,12 @@ import { Platform } from "react-native";
 
 const isIOS = Platform.OS === "ios";
 
-const icons ={
+const icons = {
   "arrow-back": isIOS ? "chevron.left" : "arrow-back",
-  "delete": "delete",
-  "language": "language",
+  delete: "delete",
+  language: "language",
+  "check-circle": "check-circle",
+  "radio-button-unchecked": "radio-button-unchecked",
 };
 
 export type IconSymbolName = keyof typeof icons;

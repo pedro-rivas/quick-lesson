@@ -17,6 +17,9 @@ const commonStyles = StyleSheet.create({
   opacity70: {
     opacity: 0.7,
   },
+  borderWidth2: {
+    borderBottomWidth: 2,
+  },
   borderRadius16: {
     borderRadius: 16,
   },
@@ -27,6 +30,10 @@ const commonStyles = StyleSheet.create({
     alignItems: "center",
     borderRadius: BUTTON_ICON_HEIGHT,
   },
+  sectionList: {
+    borderWidth: 2,
+    borderRadius: 16,
+  }
 });
 
 export { commonStyles };

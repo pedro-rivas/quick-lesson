@@ -1,3 +1,5 @@
+import useTheme from "@/hooks/useTheme";
+import { commonStyles as cs } from "@/styles/common";
 import React from "react";
 import { View as RNView, ViewProps } from "react-native";
 
@@ -25,6 +27,8 @@ interface LayoutProps extends ViewProps {
 
 export const Header = React.memo(
   ({ children, style, ...props }: LayoutProps) => {
+
+    const theme = useTheme();
     return (
       <RNView
         style={[
@@ -34,10 +38,10 @@ export const Header = React.memo(
             paddingHorizontal: 16,
             alignItems: "center",
             justifyContent: "space-between",
-            borderBottomWidth: 1,
-            borderBottomColor: "#ebebeb",
+            borderBottomColor:  theme.colors.border,
             width: "100%",
           },
+          [cs.borderWidth2],
           style,
         ]}
         {...props}
@@ -91,6 +95,8 @@ const SPACER_SIZE = {
   s: 8,
   m: 16,
   l: 24,
+  xl: 32,
+  xxl: 40,
 };
 
 export const Spacer = ({ size = "m" }: { size?: keyof typeof SPACER_SIZE }) => {

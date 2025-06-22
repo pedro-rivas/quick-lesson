@@ -1,71 +1,24 @@
 import Button from "@/components/buttons/Button";
-import * as Text from "@/components/Text";
-import { AVAILABLE_LANGUAGES, LanguageCode } from "@/constants/languages";
-import { useUserStore } from "@/store/userStore";
-import { AntDesign } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, TextInput, View } from "react-native";
-import RNPickerSelect, { Item } from "react-native-picker-select";
-import Animated, {
-  useAnimatedKeyboard,
-  useSharedValue,
-} from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Animated from "react-native-reanimated";
 
 interface LessonGeneratorFormProps {
-  selectedLanguage: LanguageCode | null; // Use LanguageCode for type safety
-  onSelectLanguage: (language: LanguageCode) => void;
   topic: string;
   onTopicChange: (topic: string) => void;
   onGenerate: () => void;
-  isGenerating: boolean; // To handle loading state from parent
-  onClose: () => void;
+  isGenerating: boolean;
 }
 
 const LessonGeneratorForm: React.FC<LessonGeneratorFormProps> = ({
-  selectedLanguage,
-  onSelectLanguage,
   topic,
   onTopicChange,
   onGenerate,
   isGenerating,
-  onClose,
 }) => {
-  const { setLearningLanguage } = useUserStore();
-
-  const handleLanguageChange = (langCode: LanguageCode) => {
-    // Update the learning language in the user store
-    setLearningLanguage(langCode);
-    // Call the parent's onSelectLanguage callback
-    onSelectLanguage(langCode);
-  };
-
-  const animatedKeyboard = useAnimatedKeyboard();
-  const insents = useSafeAreaInsets();
-  const bottomInsets = useSharedValue(insents.bottom);
-  const ty = useSharedValue(0);
-  const opacity = useSharedValue(0);
-
   return (
     <Animated.View style={[styles.container]}>
-
       <View style={styles.formContent}>
-        <RNPickerSelect
-          onValueChange={(_, index) => {
-            const langCode = AVAILABLE_LANGUAGES[index - 1]?.code || "";
-            handleLanguageChange(langCode);
-          }}
-          items={[...AVAILABLE_LANGUAGES] as Item[]}
-          disabled={isGenerating}
-        >
-          <View style={[styles.picker, isGenerating && styles.disabledInput]}>
-            <Text.Body style={styles.pickerLabel}>
-              {!selectedLanguage ? "Select Language" : selectedLanguage}
-            </Text.Body>
-            <AntDesign name={"down"} size={16} color="#0b57d0" />
-          </View>
-        </RNPickerSelect>
-
         <TextInput
           placeholder="Taking a taxi"
           value={topic}
@@ -78,7 +31,7 @@ const LessonGeneratorForm: React.FC<LessonGeneratorFormProps> = ({
 
         <Button
           onPress={onGenerate}
-          disabled={!topic || !selectedLanguage || isGenerating}
+          disabled={!topic || isGenerating}
           title="Generate"
         />
       </View>
