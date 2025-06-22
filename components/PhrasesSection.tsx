@@ -82,9 +82,9 @@ const PhrasesSection: React.FC<PhrasesSectionProps> = ({
               langCode={langCode}
               onPress={handlePress}
             />
-            <Layout.Column ml={12}>
+            <Layout.Column ml={12} flexShrink={1}>
               <Layout.Column mb={4}>
-                <Text.Body bold>{phrase.phrase}</Text.Body>
+                <Text.Body bold>{phrase.phrase + 's'}</Text.Body>
                 {phrase?.transliteration ? (
                   <Layout.Row>
                     {phrase.transliteration.split("").map((l) => (

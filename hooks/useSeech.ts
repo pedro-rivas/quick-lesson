@@ -1,5 +1,5 @@
 import { LanguageCode } from "@/constants/languages";
-import { textToSpeech } from "@/lib/texToSpeech"; // Adjust the import path as necessary
+import { textToSpeech } from "@/lib/texToSpeech";
 import React, { useEffect } from "react";
 
 const useSpeech = (text: string, langCode: LanguageCode) => {

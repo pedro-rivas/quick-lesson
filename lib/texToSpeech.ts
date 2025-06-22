@@ -5,7 +5,7 @@ import { decode } from "base64-arraybuffer";
 import * as FileSystem from "expo-file-system";
 import { supabase } from "./supabase";
 
-import { SpeechService } from "./testToSpeeechService";
+import { SpeechService } from "./speechService";
 
 const speechService = new SpeechService(ELEVEN_LABS_API_KEY);
 
@@ -20,28 +20,25 @@ export const textToSpeech = async (
   text: string,
   lang: LanguageCode
 ): Promise<string> => {
-
   if (!LANGUAGES[lang]) {
     throw new Error(`Unsupported language: ${lang}`);
   }
 
-  // Where we'll store it
   const baseName = `${lang}-${sanitizeFilename(text)}`.toLocaleLowerCase();
   const fileName = `${baseName}.mp3`;
   const fileUri = `${FileSystem.documentDirectory}${fileName}`;
 
-  // If the file already exists, just return it
+  // Return from cache if it exists
   const fileInfo = await FileSystem.getInfoAsync(fileUri);
   if (fileInfo.exists) {
-    console.log(`File already exists at ${fileUri}`);
+    //console.log(`File already exists at ${fileUri}`);
     return fileUri;
   }
 
-  // If it exists in the database, we can fetch it and wrtite it to disk
-  // then return it
+  // Return from database if it exists
   const existingFileUri = await getFileFromDatabase(text, lang, fileUri);
   if (existingFileUri) {
-    console.log(`Found existing file in database: ${existingFileUri}`);
+    //console.log(`Found existing file in database: ${existingFileUri}`);
     return existingFileUri;
   }
 
@@ -49,16 +46,19 @@ export const textToSpeech = async (
   const audioContent = await speechService.speak(text);
 
   if (!audioContent?.audio_url) {
-    throw new Error(`TTS synthesis failed: ${'Unknown error'}`);
+    throw new Error(`TTS synthesis failed: ${"Unknown error"}`);
   }
 
   // Write base64 data to file
   const uri = await writeFileInDisk(fileUri, audioContent.audio_url);
 
-  console.log(`Synthesized speech saved to ${uri}`);
+  //console.log(`Synthesized speech saved to ${uri}`);
 
   saveFileInDatabase({
-    baseName, fileUri: uri, text, lang
+    baseName,
+    fileUri: uri,
+    text,
+    lang,
   });
 
   return uri;
@@ -76,21 +76,16 @@ const saveFileInDatabase = async ({
   lang: LanguageCode;
 }) => {
   try {
-    // a) Read the newly created local file as a Blob (Expo can fetch a local file via its URI)
-    // const fetchRes = await fetch(fileUri);
-    // const fileBlob = await fetchRes.blob();
     const base64 = await FileSystem.readAsStringAsync(fileUri, {
       encoding: "base64",
     });
 
-    //    └→ now we have a Blob object we can pass to supabase.storage.upload
-
-    // b) Upload to Supabase Storage under "tts-audios" bucket
+    // b) Upload to Supabase Storage
     const { error: uploadError } = await supabase.storage
       .from(BUCKET)
       .upload(baseName + ".mp3", decode(base64), {
         contentType: "audio/mpeg",
-        upsert: false, // fail if it already exists (shouldn’t happen since we checked above)
+        upsert: true,
       });
 
     if (uploadError) {

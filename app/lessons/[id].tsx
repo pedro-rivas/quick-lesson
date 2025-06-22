@@ -2,10 +2,11 @@ import * as Layout from "@/components/Layout";
 import LessonNotFound from "@/components/LessonNotFound";
 import * as List from "@/components/List";
 import Pager from "@/components/Pager";
+import PhrasesSection from "@/components/PhrasesSection";
 import SafeAreaView from "@/components/SafeAreaView";
 import { TabBar } from "@/components/TabBar";
 import * as Text from "@/components/Text";
-import { TipExample } from "@/components/TipsSection";
+import TipsSection, { TipExample } from "@/components/TipsSection";
 import VocabularySection from "@/components/VocabularySection";
 import Button from "@/components/buttons/Button";
 import IconButton from "@/components/buttons/IconButton";
@@ -18,15 +19,12 @@ import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Alert, StyleSheet } from "react-native";
 
-
-const TipsSection = React.lazy(() => import('@/components/TipsSection'));
-const PhrasesSection = React.lazy(() => import('@/components/PhrasesSection'));
-
 export default function LessonDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const { getLessonById, removeLesson } = useLessonStore();
   const [example, setCurrentExample] = useState<TipExample | null>(null);
+  const [renderAllSections, setRenderAllSections] = useState(false);
 
   const lesson = getLessonById(id!);
 
@@ -34,8 +32,11 @@ export default function LessonDetailScreen() {
     return <LessonNotFound />;
   }
 
-
-  useEffect(() => {}, []);
+  useEffect(() => {
+    setTimeout(()=> {
+      setRenderAllSections(true);
+    }, 300)
+  }, []);
 
   const t = useTranslation();
   const theme = useTheme();
@@ -92,7 +93,7 @@ export default function LessonDetailScreen() {
         type: "vocabulary",
         content: <VocabularySection vocabulary={lesson.vocabulary} langCode={lesson.langCode} />,
       },
-      {
+      ...(renderAllSections ? [{
         type: "phrases",
         content: <PhrasesSection phrases={lesson.phrases} langCode={lesson.langCode}/>,
       },
@@ -105,9 +106,9 @@ export default function LessonDetailScreen() {
             langCode={lesson.langCode}
           />
         ),
-      },
+      }] : []),
     ],
-    [lesson]
+    [lesson, renderAllSections]
   );
 
   return (

@@ -14,6 +14,7 @@ interface LayoutProps extends ViewProps {
   gap?: number;
   flexWrap?: "wrap" | "nowrap" | "wrap-reverse";
   flexDirection?: "row" | "column" | "row-reverse" | "column-reverse";
+  flexShrink?: number;
   padding?: number;
   paddingHorizontal?: number;
   ml?: number;
@@ -67,6 +68,7 @@ export const View = ({ children, style, ...props }: LayoutProps) => {
           marginRight: props.mr,
           marginTop: props.mt,
           marginBottom: props.mb,
+          flexShrink: props.flexShrink,
         },
         style,
       ]}
