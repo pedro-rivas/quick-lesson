@@ -106,10 +106,7 @@ const Button: React.FC<ButtonProps> = ({
   });
 
   return (
-    <Animated.View
-      entering={success ? keyframe.duration(600) : undefined}
-      style={styles.wrapper}
-    >
+    <Animated.View entering={success ? keyframe.duration(600) : undefined} >
       <AnimatedPressable
         onPress={handlePress}
         onPressIn={onPressIn}
@@ -133,9 +130,6 @@ const Button: React.FC<ButtonProps> = ({
 };
 
 const styles = StyleSheet.create({
-  wrapper: {
-    width: "100%",
-  },
   button: {
     backgroundColor: "#0b57d0",
     paddingHorizontal: 16,

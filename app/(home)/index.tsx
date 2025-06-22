@@ -1,62 +1,30 @@
-import { createLesson } from "@/api/gemini";
 import QuickButton from "@/components/buttons/Button";
 import LessonCard from "@/components/LessonCard";
 import LessonEmptyState from "@/components/LessonEmptyState";
-import LessonGeneratorForm from "@/components/LessonGeneratorForm";
 import * as List from "@/components/List";
-import QuickSafeAreaView from "@/components/SafeAreaView";
-import { LanguageCode, LANGUAGES } from "@/constants/languages";
+import SafeAreaView from "@/components/SafeAreaView";
+import { LanguageCode } from "@/constants/languages";
 import useTranslation from "@/hooks/useTranslation";
 import { Lesson, useLessonStore } from "@/store/lessonStore";
 import { useUserStore } from "@/store/userStore";
 import { router } from "expo-router";
 import React, { useCallback } from "react";
-import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View
-} from "react-native";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { Alert, StyleSheet, Text, View } from "react-native";
+
+import Animated from "react-native-reanimated";
 
 export default function HomeScreen() {
-  const [selectedLanguage, setSelectedLanguage] = React.useState<LanguageCode | null>(null);
+  const [selectedLanguage, setSelectedLanguage] =
+    React.useState<LanguageCode | null>(null);
   const [topic, setTopic] = React.useState("");
   const [loading, setLoading] = React.useState(false);
-  const [showLessonForm, setShowCreateLessonFrom] = React.useState(false);
 
   const { addLesson, getAllLessons, removeLesson } = useLessonStore();
-  const { getUserPreferences } = useUserStore()
+  const { getUserPreferences } = useUserStore();
   const userPreferences = getUserPreferences();
-  const userLanguage = userPreferences.preferredLanguage
+  const userLanguage = userPreferences.preferredLanguage;
   const lessons = getAllLessons();
   const t = useTranslation();
-  
-
-  const generate = async () => {
-    try {
-      if (!selectedLanguage || !topic) return;
-      setShowCreateLessonFrom(false);
-      setLoading(true);
-
-      const lesson = await createLesson({
-        studentLanguage: userLanguage,
-        learningLanguage: selectedLanguage,
-        topic,
-      });
-
-      addLesson(lesson);
-
-      setTopic("");
-    } catch (error: any) {
-      Alert.alert(t("Something went wrong"), error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDeleteLesson = useCallback((id: string, title: string) => {
     Alert.alert(
@@ -74,7 +42,7 @@ export default function HomeScreen() {
         },
       ]
     );
-  }, [])
+  }, []);
 
   const handleViewLesson = useCallback((lesson: Lesson) => {
     router.push(`/lessons/${lesson.id}` as any);
@@ -90,82 +58,48 @@ export default function HomeScreen() {
     );
   }, []);
 
-  const selectedLanguageLabel = LANGUAGES?.[selectedLanguage] ? LANGUAGES?.[selectedLanguage].label  : null
-
   return (
-    <QuickSafeAreaView>
-      <ScrollView style={{ flex: 1, paddingHorizontal: 16 }}>
-        {selectedLanguage ? (
-          <Text style={styles.title}>
-            <Text style={styles.bigTitle}>
-              {selectedLanguageLabel
-                ? selectedLanguageLabel.charAt(0).toUpperCase() +
-                  selectedLanguageLabel.slice(1)
-                : ""}{" "}
-              for
-            </Text>
-            {topic ? "\n" + topic : ""}
-          </Text>
-        ) : (
-          <Text style={styles.title}>{t("Quick Lesson")}</Text>
-        )}
-
-        {/* --- My Lessons Section --- */}
-        <View style={styles.lessonsSectionContainer}>
-          <View style={styles.lessonsHeader}>
-            <Text style={styles.lessonsTitle}>My Lessons</Text>
-            {lessons.length > 0 && (
-              <Text style={styles.lessonsSubtitle}>
-                {lessons.length} lesson{lessons.length !== 1 ? "s" : ""}
-              </Text>
-            )}
+    <SafeAreaView>
+      <List.FlatList
+        data={lessons}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.lessonListContainer}
+        scrollEnabled={true}
+        windowSize={9}
+        nestedScrollEnabled={true}
+        pinchGestureEnabled={false}
+        ListHeaderComponent={
+          <View>
+            <Text style={styles.title}>{t("Quick Lesson")}</Text>
+            {/* --- My Lessons Section --- */}
+            <View style={styles.lessonsSectionContainer}>
+              <View style={styles.lessonsHeader}>
+                <Text style={styles.lessonsTitle}>My Lessons</Text>
+                {lessons.length > 0 && (
+                  <Text style={styles.lessonsSubtitle}>
+                    {lessons.length} lesson{lessons.length !== 1 ? "s" : ""}
+                  </Text>
+                )}
+              </View>
+            </View>
           </View>
+        }
+        ListEmptyComponent={<LessonEmptyState />}
+      />
 
-          {lessons.length === 0 && !loading ? (
-            <LessonEmptyState />
-          ) : (
-            <List.FlatList
-              data={lessons}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.id}
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={styles.lessonListContainer}
-              scrollEnabled={false}
-              windowSize={9}
-            />
-          )}
-        </View>
-      </ScrollView>
-
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-      >
-        {showLessonForm ? (
-          <Animated.View entering={FadeIn} exiting={FadeOut}>
-            <LessonGeneratorForm
-              selectedLanguage={selectedLanguage}
-              onSelectLanguage={setSelectedLanguage}
-              topic={topic}
-              onTopicChange={setTopic}
-              onGenerate={generate}
-              isGenerating={loading}
-              onClose={() => setShowCreateLessonFrom(false)}
-            />
-          </Animated.View>
-        ) : (
-          <View style={{ padding: 16 }}>
-            <QuickButton
-              onPress={() => {
-                setShowCreateLessonFrom(true);
-              }}
-              title="New Lesson"
-              loading={loading}
-              disabled={loading}
-            />
-          </View>
-        )}
-      </KeyboardAvoidingView>
-    </QuickSafeAreaView>
+      <Animated.View style={{ padding: 16 }}>
+        <QuickButton
+          onPress={() => {
+            router.push("/create-lesson");
+          }}
+          title="New Lesson"
+          loading={loading}
+          disabled={loading}
+        />
+      </Animated.View>
+    </SafeAreaView>
   );
 }
 
@@ -190,9 +124,7 @@ const styles = StyleSheet.create({
     padding: 24,
     // backgroundColor: "#0b57d0",
   },
-  lessonsSectionContainer: {
-
-  },
+  lessonsSectionContainer: {},
   lessonsHeader: {
     marginBottom: 24,
   },
@@ -208,5 +140,18 @@ const styles = StyleSheet.create({
   },
   lessonListContainer: {
     paddingBottom: 20,
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: "center",
+  },
+  input: {
+    marginTop: 8,
+    marginBottom: 10,
+    borderRadius: 10,
+    fontSize: 16,
+    lineHeight: 20,
+    padding: 8,
+    backgroundColor: "rgba(151, 151, 151, 0.25)",
   },
 });

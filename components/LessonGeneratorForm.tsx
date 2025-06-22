@@ -1,11 +1,16 @@
-import QuickButton from "@/components/buttons/Button";
-import { AVAILABLE_LANGUAGES, LanguageCode } from "@/constants/languages"; // Assuming this path is correct
+import Button from "@/components/buttons/Button";
+import * as Text from "@/components/Text";
+import { AVAILABLE_LANGUAGES, LanguageCode } from "@/constants/languages";
 import { useUserStore } from "@/store/userStore";
 import { AntDesign } from "@expo/vector-icons";
 import React from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, TextInput, View } from "react-native";
 import RNPickerSelect, { Item } from "react-native-picker-select";
-import QuickButtonIcon from "./QuickButtonIcon";
+import Animated, {
+  useAnimatedKeyboard,
+  useSharedValue,
+} from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface LessonGeneratorFormProps {
   selectedLanguage: LanguageCode | null; // Use LanguageCode for type safety
@@ -14,7 +19,7 @@ interface LessonGeneratorFormProps {
   onTopicChange: (topic: string) => void;
   onGenerate: () => void;
   isGenerating: boolean; // To handle loading state from parent
-  onClose?: () => void;
+  onClose: () => void;
 }
 
 const LessonGeneratorForm: React.FC<LessonGeneratorFormProps> = ({
@@ -35,8 +40,15 @@ const LessonGeneratorForm: React.FC<LessonGeneratorFormProps> = ({
     onSelectLanguage(langCode);
   };
 
+  const animatedKeyboard = useAnimatedKeyboard();
+  const insents = useSafeAreaInsets();
+  const bottomInsets = useSharedValue(insents.bottom);
+  const ty = useSharedValue(0);
+  const opacity = useSharedValue(0);
+
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container]}>
+
       <View style={styles.formContent}>
         <RNPickerSelect
           onValueChange={(_, index) => {
@@ -47,9 +59,9 @@ const LessonGeneratorForm: React.FC<LessonGeneratorFormProps> = ({
           disabled={isGenerating}
         >
           <View style={[styles.picker, isGenerating && styles.disabledInput]}>
-            <Text style={styles.pickerLabel}>
+            <Text.Body style={styles.pickerLabel}>
               {!selectedLanguage ? "Select Language" : selectedLanguage}
-            </Text>
+            </Text.Body>
             <AntDesign name={"down"} size={16} color="#0b57d0" />
           </View>
         </RNPickerSelect>
@@ -60,29 +72,17 @@ const LessonGeneratorForm: React.FC<LessonGeneratorFormProps> = ({
           onChangeText={onTopicChange}
           style={[styles.input, isGenerating && styles.disabledInput]}
           onSubmitEditing={onGenerate}
-          autoFocus
+          autoFocus={true}
           editable={!isGenerating}
         />
 
-        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-
-        <QuickButton
+        <Button
           onPress={onGenerate}
           disabled={!topic || !selectedLanguage || isGenerating}
           title="Generate"
-          style={{flex: 1}}
         />
-              {onClose ? (
-        <QuickButtonIcon
-          onPress={onClose}
-          iconName="close"
-          style={styles.closeButton}
-        />
-      ) : null}
-        </View>
       </View>
-
-    </View>
+    </Animated.View>
   );
 };
 
@@ -90,9 +90,9 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "flex-start",
-    backgroundColor: "#f0f4f9",
     padding: 16,
     borderRadius: 8,
+    zIndex: 1000,
   },
   formContent: {
     flex: 1,

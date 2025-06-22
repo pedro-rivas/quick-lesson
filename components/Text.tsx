@@ -1,26 +1,49 @@
 import useTranslation from "@/hooks/useTranslation";
 import React, { useEffect, useRef, useState } from "react";
-import { TextProps as RNTextProps } from "react-native";
-import Animated, {
+import { TextProps as RNTextProps, Text } from "react-native";
+import RNAnimated, {
   FadeIn,
   FadeInDown,
   FadeOut,
   FadeOutUp,
 } from "react-native-reanimated";
-import * as QuickLayout from "./Layout";
+import * as Layout from "./Layout";
 
 interface TextProps extends RNTextProps {
   bold?: boolean;
 }
 
-export const LandingHeader = ({ children, ...props }: TextProps) => {
+export const LandingHeader = ({ children, style, ...props }: TextProps) => {
   return (
     <DefaultText
-      style={{
-        fontSize: 40,
-        fontWeight: "bold",
-        color: "white",
-      }}
+      style={[
+        {
+          fontSize: 40,
+          fontWeight: "bold",
+          color: "white",
+        },
+        style,
+      ]}
+      {...props}
+    >
+      {children}
+    </DefaultText>
+  );
+};
+
+export const Header = ({ children, style, ...props }: TextProps) => {
+  return (
+    <DefaultText
+      style={[
+        {
+          fontSize: 18,
+          fontWeight: "bold",
+          color: "#222",
+          flexShrink: 1,
+          marginHorizontal: 16,
+        },
+        style,
+      ]}
       {...props}
     >
       {children}
@@ -133,10 +156,16 @@ export const Caption = ({ children, style, ...props }: TextProps) => {
 
 const DefaultText = ({ children, ...props }: TextProps) => {
   return (
-    <Animated.Text style={props.style} {...props}>
+    <Text style={props.style} {...props}>
       {children}
-    </Animated.Text>
+    </Text>
   );
+};
+
+export const Animated = (
+  props: React.ComponentProps<typeof RNAnimated.Text>
+) => {
+  return <RNAnimated.Text {...props} />;
 };
 
 const ANIMATED_TEXT_DURATION = 1000;
@@ -194,14 +223,14 @@ export const AnimatedText = ({
     <>
       {texOnly ? null : (
         <>
-          <DefaultText style={[props.style, { fontSize: 14, opacity: 0.8 }]}>
+          <Animated style={[props.style, { fontSize: 14, opacity: 0.8 }]}>
             {t("For")}
-          </DefaultText>
-          <QuickLayout.Spacer size="s" />
+          </Animated>
+          <Layout.Spacer size="s" />
         </>
       )}
 
-      <DefaultText
+      <Animated
         key={currentIndex}
         // @ts-ignore
         entering={entering}
@@ -209,7 +238,7 @@ export const AnimatedText = ({
         {...props}
       >
         {text[currentIndex]}
-      </DefaultText>
+      </Animated>
     </>
   );
 };
