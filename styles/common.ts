@@ -18,6 +18,9 @@ const commonStyles = StyleSheet.create({
   borderBottom1: {
     borderBottomWidth: 1,
   },
+  mtXs:{
+    marginTop: spacing.xs,
+  },
   opacity70: {
     opacity: 0.7,
   },

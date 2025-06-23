@@ -1,9 +1,11 @@
+import useTheme from "@/hooks/useTheme";
 import useTranslation from "@/hooks/useTranslation";
 import { Lesson } from "@/store/lessonStore"; // Assuming Lesson type is here
-import { useTheme } from "@react-navigation/native";
+import { commonStyles as cs } from "@/styles/common";
+import { spacing } from "@/styles/spacing";
 import * as Haptics from "expo-haptics";
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 import Animated, {
   interpolate,
   interpolateColor,
@@ -12,6 +14,9 @@ import Animated, {
   useSharedValue,
 } from "react-native-reanimated";
 import IconButton from "./buttons/IconButton";
+import CountryFlag from "./CountryFlag";
+import * as Layout from "./Layout";
+import * as Text from "./Text";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const MIN_SCALE = 0.99;
@@ -55,14 +60,6 @@ const LessonCard: React.FC<LessonCardProps> = ({
     ),
   }));
 
-  const iconAnimatedStyle = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(
-      pressed.value,
-      [0, 1],
-      ["#fff", "rgba(245, 245, 245, 0.4)"]
-    ),
-  }));
-
   const onPressOut = () => {
     "worklet";
     pressed.value = 0;
@@ -89,45 +86,44 @@ const LessonCard: React.FC<LessonCardProps> = ({
       onPressOut={onPressOut}
       style={[styles.lessonCard, animatedStyle]}
     >
-      <View style={styles.lessonCardContent}>
-        <View style={styles.lessonCardHeader}>
-          <Text style={styles.lessonTitleText} numberOfLines={2}>
+      <Layout.Column style={cs.flex1}>
+        <Layout.Row
+          alignItems={"center"}
+          justifyContent={"space-between"}
+          padding={spacing.s}
+        >
+          <Text.Body semibold numberOfLines={2}>
             {lesson.title}
-          </Text>
-          <IconButton
-            onPress={handleDelete}
-            name={"delete"}
-            color="#ff5252"
-            animatedStyle={iconAnimatedStyle}
-          />
-        </View>
+          </Text.Body>
+          <IconButton onPress={handleDelete} name={"delete"} color="#ff5252" />
+        </Layout.Row>
 
-        <View style={styles.lessonCardDetails}>
-          <Text style={styles.lessonLanguageText}>{lesson.language}</Text>
-          <Text style={styles.lessonDateText}>
-            {formatDate(lesson.createdAt)}
-          </Text>
-        </View>
+        <Layout.Row alignItems={"center"} justifyContent={"space-between"}>
+          <CountryFlag countryCode={lesson.langCode} size={"small"} />
+          <Text.Caption>{`${formatDate(lesson.createdAt)}`}</Text.Caption>
+        </Layout.Row>
 
-        <View style={styles.lessonStatsContainer}>
-          <View style={styles.lessonStat}>
-            <Text style={styles.lessonStatNumber}>
+        <Layout.Row justifyContent={"space-around"} alignItems={"center"}>
+          <Layout.Column alignItems={"center"}>
+            <Text.Body bold color={colors.primary}>
               {lesson.vocabulary.length}
-            </Text>
-            <Text style={styles.lessonStatLabel}>{t("Vocabulary")}</Text>
-          </View>
-          <View style={styles.lessonStat}>
-            <Text style={styles.lessonStatNumber}>{lesson.phrases.length}</Text>
-            <Text style={styles.lessonStatLabel}>{t("Phrases")}</Text>
-          </View>
-          <View style={styles.lessonStat}>
-            <Text style={styles.lessonStatNumber}>
+            </Text.Body>
+            <Text.Detail style={cs.mtXs}>{t("Vocabulary")}</Text.Detail>
+          </Layout.Column>
+          <Layout.Column alignItems={"center"}>
+            <Text.Body bold color={colors.primary}>
+              {lesson.phrases.length}
+            </Text.Body>
+            <Text.Detail style={cs.mtXs}>{t("Phrases")}</Text.Detail>
+          </Layout.Column>
+          <Layout.Column alignItems={"center"}>
+            <Text.Body bold color={colors.primary}>
               {lesson.relevantGrammar.length}
-            </Text>
-            <Text style={styles.lessonStatLabel}>{t("Grammar")}</Text>
-          </View>
-        </View>
-      </View>
+            </Text.Body>
+            <Text.Detail style={cs.mtXs}>{t("Grammar")}</Text.Detail>
+          </Layout.Column>
+        </Layout.Row>
+      </Layout.Column>
     </AnimatedPressable>
   );
 };
@@ -139,70 +135,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-  },
-  lessonCardContent: {
-    flex: 1,
-  },
-  lessonCardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 16,
-    paddingTop: 8,
-    paddingRight: 8,
-    paddingBottom: 0,
-    marginBottom: 8,
-  },
-  lessonTitleText: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#222",
-    flex: 1,
-    marginRight: 8,
-  },
-  lessonDeleteButton: {
-    padding: 4,
-  },
-  lessonCardDetails: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 12,
-    paddingHorizontal: 16,
-  },
-  lessonLanguageText: {
-    fontSize: 14,
-    color: "#0b57d0",
-    fontWeight: "500",
-    backgroundColor: "#e3f2fd",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  lessonDateText: {
-    fontSize: 14,
-    color: "#666",
-  },
-  lessonStatsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingBottom: 16,
-  },
-  lessonStat: {
-    alignItems: "center",
-  },
-  lessonStatNumber: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#0b57d0",
-  },
-  lessonStatLabel: {
-    fontSize: 12,
-    color: "#666",
-    marginTop: 2,
-  },
-  lessonChevron: {
-    marginLeft: 8,
   },
 });
 

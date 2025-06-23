@@ -2,6 +2,7 @@ import { createLesson } from "@/api/gemini";
 import { images } from "@/assets/images";
 import IconButton from "@/components/buttons/IconButton";
 import Pressable from "@/components/buttons/Pressable";
+import CountryFlag from "@/components/CountryFlag";
 import * as Layout from "@/components/Layout";
 import LessonGeneratorForm from "@/components/LessonGeneratorForm";
 import SafeAreaView from "@/components/SafeAreaView";
@@ -11,11 +12,10 @@ import useTheme from "@/hooks/useTheme";
 import useTranslation from "@/hooks/useTranslation";
 import { useLessonStore } from "@/store/lessonStore";
 import { useUserStore } from "@/store/userStore";
-import { commonStyles as cs } from "@/styles/common";
 import { spacing } from "@/styles/spacing";
 import { router } from "expo-router";
 import React, { useCallback, useMemo } from "react";
-import { Alert, Image } from "react-native";
+import { Alert } from "react-native";
 
 export default function HomeScreen() {
   const [topic, setTopic] = React.useState("");
@@ -90,7 +90,7 @@ export default function HomeScreen() {
         <IconButton name={"arrow-back"} onPress={goBack} />
         <Text.Header numberOfLines={1}>{"Create a lesson"}</Text.Header>
         <Pressable onPress={switchLanguage}>
-          <Image source={flagImage} style={cs.flagSmall} />
+          <CountryFlag countryCode={learningLanguage} size={'small'}/>
         </Pressable>
       </Layout.Header>
       <Layout.Column padding={spacing.m}>

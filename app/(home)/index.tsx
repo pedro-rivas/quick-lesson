@@ -7,6 +7,7 @@ import { LanguageCode } from "@/constants/languages";
 import useTranslation from "@/hooks/useTranslation";
 import { Lesson, useLessonStore } from "@/store/lessonStore";
 import { useUserStore } from "@/store/userStore";
+import { spacing } from "@/styles/spacing";
 import { router } from "expo-router";
 import React, { useCallback } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
@@ -65,7 +66,7 @@ export default function HomeScreen() {
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.lessonListContainer}
+        contentContainerStyle={[styles.lessonListContainer, { paddingHorizontal: spacing.m}]}
         scrollEnabled={true}
         windowSize={9}
         nestedScrollEnabled={true}

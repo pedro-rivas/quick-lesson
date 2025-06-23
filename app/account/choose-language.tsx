@@ -1,6 +1,7 @@
 import { images } from "@/assets/images";
 import IconButton from "@/components/buttons/IconButton";
 import Pressable from "@/components/buttons/Pressable";
+import CountryFlag from "@/components/CountryFlag";
 import * as Layout from "@/components/Layout";
 import * as List from "@/components/List";
 import SafeAreaView from "@/components/SafeAreaView";
@@ -13,7 +14,7 @@ import { commonStyles as cs } from "@/styles/common";
 import { spacing } from "@/styles/spacing";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useMemo } from "react";
-import { Image, ListRenderItem } from "react-native";
+import { ListRenderItem } from "react-native";
 
 export default function ChooseLanguageScreen() {
   const { shouldGoBack } = useLocalSearchParams();
@@ -62,7 +63,7 @@ export default function ChooseLanguageScreen() {
           style={[cs.centerRow, { padding: spacing.m }]}
         >
           <Layout.Row alignItems={"center"}>
-            <Image source={item.image} style={cs.flagMedium} />
+            <CountryFlag size={'medium'} countryCode={item.code} />
             <Text.Body bold>{item.label}</Text.Body>
           </Layout.Row>
           {item.isSelected ? (

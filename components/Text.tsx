@@ -12,6 +12,8 @@ import * as Layout from "./Layout";
 
 interface TextProps extends RNTextProps {
   bold?: boolean;
+  semibold?: boolean;
+  color?: string;
 }
 
 export const LandingHeader = ({ children, style, ...props }: TextProps) => {
@@ -126,7 +128,7 @@ export const Body = ({ children, style, ...props }: TextProps) => {
       style={[
         {
           fontSize: 16,
-          fontWeight: props.bold ? "bold" : "normal",
+          fontWeight: props.bold ? "bold" : props.semibold ? "600" : "normal",
         },
         style,
       ]}
@@ -155,6 +157,25 @@ export const Caption = ({ children, style, ...props }: TextProps) => {
   );
 };
 
+export const Detail = ({ children, style, ...props }: TextProps) => {
+  return (
+    <DefaultText
+      style={[
+        {
+          fontSize: 12,
+          fontWeight: props.bold ? "bold" : "normal",
+          color: "#5A6672",
+        },
+        style,
+      ]}
+      {...props}
+    >
+      {children}
+    </DefaultText>
+  );
+};
+
+
 export const Link = ({ children, style, ...props }: TextProps) => {
   const theme = useTheme();
   return (
@@ -173,13 +194,9 @@ export const Link = ({ children, style, ...props }: TextProps) => {
   );
 };
 
-const DefaultText = ({ children, ...props }: TextProps) => {
-  return (
-    <Text style={props.style} {...props}>
-      {children}
-    </Text>
-  );
-};
+const DefaultText = React.memo(({ style, ...props }: TextProps) => {
+  return <Text style={[{ color: props.color }, style]} {...props} />;
+});
 
 export const Animated = (
   props: React.ComponentProps<typeof RNAnimated.Text>
