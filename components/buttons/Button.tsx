@@ -16,10 +16,9 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
+import { MIN_SCALE } from "./Pressable";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
-const MIN_SCALE = 0.98;
 export const BUTTON_HEIGHT = 50;
 
 interface ButtonProps {

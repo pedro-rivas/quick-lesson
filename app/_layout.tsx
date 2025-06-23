@@ -1,17 +1,16 @@
 import { useColorScheme } from "@/hooks/useColorScheme";
 import "@/i18n";
+import { getBestLocale } from "@/i18n";
+import { RootNavigator } from "@/navigation";
 import { SessionProvider } from "@/providers/AuthContext";
 import { SplashScreenController } from "@/splash";
+import { useUserStore } from "@/store/userStore";
 import { DarkTheme, LightTheme } from "@/theme";
 import { ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
+import { useEffect } from "react";
 import { StatusBar, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-
-import { getBestLocale } from "@/i18n";
-import { RootNavigator } from "@/navigation";
-import { useUserStore } from "@/store/userStore";
-import { useEffect } from "react";
 import "react-native-reanimated";
 
 export default function RootLayout() {

@@ -1,5 +1,7 @@
 import { createLesson } from "@/api/gemini";
+import { images } from "@/assets/images";
 import IconButton from "@/components/buttons/IconButton";
+import Pressable from "@/components/buttons/Pressable";
 import * as Layout from "@/components/Layout";
 import LessonGeneratorForm from "@/components/LessonGeneratorForm";
 import SafeAreaView from "@/components/SafeAreaView";
@@ -9,18 +11,17 @@ import useTheme from "@/hooks/useTheme";
 import useTranslation from "@/hooks/useTranslation";
 import { useLessonStore } from "@/store/lessonStore";
 import { useUserStore } from "@/store/userStore";
+import { commonStyles as cs } from "@/styles/common";
 import { spacing } from "@/styles/spacing";
 import { router } from "expo-router";
-import React, { useCallback } from "react";
-import { Alert } from "react-native";
-import { ZoomIn, ZoomOut } from "react-native-reanimated";
+import React, { useCallback, useMemo } from "react";
+import { Alert, Image } from "react-native";
 
 export default function HomeScreen() {
   const [topic, setTopic] = React.useState("");
   const [loading, setLoading] = React.useState(false);
-  const [showLessonForm, setShowCreateLessonFrom] = React.useState(false);
 
-  const { addLesson, getAllLessons, removeLesson } = useLessonStore();
+  const { addLesson } = useLessonStore();
   const userLanguage = useUserStore((s) => s.userPreferences.preferredLanguage);
   const learningLanguage = useUserStore(
     (s) => s.userPreferences.learningLanguage
@@ -31,7 +32,7 @@ export default function HomeScreen() {
   const generate = async () => {
     try {
       if (!topic) return;
-      setShowCreateLessonFrom(false);
+
       setLoading(true);
 
       const lesson = await createLesson({
@@ -57,37 +58,56 @@ export default function HomeScreen() {
   }, []);
 
   const switchLanguage = useCallback(() => {
-    router.push("/account/choose-language");
+    router.push({
+      pathname: "/account/choose-language",
+      params: { shouldGoBack: 'true' },
+    });
   }, []);
+
+  const flagImage = useMemo(
+    // @ts-ignore
+    () => images.flags[LANGUAGES[learningLanguage].value],
+    [learningLanguage]
+  );
+
+  const styles = useMemo(
+    () => ({
+      header: {
+        color: theme.colors.primary,
+      },
+      subheading: {
+        fontSize: 24,
+        fontWeight: "bold",
+        color: "#32CD32",
+      } as const,
+    }),
+    [theme]
+  );
 
   return (
     <SafeAreaView>
       <Layout.Header>
         <IconButton name={"arrow-back"} onPress={goBack} />
         <Text.Header numberOfLines={1}>{"Create a lesson"}</Text.Header>
-        <IconButton name={"language"} onPress={switchLanguage} />
+        <Pressable onPress={switchLanguage}>
+          <Image source={flagImage} style={cs.flagSmall} />
+        </Pressable>
       </Layout.Header>
       <Layout.Column padding={spacing.m}>
-        <Text.LandingHeader
-          style={[{ color: theme.colors.primary }]}
-        >{`${LANGUAGES[learningLanguage]?.label} for `}</Text.LandingHeader>
+        <Text.LandingHeader style={styles.header}>
+          {`${LANGUAGES[learningLanguage]?.label} ${t("For")} `}
+        </Text.LandingHeader>
         {topic ? (
-          <Text.Animated
-            style={{
-              fontSize: 24,
-              fontWeight: "bold",
-              color: "#32CD32",
-            }}
-          >
+          <Text.Animated style={styles.subheading}>
             {topic?.split("").map((l, i) => (
-              <Text.Animated
-                entering={ZoomIn}
-                exiting={ZoomOut}
-                key={i}
-              >{`${l}`}</Text.Animated>
+              <Text.Animated key={i}>{`${l}`}</Text.Animated>
             ))}
           </Text.Animated>
-        ) : null}
+        ) : (
+          <Text.Animated style={[styles.subheading, { opacity: 0.6 }]}>
+            {t("Taking a Taxi")}
+          </Text.Animated>
+        )}
       </Layout.Column>
 
       <LessonGeneratorForm
@@ -95,6 +115,7 @@ export default function HomeScreen() {
         onTopicChange={setTopic}
         onGenerate={generate}
         isGenerating={loading}
+        switchLanguage={switchLanguage}
       />
     </SafeAreaView>
   );

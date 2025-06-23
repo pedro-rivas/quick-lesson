@@ -1,5 +1,6 @@
 import { images } from "@/assets/images";
 import IconButton from "@/components/buttons/IconButton";
+import Pressable from "@/components/buttons/Pressable";
 import * as Layout from "@/components/Layout";
 import * as List from "@/components/List";
 import SafeAreaView from "@/components/SafeAreaView";
@@ -8,12 +9,15 @@ import { LANGUAGES } from "@/constants/languages";
 import useTheme from "@/hooks/useTheme";
 import useTranslation from "@/hooks/useTranslation";
 import { useUserStore } from "@/store/userStore";
+import { commonStyles as cs } from "@/styles/common";
 import { spacing } from "@/styles/spacing";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useMemo } from "react";
 import { Image, ListRenderItem } from "react-native";
 
 export default function ChooseLanguageScreen() {
+  const { shouldGoBack } = useLocalSearchParams();
+
   const { setLearningLanguage } = useUserStore();
   const learningLanguage = useUserStore(
     (s) => s.userPreferences.learningLanguage
@@ -38,6 +42,11 @@ export default function ChooseLanguageScreen() {
         isSelected: l.code === learningLanguage,
         onPress: () => {
           setLearningLanguage(l.code);
+          setTimeout(() => {
+            if (shouldGoBack) {
+              goBack();
+            }
+          }, 300);
         },
       })),
     [learningLanguage]
@@ -48,21 +57,12 @@ export default function ChooseLanguageScreen() {
   >(
     ({ item }) => {
       return (
-        <Layout.Row
-          padding={spacing.m}
-          alignItems={"center"}
-          justifyContent="space-between"
+        <Pressable
+          onPress={item.onPress}
+          style={[cs.centerRow, { padding: spacing.m }]}
         >
           <Layout.Row alignItems={"center"}>
-            <Image
-              source={item.image}
-              style={{
-                width: 64,
-                height: 48,
-                borderRadius: 4,
-                marginRight: spacing.m,
-              }}
-            />
+            <Image source={item.image} style={cs.flagMedium} />
             <Text.Body bold>{item.label}</Text.Body>
           </Layout.Row>
           {item.isSelected ? (
@@ -80,7 +80,7 @@ export default function ChooseLanguageScreen() {
               onPress={item.onPress}
             />
           )}
-        </Layout.Row>
+        </Pressable>
       );
     },
     [theme]

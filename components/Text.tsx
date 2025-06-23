@@ -1,3 +1,4 @@
+import useTheme from "@/hooks/useTheme";
 import useTranslation from "@/hooks/useTranslation";
 import React, { useEffect, useRef, useState } from "react";
 import { TextProps as RNTextProps, Text } from "react-native";
@@ -151,6 +152,24 @@ export const Caption = ({ children, style, ...props }: TextProps) => {
     >
       {children}
     </DefaultText>
+  );
+};
+
+export const Link = ({ children, style, ...props }: TextProps) => {
+  const theme = useTheme();
+  return (
+    <Caption
+      style={[
+        {
+          color: theme.colors.primary,
+          textDecorationLine: "underline",
+        },
+        style,
+      ]}
+      {...props}
+    >
+      {children}
+    </Caption>
   );
 };
 
