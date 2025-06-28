@@ -64,6 +64,30 @@ const commonStyles = StyleSheet.create({
     borderBottomRightRadius: BORDER_RADIUS,
     borderBottomWidth: BORDER_WIDTH,
   },
+  // Text
+  bodyText: {
+    fontSize: 16,
+  },
+  caption: {
+    fontSize: 14,
+    color: "#5A6672",
+  },
+  detail: {
+    fontSize: 12,
+    color: "#5A6672",
+  },
+  h4: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  h3: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  h2: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
   // Components
   flagMedium: {
     width: 64,
@@ -96,6 +120,8 @@ const commonStyles = StyleSheet.create({
     height: HEADER_HEIGHT,
     paddingHorizontal: spacing.m,
     width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
 });
 

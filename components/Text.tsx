@@ -1,14 +1,15 @@
-import useTheme from "@/hooks/useTheme";
 import useTranslation from "@/hooks/useTranslation";
+import { useThemedStyles } from "@/providers/ThemeContext";
+import { commonStyles as cs } from "@/styles/common";
+import { spacing } from "@/styles/spacing";
 import React, { useEffect, useRef, useState } from "react";
-import { TextProps as RNTextProps, Text } from "react-native";
+import { TextProps as RNTextProps, Text, TextStyle } from "react-native";
 import RNAnimated, {
   FadeIn,
   FadeInDown,
   FadeOut,
   FadeOutUp,
 } from "react-native-reanimated";
-import * as Layout from "./Layout";
 
 interface TextProps extends RNTextProps {
   bold?: boolean;
@@ -54,148 +55,52 @@ export const Header = ({ children, style, ...props }: TextProps) => {
   );
 };
 
-export const Subheading = ({ children, style, ...props }: TextProps) => {
-  return (
-    <DefaultText
-      style={[
-        {
-          fontSize: 20,
-          fontWeight: "bold",
-        },
-        style,
-      ]}
-      {...props}
-    >
-      {children}
-    </DefaultText>
-  );
+export const Subheading = ({ style, ...props }: TextProps) => {
+  return <H3 style={style} {...props} />;
 };
 
-export const H2 = ({ children, style, ...props }: TextProps) => {
-  return (
-    <DefaultText
-      style={[
-        {
-          fontSize: 24,
-          fontWeight: "bold",
-        },
-        style,
-      ]}
-      {...props}
-    >
-      {children}
-    </DefaultText>
-  );
+export const H2 = ({ style, ...props }: TextProps) => {
+  return <DefaultText style={[cs.h2, style]} {...props} />;
 };
 
-export const H3 = ({ children, style, ...props }: TextProps) => {
-  return (
-    <DefaultText
-      style={[
-        {
-          fontSize: 20,
-          fontWeight: "bold",
-        },
-        style,
-      ]}
-      {...props}
-    >
-      {children}
-    </DefaultText>
-  );
+export const H3 = ({ style, ...props }: TextProps) => {
+  return <DefaultText style={[cs.h3, style]} {...props} />;
 };
 
-export const H4 = ({ children, style, ...props }: TextProps) => {
-  return (
-    <DefaultText
-      style={[
-        {
-          fontSize: 18,
-          fontWeight: "bold",
-        },
-        style,
-      ]}
-      {...props}
-    >
-      {children}
-    </DefaultText>
-  );
+export const H4 = ({ style, ...props }: TextProps) => {
+  return <DefaultText style={[cs.h4, style]} {...props} />;
 };
 
-export const Body = ({ children, style, ...props }: TextProps) => {
-  return (
-    <DefaultText
-      style={[
-        {
-          fontSize: 16,
-        },
-        style,
-      ]}
-      {...props}
-    >
-      {children}
-    </DefaultText>
-  );
+export const Body = ({ style, ...props }: TextProps) => {
+  return <DefaultText style={[cs.bodyText, style]} {...props} />;
 };
 
-export const Caption = ({ children, style, ...props }: TextProps) => {
-  return (
-    <DefaultText
-      style={[
-        {
-          fontSize: 14,
-          color: "#5A6672",
-        },
-        style,
-      ]}
-      {...props}
-    >
-      {children}
-    </DefaultText>
-  );
+export const Caption = ({ style, ...props }: TextProps) => {
+  return <DefaultText style={[cs.caption, style]} {...props} />;
 };
 
-export const Detail = ({ children, style, ...props }: TextProps) => {
-  return (
-    <DefaultText
-      style={[
-        {
-          fontSize: 12,
-          color: "#5A6672",
-        },
-        style,
-      ]}
-      {...props}
-    >
-      {children}
-    </DefaultText>
-  );
+export const Detail = ({ style, ...props }: TextProps) => {
+  return <DefaultText style={[cs.detail, style]} {...props} />;
 };
 
-
-export const Link = ({ children, style, ...props }: TextProps) => {
-  const theme = useTheme();
-  return (
-    <Caption
-      style={[
-        {
-          color: theme.colors.primary,
-          textDecorationLine: "underline",
-        },
-        style,
-      ]}
-      {...props}
-    >
-      {children}
-    </Caption>
-  );
+export const Link = ({ style, ...props }: TextProps) => {
+  const themeStyles = useThemedStyles();
+  return <Caption style={[themeStyles.link as TextStyle, style]} {...props} />;
 };
 
 const DefaultText = React.memo(({ style, ...props }: TextProps) => {
-  return <Text style={[{ 
-    color: props.color,
-    fontWeight: props.bold ? "bold" : props.semibold ? "600" : "normal",
-  }, style]} {...props} />;
+  return (
+    <Text
+      style={[
+        {
+          color: props.color,
+          fontWeight: props.bold ? "bold" : props.semibold ? "600" : "normal",
+        },
+        style,
+      ]}
+      {...props}
+    />
+  );
 });
 
 export const Animated = (
@@ -262,7 +167,7 @@ export const AnimatedText = ({
           <Animated style={[props.style, { fontSize: 14, opacity: 0.8 }]}>
             {t("For")}
           </Animated>
-          <Layout.Spacer size="s" />
+          <RNAnimated.View style={{ height: spacing.s }} />
         </>
       )}
 

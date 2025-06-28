@@ -6,10 +6,14 @@ import React, { createContext, PropsWithChildren } from "react";
 import { ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-type ThemedStylesFields = "sectionListBorder" | "borderBottomColor" | "fab";
+type ThemedStylesFields =
+  | "sectionListBorder"
+  | "borderBottomColor"
+  | "fab"
+  | "link";
 
 type ThemedStyles = {
-  [key in ThemedStylesFields]: ViewStyle;
+  [key in ThemedStylesFields]: ViewStyle
 };
 
 const ThemeContext = createContext<ThemedStyles>({} as ThemedStyles);
@@ -19,28 +23,33 @@ export function ThemeProvider({ children }: PropsWithChildren) {
   const insents = useSafeAreaInsets();
 
   const memoizedStyles = React.useMemo(
-    () => ({
-      sectionListBorder: {
-        borderWidth: BORDER_WIDTH,
-        borderTopWidth: 0,
-        borderColor: theme.colors.border,
-      },
-      borderBottomColor: {
-        borderBottomColor: theme.colors.border,
-      },
-      fab: {
-        position: "absolute",
-        bottom: insents.bottom + spacing.m,
-        right: spacing.m,
-        backgroundColor: theme.colors.primary,
-        borderRadius: BUTTON_HEIGHT,
-        height: BUTTON_HEIGHT,
-        minWidth: BUTTON_HEIGHT,
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "row",
-      },
-    }) as ThemedStyles,
+    () =>
+      ({
+        sectionListBorder: {
+          borderWidth: BORDER_WIDTH,
+          borderTopWidth: 0,
+          borderColor: theme.colors.border,
+        },
+        borderBottomColor: {
+          borderBottomColor: theme.colors.border,
+        },
+        fab: {
+          position: "absolute",
+          bottom: insents.bottom + spacing.m,
+          right: spacing.m,
+          backgroundColor: theme.colors.primary,
+          borderRadius: BUTTON_HEIGHT,
+          height: BUTTON_HEIGHT,
+          minWidth: BUTTON_HEIGHT,
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "row",
+        },
+        link: {
+          color: theme.colors.primary,
+          textDecorationLine: "underline",
+        },
+      } as ThemedStyles),
     [theme]
   );
 

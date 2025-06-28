@@ -2,16 +2,13 @@ import { useThemedStyles } from "@/providers/ThemeContext";
 import { commonStyles as cs } from "@/styles/common";
 import React from "react";
 import { View as RNView } from "react-native";
-import * as Layout from "../Layout";
 import { LayoutProps } from "../Layout";
 import * as Text from "../Text";
 
 export const Row = React.memo(({ children, style, ...props }: LayoutProps) => {
   const ts = useThemedStyles();
   return (
-    <Layout.Row
-      alignItems="center"
-      justifyContent="space-between"
+    <RNView
       style={[
         cs.borderBottomWidth2,
         cs.layoutHeader,
@@ -21,7 +18,7 @@ export const Row = React.memo(({ children, style, ...props }: LayoutProps) => {
       {...props}
     >
       {children}
-    </Layout.Row>
+    </RNView>
   );
 });
 
