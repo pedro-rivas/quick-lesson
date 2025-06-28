@@ -1,23 +1,15 @@
-import { LanguageCode } from "@/constants/languages";
 import useTranslation from "@/hooks/useTranslation";
 import { commonStyles } from "@/styles/common";
 import { spacing } from "@/styles/spacing";
 import { useTheme } from "@react-navigation/native";
 import { useAudioPlayer } from "expo-audio";
-import React from "react";
+import React, { useMemo } from "react";
 import * as Layout from "./Layout";
-import SpeechButton from "./SpeechButton";
 import * as Text from "./Text";
-
-interface VocabularyItem {
-  term: string;
-  transliteration?: string;
-  translation: string;
-}
+import VocabularyRow, { Vocab } from "./VocabularyRow";
 
 interface VocabularySectionProps {
-  vocabulary: VocabularyItem[];
-  langCode: LanguageCode;
+  vocabulary: Vocab[];
 }
 
 /**
@@ -29,7 +21,6 @@ interface VocabularySectionProps {
  */
 const VocabularySection: React.FC<VocabularySectionProps> = ({
   vocabulary,
-  langCode,
 }) => {
   const theme = useTheme();
   const t = useTranslation();
@@ -44,6 +35,8 @@ const VocabularySection: React.FC<VocabularySectionProps> = ({
       }, 10);
     }
   };
+
+  const vocabs = useMemo(() => vocabulary?.length, [vocabulary]);
 
   if (!vocabulary || vocabulary.length === 0) {
     return null;
@@ -64,44 +57,13 @@ const VocabularySection: React.FC<VocabularySectionProps> = ({
         ]}
       >
         {vocabulary.map((vocab, idx) => (
-          <Layout.Row
+          <VocabularyRow
             key={idx}
-            alignItems={"center"}
-            padding={spacing.s}
-            style={[
-              idx !== vocabulary.length - 1 && commonStyles.borderBottom2,
-              { borderColor: theme.colors.border },
-            ]}
-          >
-            <SpeechButton
-              text={vocab.term}
-              langCode={langCode}
-              onPress={handlePress}
-            />
-            <Layout.Column ml={12}>
-              <Layout.Column mb={4}>
-                <Text.Body bold>{vocab.term}</Text.Body>
-                {vocab?.transliteration ? (
-                  <Layout.Row>
-                    {vocab.transliteration.split("").map((l) => (
-                      <Text.Caption
-                        style={[
-                          commonStyles.borderBottom1,
-                          {
-                            borderColor: theme.colors.primary,
-                            marginRight: 2,
-                          },
-                        ]}
-                      >
-                        {l}
-                      </Text.Caption>
-                    ))}
-                  </Layout.Row>
-                ) : null}
-              </Layout.Column>
-              <Text.Caption>{vocab.translation}</Text.Caption>
-            </Layout.Column>
-          </Layout.Row>
+            vocab={vocab}
+            idx={idx}
+            vocabs={vocabs}
+            onPress={handlePress}
+          />
         ))}
       </Layout.Column>
     </Layout.Column>

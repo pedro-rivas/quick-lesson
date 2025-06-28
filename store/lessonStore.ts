@@ -1,32 +1,10 @@
+import { Phrase } from '@/components/PhrasesSection';
+import { Tip } from '@/components/TipsSection';
+import { Vocab } from '@/components/VocabularyRow';
 import { LanguageCode } from '@/constants/languages';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-
-export interface Phrase {
-  phrase: string;
-  transliteration?: string;
-  translation: string;
-}
-
-export interface VocabularyItem {
-  term: string;
-  transliteration?: string;
-  translation: string;
-}
-
-export interface GrammarExample {
-  sentence: string;
-  transliteration?: string;
-  translation: string;
-  explanation: string;
-}
-
-export interface GrammarTip {
-  topic: string;
-  description: string;
-  examples: GrammarExample[];
-}
 
 export interface Lesson {
   id: string;
@@ -34,8 +12,8 @@ export interface Lesson {
   language: string;
   topic: string;
   phrases: Phrase[];
-  vocabulary: VocabularyItem[];
-  relevantGrammar: GrammarTip[];
+  vocabulary: Vocab[];
+  relevantGrammar: Tip[];
   createdAt: Date;
   langCode: LanguageCode,
   studentLangCode: LanguageCode,

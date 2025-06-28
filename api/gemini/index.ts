@@ -88,9 +88,18 @@ export const createLesson = async ({
     language: selectedLanguage,
     langCode: learningLanguageCode,
     topic,
-    phrases: generatedPhrases,
-    vocabulary: generatedVocabulary,
-    relevantGrammar: generatedTips,
+    phrases: generatedPhrases.map((item: any) => ({
+      ...item,
+      langCode: learningLanguageCode,
+    })),
+    vocabulary: generatedVocabulary.map((item: any) => ({
+      ...item,
+      langCode: learningLanguageCode,
+    })),
+    relevantGrammar: generatedTips.map((item: any) => ({
+      ...item,
+      langCode: learningLanguageCode,
+    })),
     studentLangCode: studentLanguageCode,
   };
 };

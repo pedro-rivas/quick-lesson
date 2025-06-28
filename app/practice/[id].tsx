@@ -99,7 +99,7 @@ export default function PracticeScreenPage() {
 
   return (
     <SafeAreaView>
-      <Layout.Header>
+      <Layout.Header.Row>
         <IconButton
           name={'arrow-back'}
           color={"black"}
@@ -107,7 +107,7 @@ export default function PracticeScreenPage() {
         />
         <Layout.Spacer />
         <ProgressBar progress={progress} />
-      </Layout.Header>
+      </Layout.Header.Row>
  
       <PagerView
         ref={pagerRef}

@@ -19,7 +19,6 @@ const useSpeech = (text: string, langCode: LanguageCode) => {
       });
   }, [text]);
 
-
   return {
     loading,
     uri,

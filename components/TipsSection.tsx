@@ -20,11 +20,11 @@ export interface Tip {
   topic: string;
   description: string;
   examples?: TipExample[];
+  langCode: LanguageCode;
 }
 
 interface TipsSectionProps {
   tips: Tip[];
-  langCode: LanguageCode;
   setExplanation: (tipExample: TipExample) => void;
 }
 
@@ -37,11 +37,7 @@ interface TipsSectionProps {
  *
  * @returns A React element displaying the tips and their examples, or null if no tips are provided.
  */
-const TipsSection: React.FC<TipsSectionProps> = ({
-  tips,
-  langCode,
-  setExplanation,
-}) => {
+const TipsSection: React.FC<TipsSectionProps> = ({ tips, setExplanation }) => {
   if (!tips || tips.length === 0) {
     return null;
   }
@@ -98,7 +94,7 @@ const TipsSection: React.FC<TipsSectionProps> = ({
                     <View key={exIdx} style={styles.exampleCard}>
                       <SpeechButton
                         text={ex.sentence}
-                        langCode={langCode}
+                        langCode={tip.langCode}
                         onPress={handlePress}
                       />
                       <Pressable

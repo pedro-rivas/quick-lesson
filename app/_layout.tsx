@@ -3,10 +3,11 @@ import "@/i18n";
 import { getBestLocale } from "@/i18n";
 import { RootNavigator } from "@/navigation";
 import { SessionProvider } from "@/providers/AuthContext";
+import { ThemeProvider } from "@/providers/ThemeContext";
 import { SplashScreenController } from "@/splash";
 import { useUserStore } from "@/store/userStore";
 import { DarkTheme, LightTheme } from "@/theme";
-import { ThemeProvider } from "@react-navigation/native";
+import { ThemeProvider as NativeThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { useEffect } from "react";
 import { StatusBar, StyleSheet } from "react-native";
@@ -19,10 +20,10 @@ export default function RootLayout() {
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
-  const { setLanguage, setPreferredLanguage } = useUserStore()
+  const { setLanguage, setPreferredLanguage } = useUserStore();
 
   useEffect(() => {
-    const lang = getBestLocale()
+    const lang = getBestLocale();
     setLanguage(lang);
     setPreferredLanguage(lang);
   }, []);
@@ -34,13 +35,20 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={styles.gestureHandler}>
-      <StatusBar backgroundColor={colorScheme === "dark" ? 'black' : 'white'} barStyle={colorScheme === "dark" ? 'light-content' : 'dark-content'} />
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : LightTheme}>
-        <SessionProvider>
-          <SplashScreenController />
-          <RootNavigator />
-        </SessionProvider>
-      </ThemeProvider>
+      <StatusBar
+        backgroundColor={colorScheme === "dark" ? "black" : "white"}
+        barStyle={colorScheme === "dark" ? "light-content" : "dark-content"}
+      />
+      <NativeThemeProvider
+        value={colorScheme === "dark" ? DarkTheme : LightTheme}
+      >
+        <ThemeProvider>
+          <SessionProvider>
+            <SplashScreenController />
+            <RootNavigator />
+          </SessionProvider>
+        </ThemeProvider>
+      </NativeThemeProvider>
     </GestureHandlerRootView>
   );
 }

@@ -1,10 +1,9 @@
-import useTheme from "@/hooks/useTheme";
-import { commonStyles as cs } from "@/styles/common";
-import { spacing } from "@/styles/spacing";
 import React from "react";
 import { View as RNView, ViewProps } from "react-native";
 
-interface LayoutProps extends ViewProps {
+export * as Header from "./layout/header";
+
+export interface LayoutProps extends ViewProps {
   justifyContent?:
     | "flex-start"
     | "flex-end"
@@ -20,37 +19,16 @@ interface LayoutProps extends ViewProps {
   flexShrink?: number;
   padding?: number;
   paddingHorizontal?: number;
+  pv?: number;
+  ph?: number;
+  pl?: number;
+  pr?: number;
   ml?: number;
   mr?: number;
   mt?: number;
   mb?: number;
+  mh?: number;
 }
-
-export const Header = React.memo(
-  ({ children, style, ...props }: LayoutProps) => {
-    const theme = useTheme();
-    return (
-      <RNView
-        style={[
-          cs.borderBottomWidth2,
-          {
-            flexDirection: "row",
-            height: 50,
-            paddingHorizontal: spacing.m,
-            alignItems: "center",
-            justifyContent: "space-between",
-            borderBottomColor: theme.colors.border,
-            width: "100%",
-          },
-          style,
-        ]}
-        {...props}
-      >
-        {children}
-      </RNView>
-    );
-  }
-);
 
 export const Footer = ({ ...props }: LayoutProps) => {
   return <View flexDirection={"row"} padding={16} {...props} />;
@@ -66,13 +44,17 @@ export const View = ({ children, style, ...props }: LayoutProps) => {
           flex: props.flex,
           gap: props.gap,
           padding: props.padding,
-          paddingHorizontal: props.paddingHorizontal,
+          paddingHorizontal: props.paddingHorizontal || props.ph,
           flexDirection: props.flexDirection || "column",
           marginLeft: props.ml,
           marginRight: props.mr,
           marginTop: props.mt,
           marginBottom: props.mb,
+          marginHorizontal: props.mh,
           flexShrink: props.flexShrink,
+          paddingVertical: props.pv,
+          paddingLeft: props.pl,
+          paddingRight: props.pr,
         },
         style,
       ]}

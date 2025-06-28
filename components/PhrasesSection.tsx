@@ -9,15 +9,15 @@ import * as Layout from "./Layout";
 import SpeechButton from "./SpeechButton";
 import * as Text from "./Text";
 
-interface Phrase {
+export interface Phrase {
   phrase: string;
   transliteration?: string;
   translation: string;
+  langCode: LanguageCode;
 }
 
 interface PhrasesSectionProps {
   phrases: Phrase[];
-  langCode: LanguageCode;
 }
 
 /**
@@ -33,7 +33,6 @@ interface PhrasesSectionProps {
  */
 const PhrasesSection: React.FC<PhrasesSectionProps> = ({
   phrases,
-  langCode,
 }) => {
   if (!phrases || phrases.length === 0) {
     return null;
@@ -79,7 +78,7 @@ const PhrasesSection: React.FC<PhrasesSectionProps> = ({
           >
             <SpeechButton
               text={phrase.phrase}
-              langCode={langCode}
+              langCode={phrase.langCode}
               onPress={handlePress}
             />
             <Layout.Column ml={12} flexShrink={1}>

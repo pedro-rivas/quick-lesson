@@ -8,6 +8,7 @@ const icons = {
   language: "language",
   "check-circle": "check-circle",
   "radio-button-unchecked": "radio-button-unchecked",
+  "keyboard-arrow-right": 'keyboard-arrow-right',
 };
 
 export type IconSymbolName = keyof typeof icons;

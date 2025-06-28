@@ -1,11 +1,11 @@
 import * as Layout from "@/components/Layout";
 import * as Text from "@/components/Text";
-import { VocabularyItem } from "@/store/lessonStore";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { HINT_DELAY } from "./MatchWordsPage";
 import QuickSpeechButton from "./SpeechButton";
+import { Vocab } from "./VocabularyRow";
 import WordButton from "./WordButton";
 
 const cleanWord = (word: string) => {
@@ -14,7 +14,7 @@ const cleanWord = (word: string) => {
 
 interface CompleteTheWordPageProps {
   exercise: {
-    word: VocabularyItem;
+    word: Vocab;
     letters: string[];
   };
   subheading: string;

@@ -89,11 +89,11 @@ export default function ChooseLanguageScreen() {
 
   return (
     <SafeAreaView>
-      <Layout.Header>
+      <Layout.Header.Row>
         <IconButton name={"arrow-back"} onPress={goBack} />
         <Text.Header numberOfLines={1}>{t("Choose a language")}</Text.Header>
         <Layout.Spacer size={"xxl"} />
-      </Layout.Header>
+      </Layout.Header.Row>
       <Layout.Column padding={spacing.m}>
         <Text.Subheading>{t("What do you want to learn?")}</Text.Subheading>
         <Layout.Spacer size={"l"} />

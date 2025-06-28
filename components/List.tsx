@@ -1,6 +1,8 @@
-import useTheme from "@/hooks/useTheme";
+import { useThemedStyles } from "@/providers/ThemeContext";
+import { commonStyles as cs } from "@/styles/common";
 import React, { useCallback, useMemo } from "react";
 import {
+  CellRendererProps,
   FlatListProps,
   FlatList as RNFlatList,
   ScrollView as RNScrollView,
@@ -17,27 +19,10 @@ export const FlatList = <T,>(props: FlatListProps<T>) => {
 };
 
 export const Section = React.memo(
-  <T,>({ style, contentContainerStyle, ...props }: FlatListProps<T>) => {
-    const theme = useTheme();
+  <T,>({ style, ...props }: FlatListProps<T>) => {
+    const themedStyles = useThemedStyles();
 
-    const styles = useMemo(
-      () => ({
-        style: [style],
-        contentContainerStyle: [
-          theme.cs.sectionList,
-          {
-            borderColor: theme.colors.border,
-          },
-          contentContainerStyle,
-        ],
-        itemSeparator: { height: 2, backgroundColor: theme.colors.border },
-      }),
-      [theme]
-    );
-
-    const itemSeparator = useMemo(() => {
-      return () => <View style={styles.itemSeparator} />;
-    }, [styles.itemSeparator]);
+    const itemsCount = useMemo(() => props.data?.length || 0, [props.data]);
 
     const keyExtractor = useCallback(
       (item: T & { id: string }, index: number) => {
@@ -46,13 +31,33 @@ export const Section = React.memo(
       []
     );
 
+    const CellRendererComponent = useCallback(({
+      children,
+      style,
+      index,
+      ...props
+    }: CellRendererProps<T>) => {
+      return (
+        <View
+          style={[
+            themedStyles.sectionListBorder,
+            index === 0 && cs.borderTopRadius16,
+            index === itemsCount - 1 && cs.borderBottomRadius16,
+            style,
+          ]}
+          {...props}
+        >
+          {children}
+        </View>
+      );
+    }, [themedStyles, itemsCount]);
+
     return (
       <RNFlatList<T>
-        style={styles.style}
-        contentContainerStyle={styles.contentContainerStyle}
-        ItemSeparatorComponent={itemSeparator}
-        initialNumToRender={10}
-        windowSize={7}
+        style={style}
+        initialNumToRender={props.initialNumToRender || 10}
+        CellRendererComponent={CellRendererComponent}
+        windowSize={props.windowSize || 7}
         // @ts-ignore
         keyExtractor={props.keyExtractor || keyExtractor}
         {...props}

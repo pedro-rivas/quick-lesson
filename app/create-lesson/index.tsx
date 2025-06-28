@@ -1,5 +1,4 @@
 import { createLesson } from "@/api/gemini";
-import { images } from "@/assets/images";
 import IconButton from "@/components/buttons/IconButton";
 import Pressable from "@/components/buttons/Pressable";
 import CountryFlag from "@/components/CountryFlag";
@@ -64,12 +63,6 @@ export default function HomeScreen() {
     });
   }, []);
 
-  const flagImage = useMemo(
-    // @ts-ignore
-    () => images.flags[LANGUAGES[learningLanguage].value],
-    [learningLanguage]
-  );
-
   const styles = useMemo(
     () => ({
       header: {
@@ -86,13 +79,13 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView>
-      <Layout.Header>
+      <Layout.Header.Row>
         <IconButton name={"arrow-back"} onPress={goBack} />
         <Text.Header numberOfLines={1}>{"Create a lesson"}</Text.Header>
         <Pressable onPress={switchLanguage}>
           <CountryFlag countryCode={learningLanguage} size={'small'}/>
         </Pressable>
-      </Layout.Header>
+      </Layout.Header.Row>
       <Layout.Column padding={spacing.m}>
         <Text.LandingHeader style={styles.header}>
           {`${LANGUAGES[learningLanguage]?.label} ${t("For")} `}

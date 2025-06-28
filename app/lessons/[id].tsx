@@ -91,11 +91,11 @@ export default function LessonDetailScreen() {
     () => [
       {
         type: "vocabulary",
-        content: <VocabularySection vocabulary={lesson.vocabulary} langCode={lesson.langCode} />,
+        content: <VocabularySection vocabulary={lesson.vocabulary} />,
       },
       ...(renderAllSections ? [{
         type: "phrases",
-        content: <PhrasesSection phrases={lesson.phrases} langCode={lesson.langCode}/>,
+        content: <PhrasesSection phrases={lesson.phrases}/>,
       },
       {
         type: "tips",
@@ -103,7 +103,6 @@ export default function LessonDetailScreen() {
           <TipsSection
             tips={lesson.relevantGrammar}
             setExplanation={openExplanation}
-            langCode={lesson.langCode}
           />
         ),
       }] : []),
@@ -113,7 +112,7 @@ export default function LessonDetailScreen() {
 
   return (
     <SafeAreaView>
-      <Layout.Header
+      <Layout.Header.Row
         style={{
           paddingHorizontal: 8,
           borderBottomWidth: 0,
@@ -128,7 +127,7 @@ export default function LessonDetailScreen() {
           name={"delete"}
           color="#ff5252"
         />
-      </Layout.Header>
+      </Layout.Header.Row>
 
       <Pager
         initialPage={0}

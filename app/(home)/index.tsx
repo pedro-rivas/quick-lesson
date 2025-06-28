@@ -1,158 +1,126 @@
-import QuickButton from "@/components/buttons/Button";
+import * as Layout from "@/components/Layout";
 import LessonCard from "@/components/LessonCard";
 import LessonEmptyState from "@/components/LessonEmptyState";
 import * as List from "@/components/List";
+import Pager, { RenderTabBarFnProps } from "@/components/Pager";
 import SafeAreaView from "@/components/SafeAreaView";
-import { LanguageCode } from "@/constants/languages";
+import { TabBar } from "@/components/TabBar";
+import VocabularyRow, { Vocab } from "@/components/VocabularyRow";
 import useTranslation from "@/hooks/useTranslation";
 import { Lesson, useLessonStore } from "@/store/lessonStore";
-import { useUserStore } from "@/store/userStore";
 import { spacing } from "@/styles/spacing";
+import { useAudioPlayer } from "expo-audio";
 import { router } from "expo-router";
-import React, { useCallback } from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import React, { useCallback, useMemo } from "react";
 
-import Animated from "react-native-reanimated";
 
 export default function HomeScreen() {
-  const [selectedLanguage, setSelectedLanguage] =
-    React.useState<LanguageCode | null>(null);
-  const [topic, setTopic] = React.useState("");
-  const [loading, setLoading] = React.useState(false);
-
-  const { addLesson, getAllLessons, removeLesson } = useLessonStore();
-  const { getUserPreferences } = useUserStore();
-  const userPreferences = getUserPreferences();
-  const userLanguage = userPreferences.preferredLanguage;
+  const { getAllLessons } = useLessonStore();
   const lessons = getAllLessons();
-  const t = useTranslation();
 
-  const handleDeleteLesson = useCallback((id: string, title: string) => {
-    Alert.alert(
-      "Delete Lesson",
-      `Are you sure you want to delete "${title}"?`,
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => removeLesson(id),
-        },
-      ]
-    );
-  }, []);
+  const t = useTranslation();
+  const player = useAudioPlayer("");
+
+  const sections = useMemo(
+    () => [{ title: t("My Lessons") }, { title: t("Vocabulary") }],
+    []
+  );
+
+  const { allVocabulary, vocabs, lessonsCount } = useMemo(() => {
+    const all = lessons.flatMap((lesson) => lesson.vocabulary || []);
+    return {
+      allVocabulary: all,
+      vocabs: all.length,
+      lessonsCount: lessons.length,
+    };
+  }, [lessons]);
 
   const handleViewLesson = useCallback((lesson: Lesson) => {
     router.push(`/lessons/${lesson.id}` as any);
   }, []);
 
-  const renderItem = useCallback(({ item }: { item: Lesson }) => {
-    return (
-      <LessonCard
-        lesson={item}
-        onView={handleViewLesson}
-        onDelete={handleDeleteLesson}
-      />
-    );
+  const handleVocabPress = useCallback((uri: string) => {
+    if (uri) {
+      player.replace(uri);
+      player.seekTo(0);
+      setTimeout(() => {
+        player.play();
+      }, 10);
+    }
   }, []);
+
+  const handleCreateLesson = useCallback(() => {
+    router.push("/create-lesson");
+  }, []);
+
+  const renderItem = useCallback(({ item }: { item: Lesson }) => {
+    return <LessonCard lesson={item} onPress={handleViewLesson} />;
+  }, []);
+
+  const renderVocab = useCallback(
+    ({ item, index }: { item: Vocab; index: number }) => {
+      return (
+        <VocabularyRow
+          vocab={item}
+          vocabs={vocabs}
+          idx={index}
+          showBorder={false}
+          showFlag={true}
+          onPress={handleVocabPress}
+        />
+      );
+    },
+    [vocabs]
+  );
+
+  const renderTabBar = useCallback(
+    (props: RenderTabBarFnProps) => {
+      return (
+        <TabBar items={sections.map((section) => section.title)} {...props} />
+      );
+    },
+    [sections]
+  );
 
   return (
     <SafeAreaView>
-      <List.FlatList
-        data={lessons}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.lessonListContainer, { paddingHorizontal: spacing.m}]}
-        scrollEnabled={true}
-        windowSize={9}
-        nestedScrollEnabled={true}
-        pinchGestureEnabled={false}
-        ListHeaderComponent={
-          <View>
-            <Text style={styles.title}>{t("Quick Lesson")}</Text>
-            {/* --- My Lessons Section --- */}
-            <View style={styles.lessonsSectionContainer}>
-              <View style={styles.lessonsHeader}>
-                <Text style={styles.lessonsTitle}>My Lessons</Text>
-                {lessons.length > 0 && (
-                  <Text style={styles.lessonsSubtitle}>
-                    {lessons.length} lesson{lessons.length !== 1 ? "s" : ""}
-                  </Text>
-                )}
-              </View>
-            </View>
-          </View>
-        }
-        ListEmptyComponent={<LessonEmptyState />}
-      />
+      <Pager initialPage={0} renderTabBar={renderTabBar}>
+        <Layout.Column key={1} mh={spacing.m}>
+          <List.Section
+            data={lessons}
+            renderItem={renderItem}
+            showsVerticalScrollIndicator={false}
+            scrollEnabled={true}
+            windowSize={9}
+            nestedScrollEnabled={true}
+            pinchGestureEnabled={false}
+            initialNumToRender={10}
+            ListHeaderComponent={
+              <Layout.Header.Section
+                title={`${lessonsCount} ${t("Lessons")}`}
+              />
+            }
+            ListEmptyComponent={<LessonEmptyState />}
+          />
+        </Layout.Column>
 
-      <Animated.View style={{ padding: 16 }}>
-        <QuickButton
-          onPress={() => {
-            router.push("/create-lesson");
-          }}
-          title="New Lesson"
-          loading={loading}
-          disabled={loading}
-        />
-      </Animated.View>
+        <Layout.Column key={2} mh={spacing.m}>
+          <List.Section
+            data={allVocabulary}
+            renderItem={renderVocab}
+            showsVerticalScrollIndicator={false}
+            scrollEnabled={true}
+            windowSize={9}
+            nestedScrollEnabled={true}
+            pinchGestureEnabled={false}
+            initialNumToRender={10}
+            ListHeaderComponent={
+              <Layout.Header.Section title={`${vocabs} ${t("Words")}`} />
+            }
+            ListEmptyComponent={<LessonEmptyState />}
+          />
+        </Layout.Column>
+      </Pager>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    marginVertical: 24,
-    color: "#222",
-  },
-  bigTitle: {
-    color: "#0b57d0",
-    fontSize: 36,
-  },
-  bottomSheetView: {
-    flex: 1,
-    padding: 24,
-    // backgroundColor: "#0b57d0",
-  },
-  lessonsSectionContainer: {},
-  lessonsHeader: {
-    marginBottom: 24,
-  },
-  lessonsTitle: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#222",
-    marginBottom: 4,
-  },
-  lessonsSubtitle: {
-    fontSize: 16,
-    color: "#666",
-  },
-  lessonListContainer: {
-    paddingBottom: 20,
-  },
-  contentContainer: {
-    flex: 1,
-    alignItems: "center",
-  },
-  input: {
-    marginTop: 8,
-    marginBottom: 10,
-    borderRadius: 10,
-    fontSize: 16,
-    lineHeight: 20,
-    padding: 8,
-    backgroundColor: "rgba(151, 151, 151, 0.25)",
-  },
-});
