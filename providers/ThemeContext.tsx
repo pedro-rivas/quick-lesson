@@ -1,5 +1,6 @@
 import { BUTTON_HEIGHT } from "@/components/buttons/Button";
 import useTheme from "@/hooks/useTheme";
+import { BORDER_WIDTH } from "@/styles/common";
 import { spacing } from "@/styles/spacing";
 import React, { createContext, PropsWithChildren } from "react";
 import { ViewStyle } from "react-native";
@@ -20,7 +21,7 @@ export function ThemeProvider({ children }: PropsWithChildren) {
   const memoizedStyles = React.useMemo(
     () => ({
       sectionListBorder: {
-        borderWidth: 2,
+        borderWidth: BORDER_WIDTH,
         borderTopWidth: 0,
         borderColor: theme.colors.border,
       },
