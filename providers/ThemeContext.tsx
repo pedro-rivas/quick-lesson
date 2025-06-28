@@ -1,16 +1,21 @@
+import { BUTTON_HEIGHT } from "@/components/buttons/Button";
 import useTheme from "@/hooks/useTheme";
+import { spacing } from "@/styles/spacing";
 import React, { createContext, PropsWithChildren } from "react";
 import { ViewStyle } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-interface ThemedStyles {
-  sectionListBorder: ViewStyle;
-  borderBottomColor: ViewStyle;
-}
+type ThemedStylesFields = "sectionListBorder" | "borderBottomColor" | "fab";
+
+type ThemedStyles = {
+  [key in ThemedStylesFields]: ViewStyle;
+};
 
 const ThemeContext = createContext<ThemedStyles>({} as ThemedStyles);
 
 export function ThemeProvider({ children }: PropsWithChildren) {
   const theme = useTheme();
+  const insents = useSafeAreaInsets();
 
   const memoizedStyles = React.useMemo(
     () => ({
@@ -19,10 +24,22 @@ export function ThemeProvider({ children }: PropsWithChildren) {
         borderTopWidth: 0,
         borderColor: theme.colors.border,
       },
-      borderBottomColor:{
+      borderBottomColor: {
         borderBottomColor: theme.colors.border,
-      }
-    }),
+      },
+      fab: {
+        position: "absolute",
+        bottom: insents.bottom + spacing.m,
+        right: spacing.m,
+        backgroundColor: theme.colors.primary,
+        borderRadius: BUTTON_HEIGHT,
+        height: BUTTON_HEIGHT,
+        minWidth: BUTTON_HEIGHT,
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "row",
+      },
+    }) as ThemedStyles,
     [theme]
   );
 

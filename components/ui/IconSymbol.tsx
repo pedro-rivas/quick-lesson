@@ -26,5 +26,5 @@ export function IconSymbol({
     return <FontAwesome5 name="language" color={color} size={size} style={style} />
   }
   
-  return <MaterialIcons color={'color'} size={size} name={name} style={style} />;
+  return <MaterialIcons color={color} size={size} name={name} style={style} />;
 }

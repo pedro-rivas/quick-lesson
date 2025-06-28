@@ -41,6 +41,9 @@ const commonStyles = StyleSheet.create({
   m_r_xs: {
     marginRight: spacing.xs,
   },
+  m_r_m: {
+    marginRight: spacing.m,
+  },
   // Border
   border2: {
     borderWidth: BORDER_WIDTH,

@@ -1,3 +1,4 @@
+import FAB, { FABRef } from "@/components/buttons/FAB";
 import * as Layout from "@/components/Layout";
 import LessonCard from "@/components/LessonCard";
 import LessonEmptyState from "@/components/LessonEmptyState";
@@ -12,7 +13,9 @@ import { spacing } from "@/styles/spacing";
 import { useAudioPlayer } from "expo-audio";
 import { router } from "expo-router";
 import React, { useCallback, useMemo } from "react";
+import { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 
+const FAB_THRESHOLD = 100;
 
 export default function HomeScreen() {
   const { getAllLessons } = useLessonStore();
@@ -20,6 +23,9 @@ export default function HomeScreen() {
 
   const t = useTranslation();
   const player = useAudioPlayer("");
+
+  const fabRef = React.useRef<FABRef>(null);
+  const prevScrollY = React.useRef(0);
 
   const sections = useMemo(
     () => [{ title: t("My Lessons") }, { title: t("Vocabulary") }],
@@ -53,6 +59,26 @@ export default function HomeScreen() {
     router.push("/create-lesson");
   }, []);
 
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      if (event.nativeEvent.contentOffset.y > FAB_THRESHOLD) {
+        fabRef.current?.collapse();
+      } else {
+        fabRef.current?.expand();
+      }
+      prevScrollY.current = event.nativeEvent.contentOffset.y;
+    },
+    []
+  );
+
+  const handlePageChange = useCallback((nextPage: number) => {
+    if (nextPage !== 0) {
+      fabRef.current?.collapse();
+    } else if(prevScrollY.current < FAB_THRESHOLD) {
+      fabRef.current?.expand();
+    }
+  }, []);
+
   const renderItem = useCallback(({ item }: { item: Lesson }) => {
     return <LessonCard lesson={item} onPress={handleViewLesson} />;
   }, []);
@@ -84,11 +110,17 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView>
-      <Pager initialPage={0} renderTabBar={renderTabBar}>
+      <Pager 
+        initialPage={0} 
+        renderTabBar={renderTabBar} 
+        onPageSelected={handlePageChange}
+      >
         <Layout.Column key={1} mh={spacing.m}>
           <List.Section
             data={lessons}
             renderItem={renderItem}
+            onScroll={handleScroll}
+            scrollEventThrottle={100}
             showsVerticalScrollIndicator={false}
             scrollEnabled={true}
             windowSize={9}
@@ -113,7 +145,7 @@ export default function HomeScreen() {
             windowSize={9}
             nestedScrollEnabled={true}
             pinchGestureEnabled={false}
-            initialNumToRender={10}
+            initialNumToRender={4}
             ListHeaderComponent={
               <Layout.Header.Section title={`${vocabs} ${t("Words")}`} />
             }
@@ -121,6 +153,7 @@ export default function HomeScreen() {
           />
         </Layout.Column>
       </Pager>
+      <FAB ref={fabRef} onPress={handleCreateLesson} />
     </SafeAreaView>
   );
 }

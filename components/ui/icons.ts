@@ -9,6 +9,7 @@ const icons = {
   "check-circle": "check-circle",
   "radio-button-unchecked": "radio-button-unchecked",
   "keyboard-arrow-right": 'keyboard-arrow-right',
+  "add-circle": "add-circle",
 };
 
 export type IconSymbolName = keyof typeof icons;

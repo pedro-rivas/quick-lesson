@@ -21,7 +21,7 @@ interface IconButtonProps {
   style?: StyleProp<TextStyle>;
   color?: string;
   size?: number;
-  onPress: () => void;
+  onPress?: () => void;
   disabled?: boolean;
   width?: number;
   height?: number;
@@ -76,7 +76,7 @@ const IconButton = ({
     backgroundColor: interpolateColor(
       pressed.value,
       [0, 1],
-      ["#fff", "#E0E0E0"]
+      ["transparent", "#E0E0E0"]
     ),
   }));
 
@@ -85,7 +85,7 @@ const IconButton = ({
       onPress={handlePress}
       onPressIn={onPressIn}
       onPressOut={onPressOut}
-      disabled={disabled}
+      disabled={disabled || !onPress}
       style={[animatedStyle, outterAnimatedStyle]}
       hitSlop={BUTTON_ICON_HIT_SLOP}
     >

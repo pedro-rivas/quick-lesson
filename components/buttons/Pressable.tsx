@@ -2,10 +2,10 @@ import * as Haptics from "expo-haptics";
 import React, { useCallback } from "react";
 import { PressableProps, Pressable as RNPressable } from "react-native";
 import Animated, {
-    interpolate,
-    runOnJS,
-    useAnimatedStyle,
-    useSharedValue,
+  interpolate,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue
 } from "react-native-reanimated";
 
 export const MIN_SCALE = 0.98;

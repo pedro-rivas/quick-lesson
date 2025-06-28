@@ -128,7 +128,6 @@ export const Body = ({ children, style, ...props }: TextProps) => {
       style={[
         {
           fontSize: 16,
-          fontWeight: props.bold ? "bold" : props.semibold ? "600" : "normal",
         },
         style,
       ]}
@@ -145,7 +144,6 @@ export const Caption = ({ children, style, ...props }: TextProps) => {
       style={[
         {
           fontSize: 14,
-          fontWeight: props.bold ? "bold" : "normal",
           color: "#5A6672",
         },
         style,
@@ -163,7 +161,6 @@ export const Detail = ({ children, style, ...props }: TextProps) => {
       style={[
         {
           fontSize: 12,
-          fontWeight: props.bold ? "bold" : "normal",
           color: "#5A6672",
         },
         style,
@@ -195,7 +192,10 @@ export const Link = ({ children, style, ...props }: TextProps) => {
 };
 
 const DefaultText = React.memo(({ style, ...props }: TextProps) => {
-  return <Text style={[{ color: props.color }, style]} {...props} />;
+  return <Text style={[{ 
+    color: props.color,
+    fontWeight: props.bold ? "bold" : props.semibold ? "600" : "normal",
+  }, style]} {...props} />;
 });
 
 export const Animated = (
