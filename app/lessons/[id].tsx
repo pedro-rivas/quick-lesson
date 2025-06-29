@@ -4,25 +4,16 @@ import Pager from "@/components/Pager";
 import PhrasesSection from "@/components/PhrasesSection";
 import SafeAreaView from "@/components/SafeAreaView";
 import { TabBar } from "@/components/TabBar";
-import * as Text from "@/components/Text";
 import TipsSection, { TipExample } from "@/components/TipsSection";
 import VocabularySection from "@/components/VocabularySection";
+import TipBottomSheet from "@/components/bottomSheets/TipBottomSheet";
 import Button from "@/components/buttons/Button";
-import useTheme from "@/hooks/useTheme";
 import useTranslation from "@/hooks/useTranslation";
 import { useLessonStore } from "@/store/lessonStore";
 import { commonStyles as cs } from "@/styles/common";
-import { spacing } from "@/styles/spacing";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { router, useLocalSearchParams } from "expo-router";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { Alert, StyleSheet } from "react-native";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Alert } from "react-native";
 
 export default function LessonDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -44,9 +35,6 @@ export default function LessonDetailScreen() {
   }, []);
 
   const t = useTranslation();
-  const theme = useTheme();
-
-  const bottomSheetRef = useRef<BottomSheet>(null);
 
   const sections = useMemo(
     () => [
@@ -77,12 +65,6 @@ export default function LessonDetailScreen() {
       ]
     );
   }, [lesson, removeLesson, router]);
-
-  const handleSheetChanges = useCallback((index: number) => {
-    if (index === -1) {
-      setCurrentExample(null); // Reset current tip when the sheet is closed
-    }
-  }, []);
 
   const handleBackPress = useCallback(() => {
     router.back();
@@ -132,13 +114,20 @@ export default function LessonDetailScreen() {
         {pages.map((page, index) => {
           switch (page.type) {
             case "vocabulary":
-              return <VocabularySection key={index +1} vocabulary={lesson.vocabulary} />;
+              return (
+                <VocabularySection
+                  key={index + 1}
+                  vocabulary={lesson.vocabulary}
+                />
+              );
             case "phrases":
-              return <PhrasesSection key={index +1} phrases={lesson.phrases} />;
+              return (
+                <PhrasesSection key={index + 1} phrases={lesson.phrases} />
+              );
             case "tips":
               return (
                 <TipsSection
-                  key={index +1}
+                  key={index + 1}
                   tips={lesson.relevantGrammar}
                   setExplanation={openExplanation}
                 />
@@ -156,68 +145,14 @@ export default function LessonDetailScreen() {
       </Layout.Footer>
 
       {example ? (
-        <BottomSheet
-          ref={bottomSheetRef}
-          onChange={handleSheetChanges}
-          enablePanDownToClose={true}
-          handleIndicatorStyle={{ backgroundColor: theme.colors.onPrimary }}
-          backgroundStyle={{ backgroundColor: theme.colors.primary }}
-        >
-          <BottomSheetView style={styles.bottomSheetView}>
-            <Text.H3 style={{ color: theme.colors.onPrimary }}>
-              {example.sentence}
-            </Text.H3>
-            <Text.Body
-              style={{
-                color: theme.colors.onPrimary,
-                marginBottom: spacing.l,
-                opacity: 0.7,
-              }}
-            >
-              {example.translation}
-            </Text.Body>
-            <Text.Caption
-              style={{
-                color: theme.colors.onPrimary,
-                marginBottom: spacing.s,
-                opacity: 0.7,
-              }}
-            >
-              {"Explanation"}
-            </Text.Caption>
-            <Text.Body
-              style={{ color: theme.colors.onPrimary, lineHeight: 22 }}
-            >
-              {example.explanation}
-            </Text.Body>
-          </BottomSheetView>
-        </BottomSheet>
+        <TipBottomSheet
+          tip={example}
+          onClose={() => {
+            setCurrentExample(null);
+          }}
+          langCode={lesson.langCode}
+        />
       ) : null}
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
-  lessonInfo: {
-    marginBottom: 24,
-  },
-  bottomSheetView: {
-    flex: 1,
-    padding: 24,
-    backgroundColor: "#0b57d0",
-  },
-});

@@ -19,6 +19,7 @@ interface SpeechButtonProps {
   text: string;
   langCode: LanguageCode;
   onPress: (uri: string) => void;
+  color?: string;
 }
 
 /**
@@ -31,7 +32,7 @@ interface SpeechButtonProps {
  * While the speech is being generated and played, a loading indicator is shown.
  * Otherwise, a sound icon is displayed.
  */
-const SpeechButton = ({ text, langCode, onPress }: SpeechButtonProps) => {
+const SpeechButton = ({ text, langCode, color, onPress }: SpeechButtonProps) => {
 
   const theme = useTheme();
   const speech = useSpeech(text, langCode);
@@ -73,7 +74,7 @@ const SpeechButton = ({ text, langCode, onPress }: SpeechButtonProps) => {
       <AntDesign
         name={"sound"}
         size={BUTTON_ICON_SIZE}
-        color={speech.loading ? "#eee" : theme.colors.primary}
+        color={speech.loading ? "#eee" : color ||  theme.colors.primary}
       />
     </AnimatedPressable>
   );
