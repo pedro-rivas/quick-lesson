@@ -9,14 +9,20 @@ import * as Text from "@/components/Text";
 import TipsSection, { TipExample } from "@/components/TipsSection";
 import VocabularySection from "@/components/VocabularySection";
 import Button from "@/components/buttons/Button";
-import IconButton from "@/components/buttons/IconButton";
 import useTheme from "@/hooks/useTheme";
 import useTranslation from "@/hooks/useTranslation";
 import { useLessonStore } from "@/store/lessonStore";
+import { commonStyles as cs } from "@/styles/common";
 import { spacing } from "@/styles/spacing";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Alert, StyleSheet } from "react-native";
 
 export default function LessonDetailScreen() {
@@ -33,9 +39,9 @@ export default function LessonDetailScreen() {
   }
 
   useEffect(() => {
-    setTimeout(()=> {
+    setTimeout(() => {
       setRenderAllSections(true);
-    }, 300)
+    }, 300);
   }, []);
 
   const t = useTranslation();
@@ -93,36 +99,33 @@ export default function LessonDetailScreen() {
         type: "vocabulary",
         content: <VocabularySection vocabulary={lesson.vocabulary} />,
       },
-      ...(renderAllSections ? [{
-        type: "phrases",
-        content: <PhrasesSection phrases={lesson.phrases}/>,
-      },
-      {
-        type: "tips",
-        content: (
-          <TipsSection
-            tips={lesson.relevantGrammar}
-            setExplanation={openExplanation}
-          />
-        ),
-      }] : []),
+      ...(renderAllSections
+        ? [
+            {
+              type: "phrases",
+              content: <PhrasesSection phrases={lesson.phrases} />,
+            },
+            {
+              type: "tips",
+              content: (
+                <TipsSection
+                  tips={lesson.relevantGrammar}
+                  setExplanation={openExplanation}
+                />
+              ),
+            },
+          ]
+        : []),
     ],
     [lesson, renderAllSections]
   );
 
   return (
     <SafeAreaView>
-      <Layout.Header.Row
-        style={{
-          paddingHorizontal: 8,
-          borderBottomWidth: 0,
-        }}
-      >
-        <IconButton onPress={handleBackPress} name={"arrow-back"} />
-        <Text.Body style={styles.title} numberOfLines={1}>
-          {lesson.title}
-        </Text.Body>
-        <IconButton
+      <Layout.Header.Row style={cs.lessonHeader}>
+        <Layout.Header.Icon onPress={handleBackPress} name={"arrow-back"} />
+        <Layout.Header.Title title={lesson.title} />
+        <Layout.Header.Icon
           onPress={handleDeleteLesson}
           name={"delete"}
           color="#ff5252"
@@ -211,13 +214,6 @@ const styles = StyleSheet.create({
   },
   lessonInfo: {
     marginBottom: 24,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#222",
-    flexShrink: 1,
-    marginHorizontal: 16,
   },
   bottomSheetView: {
     flex: 1,

@@ -4,6 +4,7 @@ import React from "react";
 import { View as RNView } from "react-native";
 import { LayoutProps } from "../Layout";
 import * as Text from "../Text";
+import IconButton, { IconButtonProps } from "../buttons/IconButton";
 
 export const Row = React.memo(({ children, style, ...props }: LayoutProps) => {
   const ts = useThemedStyles();
@@ -31,3 +32,15 @@ export const Section = React.memo(
     );
   }
 );
+
+export const Icon = (props: IconButtonProps) => {
+  return <IconButton {...props} />;
+};
+
+export const Title = ({ title }: { title: string }) => {
+  return (
+    <Text.H4 style={[cs.f_s_1, cs.m_h_m]} numberOfLines={1}>
+      {title}
+    </Text.H4>
+  );
+};

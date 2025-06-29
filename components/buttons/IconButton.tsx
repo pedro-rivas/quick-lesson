@@ -16,7 +16,7 @@ const MIN_SCALE = 0.98;
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-interface IconButtonProps {
+export interface IconButtonProps {
   name: IconSymbolName;
   style?: StyleProp<TextStyle>;
   color?: string;
