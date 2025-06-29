@@ -1,14 +1,15 @@
 import { BUTTON_ICON_HEIGHT } from "@/constants/style";
 import { StyleSheet } from "react-native";
+import { scale } from "./scale";
 import { spacing } from "./spacing";
 
 export const BORDER_WIDTH = 2;
 export const BORDER_RADIUS = 16;
-export const HEADER_HEIGHT = 50;
+export const HEADER_HEIGHT = scale.ms(50);
 
 const commonStyles = StyleSheet.create({
   o_60:{
-
+    opacity: 0.6,
   },
   opacity70: {
     opacity: 0.7,
@@ -56,6 +57,9 @@ const commonStyles = StyleSheet.create({
   },
   m_h_m: {
     marginHorizontal: spacing.m,
+  },
+  m_l_s:{
+    marginLeft: spacing.s,
   },
   // Border
   border2: {

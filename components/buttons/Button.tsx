@@ -1,3 +1,5 @@
+import { scale } from "@/styles/scale";
+import { spacing } from "@/styles/spacing";
 import * as Haptics from "expo-haptics";
 import React from "react";
 import {
@@ -19,7 +21,7 @@ import Animated, {
 import { MIN_SCALE } from "./Pressable";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-export const BUTTON_HEIGHT = 50;
+export const BUTTON_HEIGHT = scale.ms(50);
 
 interface ButtonProps {
   onPress: () => void;
@@ -131,15 +133,15 @@ const Button: React.FC<ButtonProps> = ({
 const styles = StyleSheet.create({
   button: {
     backgroundColor: "#0b57d0",
-    paddingHorizontal: 16,
-    borderRadius: 16,
+    paddingHorizontal: spacing.m,
+    borderRadius: spacing.m,
     alignItems: "center",
     justifyContent: "center",
     height: BUTTON_HEIGHT,
   },
   secondaryButton: {
-    paddingHorizontal: 16,
-    borderRadius: 16,
+    paddingHorizontal: spacing.m,
+    borderRadius: spacing.m,
     alignItems: "center",
     justifyContent: "center",
     height: BUTTON_HEIGHT,
@@ -163,8 +165,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   success: {
-    paddingHorizontal: 16,
-    borderRadius: 16,
+    paddingHorizontal: spacing.m,
+    borderRadius: spacing.m,
     alignItems: "center",
     justifyContent: "center",
 

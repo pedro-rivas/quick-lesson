@@ -3,6 +3,7 @@ import { BUTTON_ICON_HIT_SLOP, BUTTON_ICON_SIZE } from "@/constants/style";
 import useSpeech from "@/hooks/useSeech";
 import { commonStyles as cs } from "@/styles/common";
 import { AntDesign } from "@expo/vector-icons";
+import { useTheme } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import React, { useCallback } from "react";
 import { Pressable } from "react-native";
@@ -31,6 +32,8 @@ interface SpeechButtonProps {
  * Otherwise, a sound icon is displayed.
  */
 const SpeechButton = ({ text, langCode, onPress }: SpeechButtonProps) => {
+
+  const theme = useTheme();
   const speech = useSpeech(text, langCode);
 
   const pressed = useSharedValue(0);
@@ -70,7 +73,7 @@ const SpeechButton = ({ text, langCode, onPress }: SpeechButtonProps) => {
       <AntDesign
         name={"sound"}
         size={BUTTON_ICON_SIZE}
-        color={speech.loading ? "#eee" : "#1a237e"}
+        color={speech.loading ? "#eee" : theme.colors.primary}
       />
     </AnimatedPressable>
   );

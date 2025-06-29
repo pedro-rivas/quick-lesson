@@ -1,17 +1,20 @@
+import { BUTTON_ICON_SIZE } from "@/constants/style";
 import useTheme from "@/hooks/useTheme";
 import useTranslation from "@/hooks/useTranslation";
 import { useThemedStyles } from "@/providers/ThemeContext";
 import { commonStyles as cs } from "@/styles/common";
 import React, { useImperativeHandle } from "react";
 import Animated, {
-    LinearTransition,
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming,
+  LinearTransition,
+  useAnimatedStyle,
+  useSharedValue,
 } from "react-native-reanimated";
 import * as Text from "../Text";
-import IconButton from "./IconButton";
+import { IconSymbol } from "../ui/IconSymbol";
+import { BUTTON_HEIGHT } from "./Button";
 import Pressable from "./Pressable";
+
+const PADDING_HORIZONTAL = Math.round((BUTTON_HEIGHT - BUTTON_ICON_SIZE) / 2);
 
 export interface FABRef {
   collapse: () => void;
@@ -27,8 +30,23 @@ const FAB = React.forwardRef(({ onPress }: { onPress: () => void }, ref) => {
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      opacity: withTiming(collapse.value === 0 ? 0 : 1, { duration: 600 }),
       display: collapse.value === 0 ? "none" : "flex",
+      height: BUTTON_HEIGHT,
+      paddingHorizontal: PADDING_HORIZONTAL,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+    };
+  }, []);
+
+  const iconStyle = useAnimatedStyle(() => {
+    return {
+      display: collapse.value === 1 ? "none" : "flex",
+      opacity: 1,
+      height: BUTTON_HEIGHT,
+      aspectRatio: 1,
+      justifyContent: "center",
+      alignItems: "center",
     };
   }, []);
 
@@ -45,6 +63,15 @@ const FAB = React.forwardRef(({ onPress }: { onPress: () => void }, ref) => {
     []
   );
 
+  const AddCircle = () => (
+    <IconSymbol
+      key={"add-circle"}
+      name="add-circle"
+      size={BUTTON_ICON_SIZE}
+      color="white"
+    />
+  );
+
   return (
     <Pressable
       // @ts-ignore
@@ -52,11 +79,17 @@ const FAB = React.forwardRef(({ onPress }: { onPress: () => void }, ref) => {
       style={themedStyles.fab}
       onPress={onPress}
     >
-      <IconButton name="add-circle" color="white" />
-      <Animated.View style={[animatedStyle, cs.m_r_m]}>
-        <Text.Body semibold color={theme.colors.onPrimary}>
+      <Animated.View style={iconStyle}>
+        <AddCircle />
+      </Animated.View>
+      <Animated.View style={animatedStyle}>
+        <AddCircle />
+        <Text.H4
+          color={theme.colors.onPrimary}
+          style={cs.m_l_s}
+        >
           {t("New Lesson")}
-        </Text.Body>
+        </Text.H4>
       </Animated.View>
     </Pressable>
   );

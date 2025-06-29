@@ -1,10 +1,12 @@
+import { scale } from "./scale";
+
 const spacing = {
-  xs: 4,
-  m: 16,
-  s: 8,
-  l: 24,
-  xl: 32,
-  xxl: 48,
+  xs: scale.ms(4),
+  m: scale.ms(16),
+  s: scale.ms(8),
+  l: scale.ms(24),
+  xl: scale.ms(32),
+  xxl: scale.ms(48),
 };
 
 export { spacing };

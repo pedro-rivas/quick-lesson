@@ -25,7 +25,9 @@ export const Section = React.memo(
     const itemsCount = useMemo(() => props.data?.length || 0, [props.data]);
 
     const keyExtractor = useCallback(
-      (item: T & { id: string }) =>  item.id,
+      (item: T & { id: string }, index: number) => {
+        return item?.id || index.toString();
+      },
       []
     );
 

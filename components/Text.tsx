@@ -38,11 +38,9 @@ export const LandingHeader = ({ children, style, ...props }: TextProps) => {
 
 export const Header = ({ children, style, ...props }: TextProps) => {
   return (
-    <DefaultText
+    <H4
       style={[
         {
-          fontSize: 18,
-          fontWeight: "bold",
           color: "#222",
           flexShrink: 1,
           marginHorizontal: 16,
@@ -52,7 +50,7 @@ export const Header = ({ children, style, ...props }: TextProps) => {
       {...props}
     >
       {children}
-    </DefaultText>
+    </H4>
   );
 };
 

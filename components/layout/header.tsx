@@ -1,5 +1,6 @@
 import { useThemedStyles } from "@/providers/ThemeContext";
 import { commonStyles as cs } from "@/styles/common";
+import { scale } from "@/styles/scale";
 import React from "react";
 import { View as RNView } from "react-native";
 import { LayoutProps } from "../Layout";
@@ -47,5 +48,6 @@ export const Title = ({ title }: { title: string }) => {
 };
 
 export const Spacer = ({ size = BUTTON_HEIGHT }: { size?: number }) => {
-    return <RNView style={{ width: size, height: size }} />;
-  }
+  const realSize = scale.ms(size);
+  return <RNView style={{ height: realSize, aspectRatio: 1 }} />;
+};

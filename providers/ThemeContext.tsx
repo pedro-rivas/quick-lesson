@@ -39,8 +39,6 @@ export function ThemeProvider({ children }: PropsWithChildren) {
           right: spacing.m,
           backgroundColor: theme.colors.primary,
           borderRadius: BUTTON_HEIGHT,
-          height: BUTTON_HEIGHT,
-          minWidth: BUTTON_HEIGHT,
           justifyContent: "center",
           alignItems: "center",
           flexDirection: "row",
