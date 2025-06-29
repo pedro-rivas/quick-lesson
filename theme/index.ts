@@ -11,6 +11,7 @@ export const DarkTheme = {
     primary: "#0b57d0",
     onPrimary: "#fff",
     border: "#333",
+    onSurface: "#fff",
   },
 };
 
@@ -22,5 +23,6 @@ export const LightTheme = {
     primary: "#0b57d0",
     onPrimary: "#fff",
     border: "#ebebeb",
+    onSurface: "#222",
   },
 };

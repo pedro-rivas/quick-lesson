@@ -1,3 +1,4 @@
+import useTheme from "@/hooks/useTheme";
 import useTranslation from "@/hooks/useTranslation";
 import { useThemedStyles } from "@/providers/ThemeContext";
 import { commonStyles as cs } from "@/styles/common";
@@ -89,11 +90,12 @@ export const Link = ({ style, ...props }: TextProps) => {
 };
 
 const DefaultText = React.memo(({ style, ...props }: TextProps) => {
+  const theme = useTheme();
   return (
     <Text
       style={[
         {
-          color: props.color,
+          color: props.color || theme.colors.onSurface,
           fontWeight: props.bold ? "bold" : props.semibold ? "600" : "normal",
         },
         style,

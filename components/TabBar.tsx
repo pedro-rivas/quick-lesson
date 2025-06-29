@@ -1,4 +1,5 @@
-import { useCallback } from 'react'
+import useTheme from '@/hooks/useTheme'
+import { useCallback, useMemo } from 'react'
 import {
   type LayoutChangeEvent,
   Pressable,
@@ -307,6 +308,8 @@ export function TabBar({
     [onSelect, selectedPage, onPressSelected, onPressUIThread],
   )
 
+  const theme = useTheme()
+
   return (
     <View
 
@@ -358,13 +361,13 @@ export function TabBar({
                   bottom: 0,
                   right: 0,
                   borderBottomWidth: 2,
-                  borderColor: '#0b57d0',
+                  borderColor: theme.colors.primary,
                 },
               ]}
             />
           </Animated.View>
         </ScrollView>
-      <View style={[styles.outerBottomBorder]} />
+      <View style={[styles.outerBottomBorder, { borderColor: theme.colors.border}]} />
     </View>
   )
 }
@@ -386,6 +389,10 @@ function TabBarItem({
   onItemLayout: (index: number, layout: {x: number; width: number}) => void
   onTextLayout: (index: number, layout: {width: number}) => void
 }) {
+
+  const theme = useTheme()
+
+  const textStyle = useMemo(()=> ([styles.itemText, { color: theme.colors.onSurface,}]), [theme])
 
   const style = useAnimatedStyle(() => {
     if (!_WORKLET) {
@@ -424,7 +431,7 @@ function TabBarItem({
         accessibilityRole="tab">
         <Animated.View style={[style, styles.itemInner]}>
           <Text
-            style={[styles.itemText]}
+            style={textStyle}
             onLayout={handleTextLayout}>
             {item}
           </Text>
@@ -465,6 +472,5 @@ const styles = StyleSheet.create({
     right: 0,
     top: '100%',
     borderBottomWidth: 1,
-    borderBottomColor: "#ebebeb",
   },
 })

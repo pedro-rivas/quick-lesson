@@ -11,6 +11,7 @@ const useTheme = () => {
             ...theme.colors,
             // @ts-ignore
             onPrimary: theme.colors.onPrimary,
+            onSurface: theme.colors.onSurface,
         },
         cs: commonStyles,
     };

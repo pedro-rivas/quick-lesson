@@ -7,6 +7,9 @@ export const BORDER_RADIUS = 16;
 export const HEADER_HEIGHT = 50;
 
 const commonStyles = StyleSheet.create({
+  o_60:{
+
+  },
   opacity70: {
     opacity: 0.7,
   },
@@ -35,6 +38,9 @@ const commonStyles = StyleSheet.create({
     flexShrink: 1,
   },
   // Padding
+  p_m:{
+    padding: spacing.m,
+  },
   p_v_m: {
     paddingVertical: spacing.m,
   },

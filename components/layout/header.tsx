@@ -4,6 +4,7 @@ import React from "react";
 import { View as RNView } from "react-native";
 import { LayoutProps } from "../Layout";
 import * as Text from "../Text";
+import { BUTTON_HEIGHT } from "../buttons/Button";
 import IconButton, { IconButtonProps } from "../buttons/IconButton";
 
 export const Row = React.memo(({ children, style, ...props }: LayoutProps) => {
@@ -44,3 +45,7 @@ export const Title = ({ title }: { title: string }) => {
     </Text.H4>
   );
 };
+
+export const Spacer = ({ size = BUTTON_HEIGHT }: { size?: number }) => {
+    return <RNView style={{ width: size, height: size }} />;
+  }

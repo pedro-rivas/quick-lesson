@@ -1,4 +1,5 @@
 import { BUTTON_ICON_HEIGHT, BUTTON_ICON_HIT_SLOP, BUTTON_ICON_SIZE } from "@/constants/style";
+import useTheme from "@/hooks/useTheme";
 import * as Haptics from "expo-haptics";
 import React from "react";
 import { Pressable, StyleProp, TextStyle, ViewStyle } from "react-native";
@@ -31,7 +32,7 @@ export interface IconButtonProps {
 const IconButton = ({
   name,
   style,
-  color = "black",
+  color,
   size = BUTTON_ICON_SIZE,
   onPress,
   disabled,
@@ -39,7 +40,10 @@ const IconButton = ({
   height = BUTTON_ICON_HEIGHT,
   animatedStyle: outterAnimatedStyle,
 }: IconButtonProps) => {
+  const theme = useTheme();
   const pressed = useSharedValue(0);
+
+  const iconColor = color || theme.colors.onSurface;
 
   const handlePress = () => {
     onPress?.();
@@ -89,11 +93,11 @@ const IconButton = ({
       style={[animatedStyle, outterAnimatedStyle]}
       hitSlop={BUTTON_ICON_HIT_SLOP}
     >
-      <IconSymbol name={name} size={size} color={color} style={style} />
+      <IconSymbol name={name} size={size} color={iconColor} style={style} />
     </AnimatedPressable>
   );
 };
 
 IconButton.displayName = "IconButton";
 
-export default IconButton;
+export default React.memo(IconButton);

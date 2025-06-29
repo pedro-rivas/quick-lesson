@@ -44,6 +44,7 @@ export function ThemeProvider({ children }: PropsWithChildren) {
           justifyContent: "center",
           alignItems: "center",
           flexDirection: "row",
+          overflow: "hidden",
         },
         link: {
           color: theme.colors.primary,

@@ -1,5 +1,4 @@
 import { createLesson } from "@/api/gemini";
-import IconButton from "@/components/buttons/IconButton";
 import Pressable from "@/components/buttons/Pressable";
 import CountryFlag from "@/components/CountryFlag";
 import * as Layout from "@/components/Layout";
@@ -11,12 +10,13 @@ import useTheme from "@/hooks/useTheme";
 import useTranslation from "@/hooks/useTranslation";
 import { useLessonStore } from "@/store/lessonStore";
 import { useUserStore } from "@/store/userStore";
+import { commonStyles as cs } from "@/styles/common";
 import { spacing } from "@/styles/spacing";
 import { router } from "expo-router";
 import React, { useCallback, useMemo } from "react";
 import { Alert } from "react-native";
 
-export default function HomeScreen() {
+export default function CreateLessonScreen() {
   const [topic, setTopic] = React.useState("");
   const [loading, setLoading] = React.useState(false);
 
@@ -59,7 +59,7 @@ export default function HomeScreen() {
   const switchLanguage = useCallback(() => {
     router.push({
       pathname: "/account/choose-language",
-      params: { shouldGoBack: 'true' },
+      params: { shouldGoBack: "true" },
     });
   }, []);
 
@@ -72,6 +72,7 @@ export default function HomeScreen() {
         fontSize: 24,
         fontWeight: "bold",
         color: "#32CD32",
+        ...cs.o_60,
       } as const,
     }),
     [theme]
@@ -80,10 +81,10 @@ export default function HomeScreen() {
   return (
     <SafeAreaView>
       <Layout.Header.Row>
-        <IconButton name={"arrow-back"} onPress={goBack} />
-        <Text.Header numberOfLines={1}>{"Create a lesson"}</Text.Header>
+        <Layout.Header.Icon name={"arrow-back"} onPress={goBack} />
+        <Layout.Header.Title title={t("Create a lesson")} />
         <Pressable onPress={switchLanguage}>
-          <CountryFlag countryCode={learningLanguage} size={'small'}/>
+          <CountryFlag countryCode={learningLanguage} size={"small"} />
         </Pressable>
       </Layout.Header.Row>
       <Layout.Column padding={spacing.m}>
@@ -97,7 +98,7 @@ export default function HomeScreen() {
             ))}
           </Text.Animated>
         ) : (
-          <Text.Animated style={[styles.subheading, { opacity: 0.6 }]}>
+          <Text.Animated style={styles.subheading}>
             {t("Taking a Taxi")}
           </Text.Animated>
         )}
