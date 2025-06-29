@@ -12,6 +12,7 @@ export const DarkTheme = {
     onPrimary: "#fff",
     border: "#333",
     onSurface: "#fff",
+    ripple: "rgba(11, 87, 208, 0.32)",
   },
 };
 
@@ -24,5 +25,6 @@ export const LightTheme = {
     onPrimary: "#fff",
     border: "#ebebeb",
     onSurface: "#222",
+    ripple: "rgba(0, 0, 0, 0.08)",
   },
 };

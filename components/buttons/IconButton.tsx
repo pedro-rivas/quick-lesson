@@ -80,7 +80,7 @@ const IconButton = ({
     backgroundColor: interpolateColor(
       pressed.value,
       [0, 1],
-      ["transparent", "#E0E0E0"]
+      ["transparent", theme.colors.ripple]
     ),
   }));
 
