@@ -1,6 +1,5 @@
 import * as Layout from "@/components/Layout";
 import LessonNotFound from "@/components/LessonNotFound";
-import * as List from "@/components/List";
 import Pager from "@/components/Pager";
 import PhrasesSection from "@/components/PhrasesSection";
 import SafeAreaView from "@/components/SafeAreaView";
@@ -97,22 +96,14 @@ export default function LessonDetailScreen() {
     () => [
       {
         type: "vocabulary",
-        content: <VocabularySection vocabulary={lesson.vocabulary} />,
       },
       ...(renderAllSections
         ? [
             {
               type: "phrases",
-              content: <PhrasesSection phrases={lesson.phrases} />,
             },
             {
               type: "tips",
-              content: (
-                <TipsSection
-                  tips={lesson.relevantGrammar}
-                  setExplanation={openExplanation}
-                />
-              ),
             },
           ]
         : []),
@@ -138,15 +129,24 @@ export default function LessonDetailScreen() {
           <TabBar items={sections.map((section) => section.title)} {...props} />
         )}
       >
-        {pages.map((page, index) => (
-          <List.ScrollView
-            key={index}
-            style={{ flex: 1, padding: 16 }}
-            showsVerticalScrollIndicator={false}
-          >
-            {page.content}
-          </List.ScrollView>
-        ))}
+        {pages.map((page, index) => {
+          switch (page.type) {
+            case "vocabulary":
+              return <VocabularySection key={index +1} vocabulary={lesson.vocabulary} />;
+            case "phrases":
+              return <PhrasesSection key={index +1} phrases={lesson.phrases} />;
+            case "tips":
+              return (
+                <TipsSection
+                  key={index +1}
+                  tips={lesson.relevantGrammar}
+                  setExplanation={openExplanation}
+                />
+              );
+            default:
+              return null;
+          }
+        })}
       </Pager>
       <Layout.Footer>
         <Button

@@ -1,8 +1,9 @@
 import { LanguageCode } from "@/constants/languages";
+import { useThemedStyles } from "@/providers/ThemeContext";
 import { commonStyles as cs } from "@/styles/common";
 import { spacing } from "@/styles/spacing";
-import { useTheme } from "@react-navigation/native";
 import React from "react";
+import { TextStyle } from "react-native";
 import CountryFlag from "./CountryFlag";
 import * as Layout from "./Layout";
 import SpeechButton from "./SpeechButton";
@@ -32,7 +33,8 @@ const VocabularyRow = ({
   showFlag = false,
   onPress,
 }: VocabularyRowProps) => {
-  const theme = useTheme();
+  const themedStyles = useThemedStyles();
+
   return (
     <Layout.Row
       key={idx}
@@ -40,7 +42,7 @@ const VocabularyRow = ({
       padding={spacing.s}
       style={[
         showBorder && idx !== vocabs - 1 && cs.borderBottom2,
-        { borderColor: theme.colors.border },
+        themedStyles.borderColor,
       ]}
     >
       <SpeechButton
@@ -48,39 +50,27 @@ const VocabularyRow = ({
         langCode={vocab.langCode}
         onPress={onPress}
       />
-      <Layout.Column ml={12}>
-        <Layout.Column mb={4}>
-          <Layout.Row alignItems="center">
-            {showFlag ? (
-              <CountryFlag
-                countryCode={vocab.langCode}
-                size={"tiny"}
-                style={cs.m_r_xs}
-              />
-            ) : null}
-
-            <Text.Body bold>{vocab.term}</Text.Body>
-          </Layout.Row>
-          {vocab?.transliteration ? (
-            <Layout.Row>
-              {vocab.transliteration.split("").map((l) => (
-                <Text.Caption
-                  style={[
-                    cs.borderBottom1,
-                    {
-                      borderColor: theme.colors.primary,
-                      marginRight: 2,
-                    },
-                  ]}
-                >
-                  {l}
-                </Text.Caption>
-              ))}
-            </Layout.Row>
+      <Layout.Column ml={spacing.s} flexShrink={1}>
+        <Layout.Row alignItems="center">
+          {showFlag ? (
+            <CountryFlag
+              countryCode={vocab.langCode}
+              size={"tiny"}
+              style={cs.m_r_xs}
+            />
           ) : null}
-        </Layout.Column>
-
-        <Text.Caption>{vocab.translation}</Text.Caption>
+          <Text.Body bold>{vocab.term}</Text.Body>
+        </Layout.Row>
+        {vocab?.transliteration ? (
+          <Layout.Row>
+            {vocab.transliteration.split("").map((l) => (
+              <Text.Caption style={themedStyles.transliteration as TextStyle}>
+                {l}
+              </Text.Caption>
+            ))}
+          </Layout.Row>
+        ) : null}
+        <Text.Caption style={cs.m_t_xs}>{vocab.translation}</Text.Caption>
       </Layout.Column>
     </Layout.Row>
   );

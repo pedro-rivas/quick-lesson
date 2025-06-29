@@ -75,7 +75,7 @@ const FAB = React.forwardRef(({ onPress }: { onPress: () => void }, ref) => {
   return (
     <Pressable
       // @ts-ignore
-      layout={LinearTransition}
+      layout={LinearTransition.duration(300)}
       style={themedStyles.fab}
       onPress={onPress}
     >

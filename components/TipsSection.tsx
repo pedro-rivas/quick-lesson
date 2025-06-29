@@ -1,14 +1,16 @@
 import { LanguageCode } from "@/constants/languages";
+import useTheme from "@/hooks/useTheme";
 import useTranslation from "@/hooks/useTranslation";
+import { useThemedStyles } from "@/providers/ThemeContext";
 import { commonStyles as cs } from "@/styles/common";
 import { spacing } from "@/styles/spacing";
-import { useTheme } from "@react-navigation/native";
 import { useAudioPlayer } from "expo-audio";
 import React from "react";
-import { Pressable, StyleSheet, View } from "react-native";
 import * as Layout from "./Layout";
+import * as List from "./List";
 import SpeechButton from "./SpeechButton";
 import * as Text from "./Text";
+import Pressable from "./buttons/Pressable";
 
 export interface TipExample {
   sentence: string;
@@ -43,11 +45,12 @@ const TipsSection: React.FC<TipsSectionProps> = ({ tips, setExplanation }) => {
   }
 
   const theme = useTheme();
+  const themedStyles = useThemedStyles();
   const t = useTranslation();
 
   const player = useAudioPlayer("");
 
-  const handlePress = (uri: string) => {
+  const handleSpeechPress = (uri: string) => {
     if (uri) {
       player.replace(uri);
       player.seekTo(0);
@@ -58,126 +61,57 @@ const TipsSection: React.FC<TipsSectionProps> = ({ tips, setExplanation }) => {
   };
 
   return (
-    <Layout.Column>
-      <Text.H4 bold>{`${tips.length} ${t("Tips")}`}</Text.H4>
-      <Layout.Column
-        mb={spacing.m}
-        mt={spacing.m}
-        style={[
-          cs.border2,
-          cs.borderRadius16,
-          {
-            borderColor: theme.colors.border,
-          },
-        ]}
-      >
+    <List.ScrollView style={cs.p_h_m} showsVerticalScrollIndicator={false}>
+      <Layout.Header.Section title={`${tips.length} ${t("Tips")}`} />
+      <Layout.Column mb={spacing.m} style={themedStyles.section}>
         {tips.map((tip, idx) => (
           <Layout.Column
             key={idx}
             padding={spacing.m}
             style={[
               idx !== tips.length - 1 && cs.borderBottom2,
-              { borderColor: theme.colors.border },
+              themedStyles.borderColor,
             ]}
           >
-            <Text.H3 style={styles.tipTopic}>{tip.topic}</Text.H3>
-            <Text.Body style={styles.tipDescription}>
-              {tip.description}
-            </Text.Body>
-            {tip.examples && tip.examples.length > 0 && (
+            <Text.H3 color={theme.colors.secondary} style={cs.m_b_m}>
+              {tip.topic}
+            </Text.H3>
+            <Text.Body>{tip.description}</Text.Body>
+            {tip?.examples?.length && (
               <Layout.Column mt={spacing.m}>
-                <Text.Caption style={styles.examplesLabel}>
-                  EXAMPLES
+                <Text.Caption semibold style={cs.m_b_m}>
+                  {t("EXAMPLES")}
                 </Text.Caption>
-                <View style={styles.examplesRow}>
+                <Layout.Column>
                   {tip.examples.map((ex, exIdx: number) => (
-                    <View key={exIdx} style={styles.exampleCard}>
+                    <Pressable
+                      onPress={() => setExplanation(ex)}
+                      key={exIdx}
+                      style={[
+                        themedStyles.tipsCard,
+                        exIdx !== (tip?.examples?.length || 0) - 1 && cs.m_b_m,
+                      ]}
+                    >
                       <SpeechButton
                         text={ex.sentence}
                         langCode={tip.langCode}
-                        onPress={handlePress}
+                        onPress={handleSpeechPress}
                       />
-                      <Pressable
-                        onPress={() => setExplanation(ex)}
-                        style={{ flex: 1 }}
-                      >
-                        <Text.Body style={styles.exampleGerman}>
-                          {ex.sentence}
-                        </Text.Body>
-                        <Text.Body style={styles.exampleEnglish}>
-                          {ex.translation}
-                        </Text.Body>
-                      </Pressable>
-                    </View>
+                      <Layout.Column style={[cs.f_1, cs.f_s_1]}>
+                        <Text.H4 style={cs.m_b_xs}>{ex.sentence}</Text.H4>
+                        <Text.Caption>{ex.translation}</Text.Caption>
+                      </Layout.Column>
+                    </Pressable>
                   ))}
-                </View>
+                </Layout.Column>
               </Layout.Column>
             )}
           </Layout.Column>
         ))}
       </Layout.Column>
-    </Layout.Column>
+    </List.ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 32,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 16,
-    color: "#222",
-  },
-  tipCard: {
-    backgroundColor: "#eaf4fb",
-    borderRadius: 32,
-    padding: 24,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  tipTopic: {
-    color: "#1a237e",
-    marginBottom: 12,
-  },
-  tipDescription: {
-    marginBottom: 8,
-  },
-  examplesLabel: {
-    fontSize: 13,
-    fontWeight: "600",
-    marginBottom: 12,
-    letterSpacing: 1,
-  },
-  examplesRow: {},
-  exampleCard: {
-    backgroundColor: "#dbeafe",
-    borderRadius: 20,
-    padding: 16,
-    flex: 1,
-    minWidth: 180, // Ensure cards don't get too small when wrapped
-    marginBottom: 12,
-    // marginRight: 12, // Removed as gap is used in examplesRow
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  exampleGerman: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#222",
-    marginBottom: 4,
-  },
-  exampleEnglish: {
-    fontSize: 15,
-    color: "#444",
-  },
-});
 
 TipsSection.displayName = "TipsSection";
 

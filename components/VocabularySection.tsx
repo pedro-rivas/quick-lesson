@@ -1,11 +1,11 @@
 import useTranslation from "@/hooks/useTranslation";
-import { commonStyles } from "@/styles/common";
+import { useThemedStyles } from "@/providers/ThemeContext";
+import { commonStyles as cs } from "@/styles/common";
 import { spacing } from "@/styles/spacing";
-import { useTheme } from "@react-navigation/native";
 import { useAudioPlayer } from "expo-audio";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import * as Layout from "./Layout";
-import * as Text from "./Text";
+import * as List from "./List";
 import VocabularyRow, { Vocab } from "./VocabularyRow";
 
 interface VocabularySectionProps {
@@ -22,19 +22,22 @@ interface VocabularySectionProps {
 const VocabularySection: React.FC<VocabularySectionProps> = ({
   vocabulary,
 }) => {
-  const theme = useTheme();
+  const themedStyles = useThemedStyles();
   const t = useTranslation();
   const player = useAudioPlayer("");
 
-  const handlePress = (uri: string) => {
-    if (uri) {
-      player.replace(uri);
-      player.seekTo(0);
-      setTimeout(() => {
-        player.play();
-      }, 10);
-    }
-  };
+  const handlePress = useCallback(
+    (uri: string) => {
+      if (uri) {
+        player.replace(uri);
+        player.seekTo(0);
+        setTimeout(() => {
+          player.play();
+        }, 10);
+      }
+    },
+    [player]
+  );
 
   const vocabs = useMemo(() => vocabulary?.length, [vocabulary]);
 
@@ -43,19 +46,9 @@ const VocabularySection: React.FC<VocabularySectionProps> = ({
   }
 
   return (
-    <Layout.Column>
-      <Text.H4 bold>{`${vocabulary.length} ${t("Words")}`}</Text.H4>
-      <Layout.Column
-        mb={spacing.m}
-        mt={spacing.m}
-        style={[
-          commonStyles.border2,
-          commonStyles.borderRadius16,
-          {
-            borderColor: theme.colors.border,
-          },
-        ]}
-      >
+    <List.ScrollView style={cs.p_h_m} showsVerticalScrollIndicator={false}>
+      <Layout.Header.Section title={`${vocabulary.length} ${t("Words")}`} />
+      <Layout.Column mb={spacing.m} style={themedStyles.section}>
         {vocabulary.map((vocab, idx) => (
           <VocabularyRow
             key={idx}
@@ -66,7 +59,7 @@ const VocabularySection: React.FC<VocabularySectionProps> = ({
           />
         ))}
       </Layout.Column>
-    </Layout.Column>
+    </List.ScrollView>
   );
 };
 

@@ -1,3 +1,4 @@
+import { scale } from "@/styles/scale";
 import React from "react";
 import { View as RNView, ViewProps } from "react-native";
 
@@ -34,7 +35,7 @@ export const Footer = ({ ...props }: LayoutProps) => {
   return <View flexDirection={"row"} padding={16} {...props} />;
 };
 
-export const View = ({ children, style, ...props }: LayoutProps) => {
+export const View = React.memo(({ children, style, ...props }: LayoutProps) => {
   return (
     <RNView
       style={[
@@ -63,7 +64,7 @@ export const View = ({ children, style, ...props }: LayoutProps) => {
       {children}
     </RNView>
   );
-};
+})
 
 export const Row = ({ ...props }: LayoutProps) => {
   return <View flexDirection={"row"} {...props} />;
@@ -74,11 +75,11 @@ export const Column = ({ ...props }: LayoutProps) => {
 };
 
 const SPACER_SIZE = {
-  s: 8,
-  m: 16,
-  l: 24,
-  xl: 32,
-  xxl: 40,
+  s: scale.ms(8),
+  m: scale.ms(16),
+  l: scale.ms(24),
+  xl: scale.ms(32),
+  xxl: scale.ms(40),
 };
 
 export const Spacer = ({ size = "m" }: { size?: keyof typeof SPACER_SIZE }) => {

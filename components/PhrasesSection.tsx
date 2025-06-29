@@ -1,13 +1,13 @@
 import { LanguageCode } from "@/constants/languages";
 import useTranslation from "@/hooks/useTranslation";
+import { useThemedStyles } from "@/providers/ThemeContext";
 import { commonStyles as cs } from "@/styles/common";
 import { spacing } from "@/styles/spacing";
-import { useTheme } from "@react-navigation/native";
 import { useAudioPlayer } from "expo-audio";
 import React from "react";
 import * as Layout from "./Layout";
-import SpeechButton from "./SpeechButton";
-import * as Text from "./Text";
+import * as List from "./List";
+import VocabularyRow from "./VocabularyRow";
 
 export interface Phrase {
   phrase: string;
@@ -31,15 +31,13 @@ interface PhrasesSectionProps {
  *
  * @returns A React element displaying the phrases, or `null` if no phrases are provided.
  */
-const PhrasesSection: React.FC<PhrasesSectionProps> = ({
-  phrases,
-}) => {
+const PhrasesSection: React.FC<PhrasesSectionProps> = ({ phrases }) => {
   if (!phrases || phrases.length === 0) {
     return null;
   }
 
   const t = useTranslation();
-  const theme = useTheme();
+  const themedStyles = useThemedStyles();
   const player = useAudioPlayer("");
 
   const handlePress = (uri: string) => {
@@ -53,61 +51,25 @@ const PhrasesSection: React.FC<PhrasesSectionProps> = ({
   };
 
   return (
-    <Layout.Column>
-      <Text.H4 bold>{`${phrases.length} ${t("Phrases")}`}</Text.H4>
-      <Layout.Column
-        mb={spacing.m}
-        mt={spacing.m}
-        style={[
-          cs.border2,
-          cs.borderRadius16,
-          {
-            borderColor: theme.colors.border,
-          },
-        ]}
-      >
+    <List.ScrollView style={cs.p_h_m} showsVerticalScrollIndicator={false}>
+      <Layout.Header.Section title={`${phrases.length} ${t("Phrases")}`} />
+      <Layout.Column mb={spacing.m} style={themedStyles.section}>
         {phrases.map((phrase, idx) => (
-          <Layout.Row
+          <VocabularyRow
             key={idx}
-            alignItems={"center"}
-            padding={spacing.s}
-            style={[
-              idx !== phrases.length - 1 && cs.borderBottom2,
-              { borderColor: theme.colors.border },
-            ]}
-          >
-            <SpeechButton
-              text={phrase.phrase}
-              langCode={phrase.langCode}
-              onPress={handlePress}
-            />
-            <Layout.Column ml={12} flexShrink={1}>
-              <Layout.Column mb={4}>
-                <Text.Body bold>{phrase.phrase + 's'}</Text.Body>
-                {phrase?.transliteration ? (
-                  <Layout.Row>
-                    {phrase.transliteration.split("").map((l) => (
-                      <Text.Caption
-                        style={[
-                          cs.borderBottom1,
-                          {
-                            borderColor: theme.colors.primary,
-                            marginRight: 2,
-                          },
-                        ]}
-                      >
-                        {l}
-                      </Text.Caption>
-                    ))}
-                  </Layout.Row>
-                ) : null}
-              </Layout.Column>
-              <Text.Caption>{phrase.translation}</Text.Caption>
-            </Layout.Column>
-          </Layout.Row>
+            vocab={{
+              term: phrase.phrase,
+              transliteration: phrase.transliteration,
+              translation: phrase.translation,
+              langCode: phrase.langCode,
+            }}
+            idx={idx}
+            vocabs={phrases.length}
+            onPress={handlePress}
+          />
         ))}
       </Layout.Column>
-    </Layout.Column>
+    </List.ScrollView>
   );
 };
 

@@ -8,7 +8,7 @@ export const BORDER_RADIUS = 16;
 export const HEADER_HEIGHT = scale.ms(50);
 
 const commonStyles = StyleSheet.create({
-  o_60:{
+  o_60: {
     opacity: 0.6,
   },
   opacity70: {
@@ -35,17 +35,32 @@ const commonStyles = StyleSheet.create({
   flex1: {
     flex: 1,
   },
-  f_s_1:{
+  f_1:{
+    flex: 1,
+  },
+  f_s_1: {
     flexShrink: 1,
   },
   // Padding
-  p_m:{
+  p_h_m: {
+    paddingHorizontal: spacing.m,
+  },
+  p_m: {
     padding: spacing.m,
   },
   p_v_m: {
     paddingVertical: spacing.m,
   },
   // Margin
+     m_b_xs: {
+    marginBottom: spacing.xs,
+  },
+    m_b_s: {
+    marginBottom: spacing.s,
+  },
+  m_b_m: {
+    marginBottom: spacing.m,
+  },
   m_t_xs: {
     marginTop: spacing.xs,
   },
@@ -58,7 +73,7 @@ const commonStyles = StyleSheet.create({
   m_h_m: {
     marginHorizontal: spacing.m,
   },
-  m_l_s:{
+  m_l_s: {
     marginLeft: spacing.s,
   },
   // Border
@@ -141,9 +156,9 @@ const commonStyles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  lessonHeader:{
-          paddingHorizontal: spacing.s,
-          borderBottomWidth: 0,
+  lessonHeader: {
+    paddingHorizontal: spacing.s,
+    borderBottomWidth: 0,
   },
 });
 

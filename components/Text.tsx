@@ -89,6 +89,7 @@ export const Link = ({ style, ...props }: TextProps) => {
 
 const DefaultText = React.memo(({ style, ...props }: TextProps) => {
   const theme = useTheme();
+  const realColor = props.color || theme.colors.onSurface
   return (
     <Text
       style={[
