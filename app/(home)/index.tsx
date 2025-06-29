@@ -1,4 +1,4 @@
-import FAB, { FABRef } from "@/components/buttons/FAB";
+import FAB, { FAB_THRESHOLD, FABRef } from "@/components/buttons/FAB";
 import * as Layout from "@/components/Layout";
 import LessonCard from "@/components/LessonCard";
 import LessonEmptyState from "@/components/LessonEmptyState";
@@ -14,8 +14,6 @@ import { useAudioPlayer } from "expo-audio";
 import { router } from "expo-router";
 import React, { useCallback, useMemo } from "react";
 import { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
-
-const FAB_THRESHOLD = 100;
 
 export default function HomeScreen() {
   const { getAllLessons } = useLessonStore();

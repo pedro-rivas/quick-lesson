@@ -2,6 +2,7 @@ import { scale } from "@/styles/scale";
 import React from "react";
 import { View as RNView, ViewProps } from "react-native";
 
+export * as Footer from "./layout/footer";
 export * as Header from "./layout/header";
 
 export interface LayoutProps extends ViewProps {
@@ -30,10 +31,6 @@ export interface LayoutProps extends ViewProps {
   mb?: number;
   mh?: number;
 }
-
-export const Footer = ({ ...props }: LayoutProps) => {
-  return <View flexDirection={"row"} padding={16} {...props} />;
-};
 
 export const View = React.memo(({ children, style, ...props }: LayoutProps) => {
   return (

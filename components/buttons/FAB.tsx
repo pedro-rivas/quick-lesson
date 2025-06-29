@@ -14,6 +14,7 @@ import { IconSymbol } from "../ui/IconSymbol";
 import { BUTTON_HEIGHT } from "./Button";
 import Pressable from "./Pressable";
 
+export const FAB_THRESHOLD = 100;
 const PADDING_HORIZONTAL = Math.round((BUTTON_HEIGHT - BUTTON_ICON_SIZE) / 2);
 
 export interface FABRef {

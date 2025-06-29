@@ -50,6 +50,7 @@ export function ThemeProvider({ children }: PropsWithChildren) {
           alignItems: "center",
           flexDirection: "row",
           overflow: "hidden",
+          zIndex: 1000,
         },
         link: {
           color: theme.colors.primary,

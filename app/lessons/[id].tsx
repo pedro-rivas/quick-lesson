@@ -7,7 +7,6 @@ import { TabBar } from "@/components/TabBar";
 import TipsSection, { TipExample } from "@/components/TipsSection";
 import VocabularySection from "@/components/VocabularySection";
 import TipBottomSheet from "@/components/bottomSheets/TipBottomSheet";
-import Button from "@/components/buttons/Button";
 import useTranslation from "@/hooks/useTranslation";
 import { useLessonStore } from "@/store/lessonStore";
 import { commonStyles as cs } from "@/styles/common";
@@ -47,15 +46,15 @@ export default function LessonDetailScreen() {
 
   const handleDeleteLesson = useCallback(() => {
     Alert.alert(
-      "Delete Lesson",
-      `Are you sure you want to delete "${lesson.title}"?`,
+      t('Delete Lesson'),
+      t("Are you sure you want to delete") + ` "${lesson.title}"?`,
       [
         {
-          text: "Cancel",
+          text: t("Cancel"),
           style: "cancel",
         },
         {
-          text: "Delete",
+          text: t("Delete"),
           style: "destructive",
           onPress: () => {
             removeLesson(lesson.id);
@@ -72,6 +71,10 @@ export default function LessonDetailScreen() {
 
   const openExplanation = useCallback((tipExample: TipExample) => {
     setCurrentExample(tipExample);
+  }, []);
+
+  const resetExample = useCallback(() => {
+    setCurrentExample(null);
   }, []);
 
   const pages = useMemo(
@@ -98,11 +101,7 @@ export default function LessonDetailScreen() {
       <Layout.Header.Row style={cs.lessonHeader}>
         <Layout.Header.Icon onPress={handleBackPress} name={"arrow-back"} />
         <Layout.Header.Title title={lesson.title} />
-        <Layout.Header.Icon
-          onPress={handleDeleteLesson}
-          name={"delete"}
-          color="#ff5252"
-        />
+        <Layout.Header.Icon  onPress={handleDeleteLesson}  name={"delete"} />
       </Layout.Header.Row>
 
       <Pager
@@ -137,19 +136,11 @@ export default function LessonDetailScreen() {
           }
         })}
       </Pager>
-      <Layout.Footer>
-        <Button
-          title="Practice"
-          onPress={() => router.push(`/practice/${id}` as any)}
-        />
-      </Layout.Footer>
 
       {example ? (
         <TipBottomSheet
           tip={example}
-          onClose={() => {
-            setCurrentExample(null);
-          }}
+          onClose={resetExample}
           langCode={lesson.langCode}
         />
       ) : null}

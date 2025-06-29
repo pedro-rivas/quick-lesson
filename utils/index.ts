@@ -50,3 +50,27 @@ export const shuffleArray = <T>(arr: T[]): T[] => {
   }
   return a;
 };
+
+
+/**
+ * Converts "#RGB", "#RRGGBB" or "
+ * @param hex 3- or 6-digit hex string (with or without leading “#”)
+ * @param alpha opacity between 0 and 1
+ * @returns an "rgba(r, g, b, a)" CSS string
+ */
+export const hexToRgba = (hex: string, alpha = 1) => {
+  // strip leading "#"
+  let c = hex.replace(/^#/, ``);
+
+  // expand shorthand form (#RGB → #RRGGBB)
+  if (c.length === 3) {
+    c = c.split(``).map(ch => ch + ch).join(``);
+  }
+
+  const int = parseInt(c, 16);
+  const r = (int >> 16) & 255;
+  const g = (int >> 8) & 255;
+  const b = int & 255;
+
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}

@@ -1,11 +1,8 @@
 import useTranslation from "@/hooks/useTranslation";
-import { useThemedStyles } from "@/providers/ThemeContext";
-import { commonStyles as cs } from "@/styles/common";
-import { spacing } from "@/styles/spacing";
 import { useAudioPlayer } from "expo-audio";
+import { useRouter } from "expo-router";
 import React, { useCallback, useMemo } from "react";
-import * as Layout from "./Layout";
-import * as List from "./List";
+import LessonContentWrapper from "./LessonContentWrapper";
 import VocabularyRow, { Vocab } from "./VocabularyRow";
 
 interface VocabularySectionProps {
@@ -22,9 +19,9 @@ interface VocabularySectionProps {
 const VocabularySection: React.FC<VocabularySectionProps> = ({
   vocabulary,
 }) => {
-  const themedStyles = useThemedStyles();
   const t = useTranslation();
   const player = useAudioPlayer("");
+  const router = useRouter();
 
   const handlePress = useCallback(
     (uri: string) => {
@@ -46,20 +43,21 @@ const VocabularySection: React.FC<VocabularySectionProps> = ({
   }
 
   return (
-    <List.ScrollView style={cs.p_h_m} showsVerticalScrollIndicator={false}>
-      <Layout.Header.Section title={`${vocabulary.length} ${t("Words")}`} />
-      <Layout.Column mb={spacing.m} style={themedStyles.section}>
-        {vocabulary.map((vocab, idx) => (
-          <VocabularyRow
-            key={idx}
-            vocab={vocab}
-            idx={idx}
-            vocabs={vocabs}
-            onPress={handlePress}
-          />
-        ))}
-      </Layout.Column>
-    </List.ScrollView>
+    <LessonContentWrapper
+      title={`${vocabulary.length} ${t("Words")}`}
+      buttonText={t("Practice Vocabulary")}
+      onButtonPress={() => router.push(`/practice/${12}` as any)}
+    >
+      {vocabulary.map((vocab, idx) => (
+        <VocabularyRow
+          key={idx}
+          vocab={vocab}
+          idx={idx}
+          vocabs={vocabs}
+          onPress={handlePress}
+        />
+      ))}
+    </LessonContentWrapper>
   );
 };
 

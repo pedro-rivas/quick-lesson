@@ -1,12 +1,9 @@
 import { LanguageCode } from "@/constants/languages";
 import useTranslation from "@/hooks/useTranslation";
-import { useThemedStyles } from "@/providers/ThemeContext";
-import { commonStyles as cs } from "@/styles/common";
-import { spacing } from "@/styles/spacing";
 import { useAudioPlayer } from "expo-audio";
+import { router } from "expo-router";
 import React from "react";
-import * as Layout from "./Layout";
-import * as List from "./List";
+import LessonContentWrapper from "./LessonContentWrapper";
 import VocabularyRow from "./VocabularyRow";
 
 export interface Phrase {
@@ -37,7 +34,6 @@ const PhrasesSection: React.FC<PhrasesSectionProps> = ({ phrases }) => {
   }
 
   const t = useTranslation();
-  const themedStyles = useThemedStyles();
   const player = useAudioPlayer("");
 
   const handlePress = (uri: string) => {
@@ -50,26 +46,32 @@ const PhrasesSection: React.FC<PhrasesSectionProps> = ({ phrases }) => {
     }
   };
 
+  // TODO: need to add the phrases screen
+  const handleGoToPractice = () => {
+    router.push(`/practice/${12}` as any);
+  };
+
   return (
-    <List.ScrollView style={cs.p_h_m} showsVerticalScrollIndicator={false}>
-      <Layout.Header.Section title={`${phrases.length} ${t("Phrases")}`} />
-      <Layout.Column mb={spacing.m} style={themedStyles.section}>
-        {phrases.map((phrase, idx) => (
-          <VocabularyRow
-            key={idx}
-            vocab={{
-              term: phrase.phrase,
-              transliteration: phrase.transliteration,
-              translation: phrase.translation,
-              langCode: phrase.langCode,
-            }}
-            idx={idx}
-            vocabs={phrases.length}
-            onPress={handlePress}
-          />
-        ))}
-      </Layout.Column>
-    </List.ScrollView>
+    <LessonContentWrapper
+      title={`${phrases.length} ${t("Phrases")}`}
+      buttonText={t("Practice Phrases")}
+      onButtonPress={handleGoToPractice}
+    >
+      {phrases.map((phrase, idx) => (
+        <VocabularyRow
+          key={idx}
+          vocab={{
+            term: phrase.phrase,
+            transliteration: phrase.transliteration,
+            translation: phrase.translation,
+            langCode: phrase.langCode,
+          }}
+          idx={idx}
+          vocabs={phrases.length}
+          onPress={handlePress}
+        />
+      ))}
+    </LessonContentWrapper>
   );
 };
 
