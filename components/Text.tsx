@@ -95,7 +95,8 @@ const DefaultText = React.memo(({ style, ...props }: TextProps) => {
       style={[
         {
           color: props.color || theme.colors.onSurface,
-          fontWeight: props.bold ? "bold" : props.semibold ? "600" : "normal",
+          fontWeight: props.bold ? "700" : props.semibold ? "500" : "normal",
+          fontFamily: 'Roboto',
         },
         style,
       ]}
@@ -107,7 +108,7 @@ const DefaultText = React.memo(({ style, ...props }: TextProps) => {
 export const Animated = (
   props: React.ComponentProps<typeof RNAnimated.Text>
 ) => {
-  return <RNAnimated.Text {...props} />;
+  return <RNAnimated.Text {...props} style={{fontFamily: 'Roboto',}} />;
 };
 
 const ANIMATED_TEXT_DURATION = 1000;

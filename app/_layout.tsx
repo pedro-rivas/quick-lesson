@@ -8,7 +8,6 @@ import { SplashScreenController } from "@/splash";
 import { useUserStore } from "@/store/userStore";
 import { DarkTheme, LightTheme } from "@/theme";
 import { ThemeProvider as NativeThemeProvider } from "@react-navigation/native";
-import { useFonts } from "expo-font";
 import { useEffect } from "react";
 import { StatusBar, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -16,9 +15,7 @@ import "react-native-reanimated";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-  });
+
 
   const { setLanguage, setPreferredLanguage } = useUserStore();
 
@@ -27,11 +24,6 @@ export default function RootLayout() {
     setLanguage(lang);
     setPreferredLanguage(lang);
   }, []);
-
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
-  }
 
   return (
     <GestureHandlerRootView style={styles.gestureHandler}>

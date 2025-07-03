@@ -53,7 +53,18 @@ export function SessionProvider({ children }: PropsWithChildren) {
     if (res.type === "success") {
       const { url } = res;
       const session = await createSessionFromUrl(url);
-      if (session) setSession(session);
+      if (session) {
+        const user = {
+          id: session.user.id,
+          email: session.user.email,
+          name: session.user.user_metadata.full_name || "",
+          picture: session.user.user_metadata.avatar_url || "",
+          auth: {
+            provider: session.user.app_metadata.provider
+          }
+        }
+        setSession(session);
+      }
     }
   };
 
