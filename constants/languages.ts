@@ -50,3 +50,48 @@ export const LANGUAGES: Record<LanguageCode, {
 }
 
 export const AVAILABLE_LANGUAGES = Object.values(LANGUAGES)
+
+export const LANG_ISO_CODES: Record<LanguageCode, String> = {
+  "es-ES": "es",
+  "tr-TR": "tr",
+  "en-US": "en",
+  "pt-PT": "pt",
+  "fr-FR": "fr",
+  "de-DE": "de",
+  "it-IT": "it"
+};
+
+
+const ALPHABETS:Record<LanguageCode, String[]> = {
+ "tr-TR": ['a','b','c','ç','d','e','f','g','ğ','h','ı','i','j','k','l','m','n','o','ö','p','r','s','ş','t','u','ü','v','y','z'],
+  "es-ES": [
+  'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+  'j', 'k', 'l', 'm', 'n', 'ñ', 'o', 'p', 'q',
+  'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+],
+'en-US': [
+  'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+  'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+  's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+],
+'pt-PT': [
+  'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+  'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+  's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+],
+'fr-FR': [
+  'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+  'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+  's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+],
+'de-DE': [
+  'a', 'ä', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+  'j', 'k', 'l', 'm', 'n', 'o', 'ö', 'p', 'q', 'r',
+  's', 't', 'u', 'ü', 'v', 'w', 'x', 'y', 'z', 'ß'
+],
+'it-IT': [
+  'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+  'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+  'u', 'v', 'z'
+]
+}

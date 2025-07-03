@@ -1,11 +1,10 @@
 import { BUCKET, ELEVEN_LABS_API_KEY, TABLE_NAME } from "@/constants/config";
 import { LANGUAGES, LanguageCode } from "@/constants/languages";
-import { sanitizeFilename } from "@/utils";
+import { sha256 } from "@/utils/language";
 import { decode } from "base64-arraybuffer";
 import * as FileSystem from "expo-file-system";
-import { supabase } from "./supabase";
-
 import { SpeechService } from "./speechService";
+import { supabase } from "./supabase";
 
 const speechService = new SpeechService(ELEVEN_LABS_API_KEY);
 
@@ -24,7 +23,8 @@ export const textToSpeech = async (
     throw new Error(`Unsupported language: ${lang}`);
   }
 
-  const baseName = `${lang}-${sanitizeFilename(text)}`.toLocaleLowerCase();
+  const s256 = await sha256(text);
+  const baseName = `${lang}-${text.length}${s256}`;
   const fileName = `${baseName}.mp3`;
   const fileUri = `${FileSystem.documentDirectory}${fileName}`;
 
@@ -80,10 +80,12 @@ const saveFileInDatabase = async ({
       encoding: "base64",
     });
 
+    const storagePath = `${baseName}.mp3`;
+
     // b) Upload to Supabase Storage
     const { error: uploadError } = await supabase.storage
       .from(BUCKET)
-      .upload(baseName + ".mp3", decode(base64), {
+      .upload(storagePath, decode(base64), {
         contentType: "audio/mpeg",
         upsert: true,
       });
@@ -93,9 +95,6 @@ const saveFileInDatabase = async ({
       return;
     }
 
-    // c) Insert a row into Postgres linking (text, language) → storage_path
-    const storagePath = baseName + ".mp3";
-    //   (If you prefer prefixing with the bucket folder, do `${BUCKET}/${baseName}.mp3`.)
     const { error: insertError } = await supabase.from(TABLE_NAME).insert({
       text,
       language: lang,
@@ -107,7 +106,6 @@ const saveFileInDatabase = async ({
         "Supabase DB insert error for TTS row:",
         insertError.message
       );
-      // Optionally: clean up the file you just uploaded:
       await supabase.storage.from(BUCKET).remove([storagePath]);
     }
   } catch (e) {
@@ -134,10 +132,6 @@ const getFileFromDatabase = async (
   } else if (existingRow && existingRow.storage_path) {
     // We found a row in the DB.
     const storagePath = existingRow.storage_path;
-    // e.g. "tts-audios/en-hello_world.mp3"  or simply "en-hello_world.mp3"
-    // Supabase JS expects just the path within the bucket:
-    // If your table stored "en-hello_world.mp3", use that.
-    // If your table stored "tts-audios/en-hello_world.mp3", strip the bucket prefix:
     const keyInBucket = storagePath.startsWith(`${BUCKET}/`)
       ? storagePath.replace(`${BUCKET}/`, "")
       : storagePath;
