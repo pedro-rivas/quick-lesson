@@ -19,7 +19,7 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   const { setLanguage, } = useAppStore()
-  const userLanguage = useUserStore((s) => s.userPreferences.language);
+  const userLanguage = useUserStore((s) => s.user.preferences.language);
 
   useEffect(() => {
     const systemLang = getBestLocale();

@@ -51,7 +51,11 @@ export const useUserStore = create<UserStore>()(
       // Actions
       updateUserState: (updates) =>
         set((state) => ({
-          user: { ...state.user, ...updates },
+          user: {
+            ...state.user,
+            ...updates,
+            preferences: { ...state.user.preferences, ...updates.preferences },
+          },
         })),
 
       setOnboardingComplete: () =>
