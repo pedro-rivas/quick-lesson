@@ -4,41 +4,32 @@ import LanguageRow, { LanguageRowProps } from "@/components/LanguageRow";
 import * as Layout from "@/components/Layout";
 import * as List from "@/components/List";
 import SafeAreaView from "@/components/SafeAreaView";
-import { LanguageCode, LANGUAGES } from "@/constants/languages";
+import { APP_LANGUAGES, LanguageCode } from "@/constants/languages";
 import useTheme from "@/hooks/useTheme";
 import useTranslation from "@/hooks/useTranslation";
+import { changeAppLanguage } from "@/i18n";
 import { useUserStore } from "@/store/userStore";
 import { spacing } from "@/styles/spacing";
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import React, { useCallback, useMemo } from "react";
 import { ListRenderItem } from "react-native";
 
-export default function ChooseLanguageScreen() {
-  const { shouldGoBack } = useLocalSearchParams();
-
-  const { setLearningLanguage } = useUserStore();
-  const learningLanguage = useUserStore(
-    (s) => s.userPreferences.learningLanguage
-  );
+export default function ChooseNativeLanguageScreen() {
+  const { setLanguage } = useUserStore();
+  const language = useUserStore((s) => s.userPreferences.language);
 
   const t = useTranslation();
   const theme = useTheme();
 
-  const goBack = useCallback(() => {
-    router.back();
-  }, []);
-
-  const langs = useMemo(() => Object.values(LANGUAGES), []);
+  const langs = useMemo(() => Object.values(APP_LANGUAGES), []);
 
   const handleLanguageChange = useCallback((code: LanguageCode) => {
-    setLearningLanguage(code);
-    if (shouldGoBack) {
-      setTimeout(goBack, 300);
-    }
+    setLanguage(code);
+    changeAppLanguage(code);
   }, []);
 
   const handleNext = useCallback(() => {
-    // go to selct your fist lesson
+    router.navigate("/account/choose-language");
   }, []);
 
   const availableLanguages = useMemo(
@@ -50,10 +41,10 @@ export default function ChooseLanguageScreen() {
         code: l.code,
         // @ts-ignore
         image: images.flags[l.value],
-        isSelected: l.code === learningLanguage,
-        onPress: handleLanguageChange,
+        isSelected: l.code === language,
+        onPress: l.code === language ? () => {} : handleLanguageChange,
       })),
-    [learningLanguage]
+    [language]
   );
 
   const renderItem = useCallback<ListRenderItem<LanguageRowProps>>(
@@ -64,27 +55,25 @@ export default function ChooseLanguageScreen() {
   return (
     <SafeAreaView>
       <Layout.Header.Row>
-        <Layout.Header.Icon name={"arrow-back"} onPress={goBack} />
-        <Layout.Header.Title title={t("Choose a language")} />
+        <Layout.Header.Spacer />
+        <Layout.Header.Title title={t("Choose Your language")} />
         <Layout.Header.Spacer />
       </Layout.Header.Row>
       <Layout.Column ph={spacing.m} flex={1}>
         <List.Section
           ListHeaderComponent={
-            <Layout.Header.SectionTitle title={t("What do you want to learn?")} />
+            <Layout.Header.SectionTitle title={t("Choose a Language")} />
           }
           data={availableLanguages}
           renderItem={renderItem}
         />
-        {!shouldGoBack ? (
-          <Layout.Footer.Gradient>
-            <Button
-              title={t("Continue")}
-              onPress={handleNext}
-              disabled={!learningLanguage}
-            />
-          </Layout.Footer.Gradient>
-        ) : null}
+        <Layout.Footer.Gradient>
+          <Button
+            title={t("Continue")}
+            onPress={handleNext}
+            disabled={!language}
+          />
+        </Layout.Footer.Gradient>
       </Layout.Column>
     </SafeAreaView>
   );

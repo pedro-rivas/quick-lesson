@@ -44,7 +44,7 @@ const LessonContentWrapper: React.FC<LessonContentWrapperProps> = ({
         style={cs.p_h_m}
         showsVerticalScrollIndicator={false}
       >
-        <Layout.Header.Section title={title} />
+        <Layout.Header.SectionTitle title={title} />
         <Layout.Column
           mb={spacing.m + BUTTON_HEIGHT}
           style={themedStyles.section}

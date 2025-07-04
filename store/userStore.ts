@@ -4,31 +4,46 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 export interface UserPreferences {
-  language: LanguageCode;
-  learningLanguage: LanguageCode;
-  preferredLanguage: LanguageCode;
+  language: LanguageCode | null;
+  learningLanguage: LanguageCode | null;
+}
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  name: string;
+  picture: string;
+  auth: {
+    provider: string;
+  };
+  onboardingCompleted?: boolean;
 }
 
 interface UserStore {
   userPreferences: UserPreferences;
+  userProfile: UserProfile | null;
   setLanguage: (language: LanguageCode) => void;
   setLearningLanguage: (language: LanguageCode) => void;
-  setPreferredLanguage: (language: LanguageCode) => void;
   updateUserPreferences: (preferences: Partial<UserPreferences>) => void;
   getUserPreferences: () => UserPreferences;
   resetUserPreferences: () => void;
+  setUserProfile: (profile: UserProfile) => void;
+  updateUserProfile: (profile: Partial<UserProfile>) => void;
+  getUserProfile: () => UserProfile | null;
+  clearUserProfile: () => void;
+  isAuthenticated: () => boolean;
 }
 
-const initialState: UserPreferences = {
-  language: "en-US",
-  learningLanguage: "es-ES",
-  preferredLanguage: "en-US",
+const initialUserPreferences: UserPreferences = {
+  language: null,
+  learningLanguage: null,
 };
 
 export const useUserStore = create<UserStore>()(
   persist(
     (set, get) => ({
-      userPreferences: initialState,
+      userPreferences: initialUserPreferences,
+      userProfile: null,
 
       setLanguage: (language: LanguageCode) => {
         set((state) => ({
@@ -48,15 +63,6 @@ export const useUserStore = create<UserStore>()(
         }));
       },
 
-      setPreferredLanguage: (language: LanguageCode) => {
-        set((state) => ({
-          userPreferences: {
-            ...state.userPreferences,
-            preferredLanguage: language,
-          },
-        }));
-      },
-
       updateUserPreferences: (preferences: Partial<UserPreferences>) => {
         set((state) => ({
           userPreferences: {
@@ -72,8 +78,37 @@ export const useUserStore = create<UserStore>()(
 
       resetUserPreferences: () => {
         set((state) => ({
-          userPreferences: initialState,
+          userPreferences: initialUserPreferences,
         }));
+      },
+
+      setUserProfile: (profile: UserProfile) => {
+        set((state) => ({
+          userProfile: profile,
+        }));
+      },
+
+      updateUserProfile: (profile: Partial<UserProfile>) => {
+        set((state) => ({
+          userProfile: state.userProfile ? {
+            ...state.userProfile,
+            ...profile,
+          } : null,
+        }));
+      },
+
+      getUserProfile: () => {
+        return get().userProfile;
+      },
+
+      clearUserProfile: () => {
+        set((state) => ({
+          userProfile: null,
+        }));
+      },
+
+      isAuthenticated: () => {
+        return get().userProfile !== null;
       },
     }),
     {

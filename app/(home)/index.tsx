@@ -126,7 +126,7 @@ export default function HomeScreen() {
             pinchGestureEnabled={false}
             initialNumToRender={10}
             ListHeaderComponent={
-              <Layout.Header.Section
+              <Layout.Header.SectionTitle
                 title={`${lessonsCount} ${t("Lessons")}`}
               />
             }
@@ -145,7 +145,7 @@ export default function HomeScreen() {
             pinchGestureEnabled={false}
             initialNumToRender={4}
             ListHeaderComponent={
-              <Layout.Header.Section title={`${vocabs} ${t("Words")}`} />
+              <Layout.Header.SectionTitle title={`${vocabs} ${t("Words")}`} />
             }
             ListEmptyComponent={<LessonEmptyState />}
           />

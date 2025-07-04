@@ -1,5 +1,6 @@
 import useAppSession from "@/hooks/useAppSession";
 import { supabase } from "@/lib/supabase";
+import { UserProfile, useUserStore } from "@/store/userStore";
 import { Session } from "@supabase/supabase-js";
 import { makeRedirectUri } from "expo-auth-session";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
@@ -19,6 +20,8 @@ const AuthContext = createContext<{
 });
 
 const createSessionFromUrl = async (url: string) => {
+
+
   const { params, errorCode } = QueryParams.getQueryParams(url);
   if (errorCode) throw new Error(errorCode);
   const { access_token, refresh_token } = params;
@@ -33,7 +36,7 @@ const createSessionFromUrl = async (url: string) => {
 
 export function SessionProvider({ children }: PropsWithChildren) {
   const { session, loading, setSession } = useAppSession();
-
+  const { setUserProfile } = useUserStore();
   const signIn = async (provider: "google" | "apple") => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: provider,
@@ -62,7 +65,10 @@ export function SessionProvider({ children }: PropsWithChildren) {
           auth: {
             provider: session.user.app_metadata.provider
           }
-        }
+        } as UserProfile;
+
+        // TODO: check if user e  ists in your database
+        setUserProfile(user);
         setSession(session);
       }
     }

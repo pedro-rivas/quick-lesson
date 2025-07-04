@@ -49,6 +49,16 @@ export const LANGUAGES: Record<LanguageCode, {
   // "bn-IN":    { label: "Bengali",     value: "bengali",    code: "bn-IN" },
 }
 
+export const APP_LANGUAGES: Record<"en-US" | "es-ES" | "tr-TR", {
+  label: string;
+  value: string;
+  code: LanguageCode
+}> = {
+  "es-ES":    { label: "Español",     value: "spanish",    code: "es-ES",},
+  "tr-TR":    { label: "Türkçe",      value: "turkish",    code: "tr-TR" },
+  "en-US":    { label: "English",     value: "english",    code: "en-US" },
+}
+
 export const AVAILABLE_LANGUAGES = Object.values(LANGUAGES)
 
 export const LANG_ISO_CODES: Record<LanguageCode, String> = {

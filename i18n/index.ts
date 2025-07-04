@@ -58,7 +58,16 @@ export async function initI18n() {
   }
 }
 
-// run it immediately (or call it from your App entry)
 initI18n();
+
+export const changeAppLanguage = (language: LanguageCode) => {
+  i18n.changeLanguage(language)
+    .then(() => {
+      console.log(`[i18n] language changed to "${language}"`);
+    })
+    .catch((err) => {
+      console.error(`[i18n] failed to change language to "${language}":`, err);
+    });
+};
 
 export default i18n;

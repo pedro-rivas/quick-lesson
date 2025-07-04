@@ -25,7 +25,7 @@ export const Row = React.memo(({ children, style, ...props }: LayoutProps) => {
   );
 });
 
-export const Section = React.memo(
+export const SectionTitle = React.memo(
   ({ style, title, ...props }: LayoutProps & { title: string }) => {
     return (
       <RNView style={[cs.p_v_m, style]} {...props}>

@@ -1,7 +1,43 @@
 {
-    "screens": {
-        "home": {
-            "quickLesson": "Quick Lesson"
-        }
-    }
+  "Quick Lesson": "Quick Lesson",
+  "Learn a new language in minutes.": "Dakikalar içinde yeni bir dil öğrenin.",
+  "Taking a Taxi": "Taksiye Binme",
+  "Ordering a pizza": "Pizza Siparişi",
+  "Booking a hotel": "Otel Rezervasyonu",
+  "a trip to the beach": "Bir plaj gezisi",
+  "For": "İçin",
+  "Continue With Google": "Google ile Devam Et",
+  "Continue With Apple": "Apple ile Devam Et",
+  "Something went wrong": "Bir şeyler yanlış gitti",
+  "Great job!": "Aferin!",
+  "Tap the matching pairs": "Eşleşen çiftlere dokunun",
+  "Vocabulary": "Kelime Bilgisi",
+  "Complete the word": "Kelimeyi Tamamla",
+  "Next": "İleri",
+  "Continue": "Devam",
+  "Phrases": "İfadeler",
+  "Grammar": "Dilbilgisi",
+  "Lesson not found": "Ders bulunamadı",
+  "This lesson may have been deleted or doesn't exist.": "Bu ders silinmiş olabilir veya mevcut değil.",
+  "Go Back": "Geri Dön",
+  "Words": "Kelimeler",
+  "Tips": "İpuçları",
+  "What do you want to learn?": "Ne öğrenmek istiyorsun?",
+  "Choose a language": "Dil seçin",
+  "Create Lesson": "Ders Oluştur",
+  "Change language": "Dili Değiştir",
+  "My Lessons": "Derslerim",
+  "Lessons": "Dersler",
+  "New Lesson": "Yeni Ders",
+  "Create a lesson": "Bir ders oluştur",
+  "EXAMPLES": "ÖRNEKLER",
+  "Explanation": "Açıklama",
+  "Practice Vocabulary": "Kelime Bilgisi Çalışması",
+  "Practice Phrases": "İfade Çalışması",
+  "Delete Lesson": "Dersi Sil",
+  "Are you sure you want to delete": "Silmek istediğinizden emin misiniz?",
+  "Cancel": "İptal",
+  "Delete": "Sil",
+  "Choose Your language": "Dilini Seç",
+  "Choose a Language": "Dil Seçin"
 }

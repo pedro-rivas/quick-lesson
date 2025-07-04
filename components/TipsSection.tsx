@@ -62,7 +62,7 @@ const TipsSection: React.FC<TipsSectionProps> = ({ tips, setExplanation }) => {
 
   return (
     <List.ScrollView style={cs.p_h_m} showsVerticalScrollIndicator={false}>
-      <Layout.Header.Section title={`${tips.length} ${t("Tips")}`} />
+      <Layout.Header.SectionTitle title={`${tips.length} ${t("Tips")}`} />
       <Layout.Column mb={spacing.m} style={themedStyles.section}>
         {tips.map((tip, idx) => (
           <Layout.Column
