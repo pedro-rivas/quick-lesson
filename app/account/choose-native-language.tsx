@@ -10,13 +10,23 @@ import useTranslation from "@/hooks/useTranslation";
 import { changeAppLanguage } from "@/i18n";
 import { useUserStore } from "@/store/userStore";
 import { spacing } from "@/styles/spacing";
-import { router } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useMemo } from "react";
 import { ListRenderItem } from "react-native";
 
 export default function ChooseNativeLanguageScreen() {
   const { setLanguage } = useUserStore();
   const language = useUserStore((s) => s.user.preferences.language);
+  const onboardingCompleted = useUserStore((s => s.user.onboardingCompleted));
+
+  const router = useRouter();
+
+  useFocusEffect(() => {
+    console.log({ onboardingCompleted})
+    if(onboardingCompleted){
+      router.replace('/(home)');
+    }
+  });
 
   const t = useTranslation();
   const theme = useTheme();

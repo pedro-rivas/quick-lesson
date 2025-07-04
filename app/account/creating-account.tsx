@@ -1,9 +1,11 @@
 import { createUserProfile } from "@/api/db/user";
+import { createLesson } from "@/api/gemini";
 import * as Layout from "@/components/Layout";
 import SafeAreaView from "@/components/SafeAreaView";
 import * as Text from "@/components/Text";
 import { LanguageCode } from "@/constants/languages";
 import useTheme from "@/hooks/useTheme";
+import { useLessonStore } from "@/store/lessonStore";
 import { useUserStore } from "@/store/userStore";
 import { spacing } from "@/styles/spacing";
 import { useLocalSearchParams, useRouter } from "expo-router/build/hooks";
@@ -20,6 +22,7 @@ export default function ChooseFirstLessonScreen() {
   const { colors } = useTheme();
 
   const user = useUserStore((s) => s.user);
+  const { addLesson } = useLessonStore();
 
   const { updateUserState } = useUserStore();
   useEffect(() => {
@@ -29,8 +32,13 @@ export default function ChooseFirstLessonScreen() {
   const createAccount = useCallback(async () => {
     try {
       const realUser = await createUserProfile(user);
-      // TODO: Create Lesson
+      const lesson = await createLesson({
+        topic: title,
+        studentLanguage: user.preferences.language!,
+        learningLanguage: langCode,
+      });
       updateUserState(realUser)
+      addLesson(lesson);
       router.replace('/(home)')
     } catch (error) { 
       console.log("Error creating user profile:", error);

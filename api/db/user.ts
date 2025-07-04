@@ -25,8 +25,38 @@ export async function createUserProfile(raw: UserState): Promise<UserState> {
     throw error;
   }
 
+  return rowDataToUserState(data);
+}
+
+export async function getUser(email: string): Promise<UserState | null> {
+
+  if (!email) {
+    console.log("Email is required to fetch user.");
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from(USER_TABLE_NAME)
+    .select("*")
+    .eq("email", email)
+    .single();
+
+  if (error) {
+    console.log("Error fetching user:", error);
+    return null;
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  return rowDataToUserState(data);
+}
+
+
+const rowDataToUserState = (data: any): UserState => {
   return {
-    id: user.id,
+     id: data.id,
     email: data.email,
     name: data.name,
     picture: data.picture,
@@ -36,5 +66,5 @@ export async function createUserProfile(raw: UserState): Promise<UserState> {
       language: data.language,
       learningLanguage: data.learning_language,
     },
-  };
-}
+  } as UserState;
+};

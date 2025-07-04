@@ -1,11 +1,19 @@
+import { getUser } from "@/api/db/user";
 import useAppSession from "@/hooks/useAppSession";
 import { supabase } from "@/lib/supabase";
 import { UserState, useUserStore } from "@/store/userStore";
 import { Session } from "@supabase/supabase-js";
 import { makeRedirectUri } from "expo-auth-session";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
+import { router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
-import { createContext, type PropsWithChildren, use, useMemo } from "react";
+import {
+  createContext,
+  type PropsWithChildren,
+  use,
+  useCallback,
+  useMemo,
+} from "react";
 
 const redirectTo = makeRedirectUri();
 
@@ -20,8 +28,6 @@ const AuthContext = createContext<{
 });
 
 const createSessionFromUrl = async (url: string) => {
-
-
   const { params, errorCode } = QueryParams.getQueryParams(url);
   if (errorCode) throw new Error(errorCode);
   const { access_token, refresh_token } = params;
@@ -38,7 +44,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
   const { session, loading, setSession } = useAppSession();
   const { updateUserState } = useUserStore();
 
-  const signIn = async (provider: "google" | "apple") => {
+  const signIn = useCallback(async (provider: "google" | "apple") => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: provider,
       options: {
@@ -64,17 +70,19 @@ export function SessionProvider({ children }: PropsWithChildren) {
           name: session.user.user_metadata.full_name || "",
           picture: session.user.user_metadata.avatar_url || "",
           auth: {
-            provider: session.user.app_metadata.provider
-          }
+            provider: session.user.app_metadata.provider,
+          },
         } as UserState;
 
-        // TODO: check if user exists in the database
+        const realUser = await getUser(user.email!);
 
-        updateUserState(user);
+        updateUserState(realUser || user);
         setSession(session);
+
+        router.replace(realUser?.onboardingCompleted ? "/(home)" : '/account/choose-native-language');
       }
     }
-  };
+  }, []);
 
   const value = useMemo(
     () => ({
