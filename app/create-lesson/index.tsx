@@ -21,10 +21,10 @@ export default function CreateLessonScreen() {
   const [loading, setLoading] = React.useState(false);
 
   const { addLesson } = useLessonStore();
-  const userLanguage = useUserStore((s) => s.userPreferences.language);
-  const learningLanguage = useUserStore(
-    (s) => s.userPreferences.learningLanguage
-  );
+  const userPreferences = useUserStore((s) => s.user.preferences);
+  const userLanguage = userPreferences.language!
+  const learningLanguage = userPreferences.learningLanguage!
+
   const t = useTranslation();
   const theme = useTheme();
 

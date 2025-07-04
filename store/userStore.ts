@@ -3,114 +3,90 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-export interface UserPreferences {
-  language: LanguageCode | null;
-  learningLanguage: LanguageCode | null;
-}
-
-export interface UserProfile {
-  id: string;
-  email: string;
-  name: string;
-  picture: string;
+export interface UserState {
+  id: string | null;
+  email: string | null;
+  name: string | null;
+  picture: string | null;
   auth: {
-    provider: string;
+    provider: string | null;
   };
-  onboardingCompleted?: boolean;
+  onboardingCompleted: boolean;
+  preferences: {
+    language: LanguageCode | null;
+    learningLanguage: LanguageCode | null;
+  };
 }
 
 interface UserStore {
-  userPreferences: UserPreferences;
-  userProfile: UserProfile | null;
+  user: UserState;
+  updateUserState: (state: Partial<UserState>) => void;
+  setOnboardingComplete: () => void;
   setLanguage: (language: LanguageCode) => void;
   setLearningLanguage: (language: LanguageCode) => void;
-  updateUserPreferences: (preferences: Partial<UserPreferences>) => void;
-  getUserPreferences: () => UserPreferences;
-  resetUserPreferences: () => void;
-  setUserProfile: (profile: UserProfile) => void;
-  updateUserProfile: (profile: Partial<UserProfile>) => void;
-  getUserProfile: () => UserProfile | null;
   clearUserProfile: () => void;
-  isAuthenticated: () => boolean;
 }
 
-const initialUserPreferences: UserPreferences = {
-  language: null,
-  learningLanguage: null,
+const initialState: UserState = {
+  id: null,
+  email: null,
+  name: null,
+  picture: null,
+  auth: {
+    provider: null,
+  },
+  onboardingCompleted: false,
+  preferences: {
+    language: null,
+    learningLanguage: null,
+  },
 };
 
 export const useUserStore = create<UserStore>()(
   persist(
-    (set, get) => ({
-      userPreferences: initialUserPreferences,
-      userProfile: null,
+    (set) => ({
+      // State
+      user: initialState,
 
-      setLanguage: (language: LanguageCode) => {
+      // Actions
+      updateUserState: (updates) =>
         set((state) => ({
-          userPreferences: {
-            ...state.userPreferences,
-            language: language,
+          user: { ...state.user, ...updates },
+        })),
+
+      setOnboardingComplete: () =>
+        set((state) => ({
+          user: { ...state.user, onboardingCompleted: true },
+        })),
+
+      setLanguage: (language) =>
+        set((state) => ({
+          user: {
+            ...state.user,
+            preferences: {
+              ...state.user.preferences,
+              language,
+            },
           },
-        }));
-      },
+        })),
 
-      setLearningLanguage: (language: LanguageCode) => {
+      setLearningLanguage: (learningLanguage) =>
         set((state) => ({
-          userPreferences: {
-            ...state.userPreferences,
-            learningLanguage: language,
+          user: {
+            ...state.user,
+            preferences: {
+              ...state.user.preferences,
+              learningLanguage,
+            },
           },
-        }));
-      },
+        })),
 
-      updateUserPreferences: (preferences: Partial<UserPreferences>) => {
-        set((state) => ({
-          userPreferences: {
-            ...state.userPreferences,
-            ...preferences,
-          },
-        }));
-      },
-
-      getUserPreferences: () => {
-        return get().userPreferences;
-      },
-
-      resetUserPreferences: () => {
-        set((state) => ({
-          userPreferences: initialUserPreferences,
-        }));
-      },
-
-      setUserProfile: (profile: UserProfile) => {
-        set((state) => ({
-          userProfile: profile,
-        }));
-      },
-
-      updateUserProfile: (profile: Partial<UserProfile>) => {
-        set((state) => ({
-          userProfile: state.userProfile ? {
-            ...state.userProfile,
-            ...profile,
-          } : null,
-        }));
-      },
-
-      getUserProfile: () => {
-        return get().userProfile;
-      },
-
-      clearUserProfile: () => {
-        set((state) => ({
-          userProfile: null,
-        }));
-      },
-
-      isAuthenticated: () => {
-        return get().userProfile !== null;
-      },
+      clearUserProfile: () =>
+        set(() => ({
+          user: initialState,
+        })),
     }),
+
     {
       name: "user-storage",
       storage: createJSONStorage(() => AsyncStorage),

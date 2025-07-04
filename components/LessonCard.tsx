@@ -33,9 +33,12 @@ const LessonCard: React.FC<LessonCardProps> = ({ lesson, onPress }) => {
               <Text.Body semibold numberOfLines={2}>
                 {lesson.title}
               </Text.Body>
+              {lesson.createdAt ? 
               <Text.Detail style={cs.m_t_xs}>
                 {`${formatDateShort(lesson.createdAt)}`}
               </Text.Detail>
+              : null}
+
             </Layout.Column>
           </Layout.Row>
           <IconButton onPress={handlePress} name={"keyboard-arrow-right"} />

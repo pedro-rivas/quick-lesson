@@ -1,19 +1,19 @@
-import { useTheme } from "@react-navigation/native";
-import React, { useMemo } from "react";
+import useTheme from "@/hooks/useTheme";
+import React, { PropsWithChildren, useMemo } from "react";
 import { StyleSheet, View, ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-interface SafeAreaViewProps {
-  children: React.ReactNode;
+type SafeAreaViewProps = {
   styles?: ViewStyle;
-}
+  backgroundColor?: string;
+} & PropsWithChildren
 
 /**
  * A layout component that wraps its children within a React Native `View`.
  *
  * @param children - The content to be rendered inside the screen layout.
  */
-const SafeAreaView = ({ children, styles: customStyles }: SafeAreaViewProps) => {
+const SafeAreaView = ({ children, styles: customStyles, backgroundColor }: SafeAreaViewProps) => {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
 
@@ -24,7 +24,7 @@ const SafeAreaView = ({ children, styles: customStyles }: SafeAreaViewProps) => 
           flex: 1,
           paddingTop: insets.top,
           paddingBottom: insets.bottom,
-          backgroundColor: colors.background,
+          backgroundColor: backgroundColor || colors.background,
         },
       }),
     [insets, colors]

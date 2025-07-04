@@ -41,7 +41,7 @@ export const Header = ({ children, style, ...props }: TextProps) => {
     <H4
       style={[
         {
-          color: "#222",
+          color: props.color || "#222",
           flexShrink: 1,
           marginHorizontal: 16,
         },
@@ -89,7 +89,6 @@ export const Link = ({ style, ...props }: TextProps) => {
 
 const DefaultText = React.memo(({ style, ...props }: TextProps) => {
   const theme = useTheme();
-  const realColor = props.color || theme.colors.onSurface
   return (
     <Text
       style={[
@@ -106,9 +105,9 @@ const DefaultText = React.memo(({ style, ...props }: TextProps) => {
 });
 
 export const Animated = (
-  props: React.ComponentProps<typeof RNAnimated.Text>
+  { style, ...props}: React.ComponentProps<typeof RNAnimated.Text>
 ) => {
-  return <RNAnimated.Text {...props} style={{fontFamily: 'Roboto',}} />;
+  return <RNAnimated.Text style={[{fontFamily: 'Roboto',}, style]}  {...props}/>;
 };
 
 const ANIMATED_TEXT_DURATION = 1000;

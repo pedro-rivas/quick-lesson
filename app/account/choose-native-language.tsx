@@ -16,7 +16,7 @@ import { ListRenderItem } from "react-native";
 
 export default function ChooseNativeLanguageScreen() {
   const { setLanguage } = useUserStore();
-  const language = useUserStore((s) => s.userPreferences.language);
+  const language = useUserStore((s) => s.user.preferences.language);
 
   const t = useTranslation();
   const theme = useTheme();
@@ -29,7 +29,7 @@ export default function ChooseNativeLanguageScreen() {
   }, []);
 
   const handleNext = useCallback(() => {
-    router.navigate("/account/choose-language");
+    router.push("/account/choose-language");
   }, []);
 
   const availableLanguages = useMemo(

@@ -16,9 +16,9 @@ import { ListRenderItem } from "react-native";
 export default function ChooseLanguageScreen() {
   const { shouldGoBack } = useLocalSearchParams();
 
-  const { setLearningLanguage } = useUserStore();
+  const { setLearningLanguage, } = useUserStore();
   const learningLanguage = useUserStore(
-    (s) => s.userPreferences.learningLanguage
+    (s) => s.user.preferences.learningLanguage
   );
 
   const t = useTranslation();
@@ -38,7 +38,7 @@ export default function ChooseLanguageScreen() {
   }, []);
 
   const handleNext = useCallback(() => {
-    // go to selct your fist lesson
+    router.push("/account/choose-first-lesson");
   }, []);
 
   const availableLanguages = useMemo(
