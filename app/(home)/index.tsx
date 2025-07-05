@@ -9,21 +9,39 @@ import { TabBar } from "@/components/TabBar";
 import VocabularyRow, { Vocab } from "@/components/VocabularyRow";
 import useTranslation from "@/hooks/useTranslation";
 import { Lesson, useLessonStore } from "@/store/lessonStore";
+import { useUserStore } from "@/store/userStore";
 import { spacing } from "@/styles/spacing";
 import { useAudioPlayer } from "expo-audio";
 import { router } from "expo-router";
-import React, { useCallback, useMemo } from "react";
-import { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
+import React, { useCallback, useEffect, useMemo } from "react";
+import {
+  ActivityIndicator,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+} from "react-native";
 
 export default function HomeScreen() {
-  const { getAllLessons } = useLessonStore();
-  const lessons = getAllLessons();
+  const { loadLessons } = useLessonStore();
+  const { lessons, hasMore, loading } = useLessonStore((state) => state);
+  const userId = useUserStore((state) => state.user.id!);
+
+  useEffect(() => {
+    handleLoadLessons(userId);
+  }, []);
 
   const t = useTranslation();
   const player = useAudioPlayer("");
 
   const fabRef = React.useRef<FABRef>(null);
-  const prevScrollY = React.useRef(0);
+  const refs = React.useRef({
+    currentPage: 0,
+    loading,
+    hasMore,
+    prevScrollY: 0,
+  });
+
+  refs.current.loading = loading;
+  refs.current.hasMore = hasMore;
 
   const sections = useMemo(
     () => [{ title: t("My Lessons") }, { title: t("Vocabulary") }],
@@ -39,7 +57,28 @@ export default function HomeScreen() {
     };
   }, [lessons]);
 
-  const handleViewLesson = useCallback((lesson: Lesson) => {
+  const handleLoadLessons = useCallback((userId: string, page = 0) => {
+    loadLessons({
+      userId,
+      page,
+    });
+  }, []);
+
+  const handleLoadMore = useCallback(() => {
+    const { currentPage, hasMore, loading } = refs.current;
+    if (!hasMore || loading) return;
+
+    const nextPage = currentPage + 1;
+
+    loadLessons({
+      userId,
+      page: nextPage,
+    });
+
+    refs.current.currentPage = nextPage;
+  }, [userId]);
+
+  const handlePressLesson = useCallback((lesson: Lesson) => {
     router.push(`/lessons/${lesson.id}` as any);
   }, []);
 
@@ -64,7 +103,7 @@ export default function HomeScreen() {
       } else {
         fabRef.current?.expand();
       }
-      prevScrollY.current = event.nativeEvent.contentOffset.y;
+      refs.current.prevScrollY = event.nativeEvent.contentOffset.y;
     },
     []
   );
@@ -72,13 +111,13 @@ export default function HomeScreen() {
   const handlePageChange = useCallback((nextPage: number) => {
     if (nextPage !== 0) {
       fabRef.current?.collapse();
-    } else if(prevScrollY.current < FAB_THRESHOLD) {
+    } else if (refs.current.prevScrollY < FAB_THRESHOLD) {
       fabRef.current?.expand();
     }
   }, []);
 
   const renderItem = useCallback(({ item }: { item: Lesson }) => {
-    return <LessonCard lesson={item} onPress={handleViewLesson} />;
+    return <LessonCard lesson={item} onPress={handlePressLesson} />;
   }, []);
 
   const renderVocab = useCallback(
@@ -108,9 +147,9 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView>
-      <Pager 
-        initialPage={0} 
-        renderTabBar={renderTabBar} 
+      <Pager
+        initialPage={0}
+        renderTabBar={renderTabBar}
         onPageSelected={handlePageChange}
       >
         <Layout.Column key={1} mh={spacing.m}>
@@ -130,7 +169,16 @@ export default function HomeScreen() {
                 title={`${lessonsCount} ${t("Lessons")}`}
               />
             }
-            ListEmptyComponent={<LessonEmptyState />}
+            ListEmptyComponent={
+              loading && !lessonsCount ? (
+                <ActivityIndicator size={"large"} />
+              ) : (
+                <LessonEmptyState />
+              )
+            }
+            onEndReached={handleLoadMore}
+            onRefresh={handleLoadMore}
+            refreshing={loading}
           />
         </Layout.Column>
 
@@ -140,10 +188,11 @@ export default function HomeScreen() {
             renderItem={renderVocab}
             showsVerticalScrollIndicator={false}
             scrollEnabled={true}
-            windowSize={9}
+            windowSize={7}
             nestedScrollEnabled={true}
             pinchGestureEnabled={false}
             initialNumToRender={4}
+            maxToRenderPerBatch={4}
             ListHeaderComponent={
               <Layout.Header.SectionTitle title={`${vocabs} ${t("Words")}`} />
             }

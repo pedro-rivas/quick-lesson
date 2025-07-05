@@ -5,6 +5,7 @@ import SafeAreaView from "@/components/SafeAreaView";
 import * as Text from "@/components/Text";
 import { LanguageCode } from "@/constants/languages";
 import useTheme from "@/hooks/useTheme";
+import useTranslation from "@/hooks/useTranslation";
 import { useLessonStore } from "@/store/lessonStore";
 import { useUserStore } from "@/store/userStore";
 import { spacing } from "@/styles/spacing";
@@ -21,6 +22,7 @@ export default function ChooseFirstLessonScreen() {
 
   const router = useRouter();
   const { colors } = useTheme();
+  const t = useTranslation();
 
   const user = useUserStore((s) => s.user);
   const { addLesson } = useLessonStore();
@@ -43,7 +45,7 @@ export default function ChooseFirstLessonScreen() {
       addLesson(lesson);
       router.replace('/(home)')
     } catch (error) { 
-      logger.recordError('src/account/creating-account', error)
+      logger.recordError('app/account/creating-account', error)
     }
   }, [user]);
 
@@ -58,7 +60,7 @@ export default function ChooseFirstLessonScreen() {
         <ActivityIndicator color={colors.onPrimary} size={"large"} />
         <Layout.Spacer />
         <Text.Header color={colors.onPrimary}>
-          {"Creating your first lesson..."}
+          {t('Creating your first lesson...')}
         </Text.Header>
       </Layout.Column>
     </SafeAreaView>

@@ -2,6 +2,7 @@ import { LESSONS_TABLE_NAME } from "@/constants/config";
 import { LanguageCode } from "@/constants/languages";
 import { supabase } from "@/lib/supabase";
 import { Lesson } from "@/store/lessonStore";
+import { logger } from "@/utils";
 import { PostgrestError } from "@supabase/supabase-js";
 import { CreateLessonSchema } from "./schemas";
 
@@ -50,7 +51,7 @@ export async function getLesson({
     .eq("student_lang_code", studentLangCode)
     .single();
 
- // Need to improve this to check the type of error
+  // Need to improve this to check the type of error
   if (error) {
     if ((error as PostgrestError).code !== "PGRST116") {
       console.error("Error fetching lesson:", error);
@@ -63,6 +64,50 @@ export async function getLesson({
   }
 
   return rowDataToLesson(data);
+}
+
+const PAGE_SIZE = 15;
+
+export async function getLessonsByUserId({
+  userId,
+  page = 0,
+  pageSize = PAGE_SIZE,
+}: {
+  userId: string;
+  page?: number;
+  pageSize?: number;
+}): Promise<{
+  lessons: Lesson[];
+  hasMore: boolean;
+}> {
+  const from = page * pageSize;
+  const to = from + pageSize - 1;
+
+  const { data, error } = await supabase
+    .from(LESSONS_TABLE_NAME)
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false }) // Newest first
+    .limit(pageSize)
+    .range(from, to);
+
+  const hasMore = data && data.length === pageSize ? true : false;
+
+  if (error) {
+    logger.recordError("api/db/lessons.ts", error);
+  }
+
+  if (!data || error) {
+    return {
+      lessons: [],
+      hasMore,
+    };
+  }
+
+  return {
+    lessons: data.map(rowDataToLesson),
+    hasMore,
+  };
 }
 
 const rowDataToLesson = (data: any): Lesson => {

@@ -1,3 +1,4 @@
+import * as db from "@/api/db";
 import { Phrase } from "@/components/PhrasesSection";
 import { Tip } from "@/components/TipsSection";
 import { Vocab } from "@/components/VocabularyRow";
@@ -22,10 +23,17 @@ export interface Lesson {
 
 interface LessonStore {
   lessons: Lesson[];
-  addLesson: (lesson: Omit<Lesson, "id" | "createdAt">) => string;
+  loading: boolean;
+  error: string | null;
+  hasMore: boolean;
+  addLesson: (lesson: Lesson) => void;
   removeLesson: (id: string) => void;
   getLessonById: (id: string) => Lesson | undefined;
-  getAllLessons: () => Lesson[];
+  loadLessons: ({}: {
+    userId: string;
+    page?: number,
+    ageSize?: number
+  }) => Promise<Lesson[] | void>;
   updateLesson: (
     id: string,
     updates: Partial<Omit<Lesson, "id" | "createdAt">>
@@ -36,21 +44,31 @@ export const useLessonStore = create<LessonStore>()(
   persist(
     (set, get) => ({
       lessons: [],
+      loading: false,
+      error: null,
+      hasMore: true,
+
+      loadLessons: async (params) => {
+        set({ loading: true, error: null });
+        try {
+          const {lessons: newLessons, hasMore } = await db.Lessons.getLessonsByUserId(params);
+          set((state) =>{
+            const existingIds = new Set(state.lessons.map((l) => l.id))
+            const uniqueNew = newLessons.filter((l) => !existingIds.has(l.id))
+            const merged = [...uniqueNew, ...state.lessons].sort((a, b) => {
+              return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            });
+            return { lessons: merged, loading: false, hasMore, error: null };
+          })
+        } catch (error) {
+          set({ error: "Failed to load lessons", loading: false });
+        }
+      },
 
       addLesson: (lessonData) => {
-        const id =
-          Date.now().toString() + Math.random().toString(36).substr(2, 9);
-        const newLesson: Lesson = {
-          ...lessonData,
-          id,
-          createdAt: new Date(),
-        };
-
         set((state) => ({
-          lessons: [...state.lessons, newLesson],
+          lessons: [...state.lessons, lessonData],
         }));
-
-        return id;
       },
 
       removeLesson: (id) => {
@@ -61,10 +79,6 @@ export const useLessonStore = create<LessonStore>()(
 
       getLessonById: (id) => {
         return get().lessons.find((lesson) => lesson.id === id);
-      },
-
-      getAllLessons: () => {
-        return get().lessons;
       },
 
       updateLesson: (id, updates) => {

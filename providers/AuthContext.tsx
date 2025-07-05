@@ -76,6 +76,8 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
         const realUser = await getUser(user.email!);
 
+        // TODO:set user language if useer exists
+
         updateUserState(realUser || user);
         setSession(session);
 
