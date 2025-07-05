@@ -5,4 +5,4 @@ export const BUCKET = process.env.EXPO_PUBLIC_TTS_BUCKET_NAME!
 export const TABLE_NAME = process.env.EXPO_PUBLIC_TTS_TABLE_NAME!
 export const USER_TABLE_NAME = process.env.EXPO_PUBLIC_USER_TABLE_NAME!
 export const LESSONS_TABLE_NAME = process.env.EXPO_PUBLIC_LESSONS_TABLE_NAME!
-export const EXPO_PUBLIC_SYSTEM_ID = process.env.EXPO_PUBLIC_SYSTEM_ID!;
+export const SYSTEM_ID = process.env.EXPO_PUBLIC_SYSTEM_ID!;

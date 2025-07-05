@@ -31,8 +31,8 @@ interface LessonStore {
   getLessonById: (id: string) => Lesson | undefined;
   loadLessons: ({}: {
     userId: string;
-    page?: number,
-    ageSize?: number
+    page?: number;
+    ageSize?: number;
   }) => Promise<Lesson[] | void>;
   updateLesson: (
     id: string,
@@ -51,15 +51,19 @@ export const useLessonStore = create<LessonStore>()(
       loadLessons: async (params) => {
         set({ loading: true, error: null });
         try {
-          const {lessons: newLessons, hasMore } = await db.Lessons.getLessonsByUserId(params);
-          set((state) =>{
-            const existingIds = new Set(state.lessons.map((l) => l.id))
-            const uniqueNew = newLessons.filter((l) => !existingIds.has(l.id))
+          const { lessons: newLessons, hasMore } =
+            await db.Lessons.getLessonsByUserId(params);
+          set((state) => {
+            const existingIds = new Set(state.lessons.map((l) => l.id));
+            const uniqueNew = newLessons.filter((l) => !existingIds.has(l.id));
             const merged = [...uniqueNew, ...state.lessons].sort((a, b) => {
-              return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+              return (
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime()
+              );
             });
             return { lessons: merged, loading: false, hasMore, error: null };
-          })
+          });
         } catch (error) {
           set({ error: "Failed to load lessons", loading: false });
         }
@@ -72,6 +76,7 @@ export const useLessonStore = create<LessonStore>()(
       },
 
       removeLesson: (id) => {
+        db.Lessons.deleteLesson(id);
         set((state) => ({
           lessons: state.lessons.filter((lesson) => lesson.id !== id),
         }));

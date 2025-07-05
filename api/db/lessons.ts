@@ -1,4 +1,4 @@
-import { LESSONS_TABLE_NAME } from "@/constants/config";
+import { LESSONS_TABLE_NAME, SYSTEM_ID } from "@/constants/config";
 import { LanguageCode } from "@/constants/languages";
 import { supabase } from "@/lib/supabase";
 import { Lesson } from "@/store/lessonStore";
@@ -108,6 +108,17 @@ export async function getLessonsByUserId({
     lessons: data.map(rowDataToLesson),
     hasMore,
   };
+}
+
+export async function deleteLesson(lessonId: string): Promise<void> {
+  const { error } = await supabase
+    .from(LESSONS_TABLE_NAME)
+    .update({ user_id: SYSTEM_ID })
+    .eq("id", lessonId);
+
+  if (error) {
+    logger.recordError("api/db/lessons", error);
+  }
 }
 
 const rowDataToLesson = (data: any): Lesson => {

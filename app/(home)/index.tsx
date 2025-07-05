@@ -69,13 +69,12 @@ export default function HomeScreen() {
     if (!hasMore || loading) return;
 
     const nextPage = currentPage + 1;
-
+    refs.current.currentPage = nextPage;
+    
     loadLessons({
       userId,
       page: nextPage,
     });
-
-    refs.current.currentPage = nextPage;
   }, [userId]);
 
   const handlePressLesson = useCallback((lesson: Lesson) => {
