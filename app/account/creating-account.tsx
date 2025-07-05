@@ -1,5 +1,5 @@
 import { createUserProfile } from "@/api/db/user";
-import { createLesson } from "@/api/gemini";
+import * as gemini from "@/api/gemini";
 import * as Layout from "@/components/Layout";
 import SafeAreaView from "@/components/SafeAreaView";
 import * as Text from "@/components/Text";
@@ -8,6 +8,7 @@ import useTheme from "@/hooks/useTheme";
 import { useLessonStore } from "@/store/lessonStore";
 import { useUserStore } from "@/store/userStore";
 import { spacing } from "@/styles/spacing";
+import { logger } from "@/utils";
 import { useLocalSearchParams, useRouter } from "expo-router/build/hooks";
 import React, { useCallback, useEffect } from "react";
 import { ActivityIndicator } from "react-native";
@@ -32,16 +33,17 @@ export default function ChooseFirstLessonScreen() {
   const createAccount = useCallback(async () => {
     try {
       const realUser = await createUserProfile(user);
-      const lesson = await createLesson({
+      const lesson = await gemini.lessons.createLesson({
         topic: title,
-        studentLanguage: user.preferences.language!,
+        studentLanguage: realUser.preferences.language!,
         learningLanguage: langCode,
+        userId: realUser.id!,
       });
       updateUserState(realUser)
       addLesson(lesson);
       router.replace('/(home)')
     } catch (error) { 
-      console.log("Error creating user profile:", error);
+      logger.recordError('src/account/creating-account', error)
     }
   }, [user]);
 

@@ -1,3 +1,4 @@
+
 export const tipsPrompt = (studentLanguage: string, tutorLanguage: string) => `
             You are a(n) ${tutorLanguage} tutor who is bilingual in ${tutorLanguage} and
             ${studentLanguage} and an expert at crafting educational content that is 
@@ -220,4 +221,44 @@ export const termsPrompt = (studentLanguage: string, tutorLanguage: string) => `
                 },
               ],
             })}
+`;
+
+export const lessonTitlePrompt = (topic: string, studentLanguage:string) => `
+  You are a helpful assistant that generates a lesson title for a language learning lesson.
+
+  The user wants to create a lesson about the topic "${topic}" in ${studentLanguage}.
+
+  Generate a concise and engaging title that reflects the topic and is suitable for a language learning lesson.
+
+  The title should be in ${studentLanguage} and should not include any additional explanations or context.
+  The title should be no longer than 10 words.
+  If the topic is already short and clear, you can use it as the title.
+
+  Example:
+  Topic: Taking a taxi in China
+  Title: Taking a taxi
+
+  Topic: Ordering food in a restaurant
+  Title: Ordering food
+
+  Topic: Asking for directions
+  Title: Asking for directions
+
+  Topic: Making small talk
+  Title: Making small talk
+
+  Topic: I want to learn how to take a taxi in China
+  Title: Taking a taxi
+
+  Topic: Quiero saber como pedir la cuenta en un restaurante
+  Title: Pidiendo la cuenta
+
+  Topic: Me gustaria saber como comenzar una conversación
+  Title: Comenzando una conversación
+
+  Topic: Me gustaria aprender vocabulario para el gym
+  Title: Entrenando en el gym
+
+  Topic: Pedir una pizza
+  Title: Pidiendo una pizza
 `;

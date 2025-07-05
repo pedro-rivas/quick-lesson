@@ -1,4 +1,4 @@
-import { createLesson } from "@/api/gemini";
+import * as gemini from "@/api/gemini";
 import Pressable from "@/components/buttons/Pressable";
 import CountryFlag from "@/components/CountryFlag";
 import * as Layout from "@/components/Layout";
@@ -12,32 +12,35 @@ import { useLessonStore } from "@/store/lessonStore";
 import { useUserStore } from "@/store/userStore";
 import { commonStyles as cs } from "@/styles/common";
 import { spacing } from "@/styles/spacing";
+import { logger } from "@/utils";
 import { router } from "expo-router";
 import React, { useCallback, useMemo } from "react";
-import { Alert } from "react-native";
 
 export default function CreateLessonScreen() {
   const [topic, setTopic] = React.useState("");
   const [loading, setLoading] = React.useState(false);
 
   const { addLesson } = useLessonStore();
-  const userPreferences = useUserStore((s) => s.user.preferences);
-  const userLanguage = userPreferences.language!
-  const learningLanguage = userPreferences.learningLanguage!
+  const user = useUserStore((s) => s.user);
+  const userId = user.id!;
+  const userPreferences = user.preferences;
+  const userLanguage = userPreferences.language!;
+  const learningLanguage = userPreferences.learningLanguage!;
 
   const t = useTranslation();
   const theme = useTheme();
 
-  const generate = async () => {
+  const generate = useCallback(async () => {
     try {
       if (!topic) return;
 
       setLoading(true);
 
-      const lesson = await createLesson({
+      const lesson = await gemini.lessons.createLesson({
         studentLanguage: userLanguage,
         learningLanguage: learningLanguage,
         topic,
+        userId,
       });
 
       addLesson(lesson);
@@ -45,12 +48,12 @@ export default function CreateLessonScreen() {
       setTopic("");
 
       router.back();
-    } catch (error: any) {
-      Alert.alert(t("Something went wrong"), error.message);
+    } catch (error) {
+      logger.recordError("app/create-lesson", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [topic, userPreferences]);
 
   const goBack = useCallback(() => {
     router.back();

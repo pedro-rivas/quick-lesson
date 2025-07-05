@@ -1,3 +1,4 @@
+export * as logger from "./logger";
 
 /**
  * Turns any string into a safe filename segment:

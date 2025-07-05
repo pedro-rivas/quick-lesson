@@ -16,6 +16,7 @@ export interface TipExample {
   sentence: string;
   translation: string;
   explanation: string;
+  transliteration?: string;
 }
 
 export interface Tip {
