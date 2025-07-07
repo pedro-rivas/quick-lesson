@@ -25,6 +25,7 @@ export interface LayoutProps extends ViewProps {
   ph?: number;
   pl?: number;
   pr?: number;
+  pb?: number;
   ml?: number;
   mr?: number;
   mt?: number;
@@ -41,8 +42,6 @@ export const View = React.memo(({ children, style, ...props }: LayoutProps) => {
           alignItems: props.alignItems,
           flex: props.flex,
           gap: props.gap,
-          padding: props.padding,
-          paddingHorizontal: props.paddingHorizontal || props.ph,
           flexDirection: props.flexDirection || "column",
           marginLeft: props.ml,
           marginRight: props.mr,
@@ -50,9 +49,12 @@ export const View = React.memo(({ children, style, ...props }: LayoutProps) => {
           marginBottom: props.mb,
           marginHorizontal: props.mh,
           flexShrink: props.flexShrink,
+          padding: props.padding,
+          paddingHorizontal: props.paddingHorizontal || props.ph,
           paddingVertical: props.pv,
           paddingLeft: props.pl,
           paddingRight: props.pr,
+          paddingBottom: props.pb,
         },
         style,
       ]}

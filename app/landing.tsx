@@ -2,8 +2,10 @@ import Button from "@/components/buttons/Button";
 import * as Layout from "@/components/Layout";
 import SafeAreaView from "@/components/SafeAreaView";
 import * as Text from "@/components/Text";
+import useInsets from "@/hooks/useInsents";
 import useTranslation from "@/hooks/useTranslation";
 import { useSession } from "@/providers/AuthContext";
+import { spacing } from "@/styles/spacing";
 import React, { useMemo } from "react";
 import { Alert, StyleSheet } from "react-native";
 
@@ -12,6 +14,7 @@ import { Alert, StyleSheet } from "react-native";
 export default function LandingPage() {
   const { signIn } = useSession();
   const t = useTranslation();
+  const insets = useInsets();
 
   const PLACE_HOLDER_LESSONS = useMemo(() => {
     return [
@@ -46,7 +49,7 @@ export default function LandingPage() {
             text={PLACE_HOLDER_LESSONS}
           />
         </Layout.Column>
-        <Layout.Column>
+        <Layout.Column mb={insets.bottom + spacing.m}>
           <Button
             secondary
             title={t("Continue With Google")}

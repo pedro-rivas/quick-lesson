@@ -60,7 +60,7 @@ export default function ChooseFirstLessonScreen() {
           }
           data={initialLessons}
           renderItem={renderItem}
-          initialNumToRender={4}
+          initialNumToRender={8}
           showsVerticalScrollIndicator={false}
         />
       </Layout.Column>

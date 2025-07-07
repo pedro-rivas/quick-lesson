@@ -172,9 +172,9 @@ const commonStyles = StyleSheet.create({
     overflow: "hidden",
   },
   wordButtonGrow: {
-       flexGrow: 1,
+    flexGrow: 1,
     width: Dimensions.get("window").width / 2 - spacing.l * 2,
-  }
+  },
 });
 
 export { commonStyles, commonStyles as cs };

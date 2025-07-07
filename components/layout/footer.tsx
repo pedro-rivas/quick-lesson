@@ -5,9 +5,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import React, { PropsWithChildren, useImperativeHandle } from "react";
 import { StyleSheet } from "react-native";
 import Animated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BUTTON_HEIGHT } from "../buttons/Button";
@@ -47,7 +47,7 @@ export const Gradient = React.forwardRef(
       <Animated.View style={[styles.container, animatedStyle]}>
         <LinearGradient
           colors={[hexToRgba(background, 0), background, background]}
-          style={styles.gradient}
+          style={[styles.gradient, { paddingBottom: insets.bottom + spacing.m }]}
         >
           {children}
         </LinearGradient>

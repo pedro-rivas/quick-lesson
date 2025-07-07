@@ -5,7 +5,7 @@ import * as Layout from "@/components/Layout";
 import * as List from "@/components/List";
 import SafeAreaView from "@/components/SafeAreaView";
 import { APP_LANGUAGES, LanguageCode } from "@/constants/languages";
-import useTheme from "@/hooks/useTheme";
+import useInsets from "@/hooks/useInsents";
 import useTranslation from "@/hooks/useTranslation";
 import { changeAppLanguage } from "@/i18n";
 import { useUserStore } from "@/store/userStore";
@@ -20,16 +20,14 @@ export default function ChooseNativeLanguageScreen() {
   const onboardingCompleted = useUserStore((s => s.user.onboardingCompleted));
 
   const router = useRouter();
+  const t = useTranslation();
+  const insets = useInsets();
 
   useFocusEffect(() => {
-    console.log({ onboardingCompleted})
     if(onboardingCompleted){
       router.replace('/(home)');
     }
   });
-
-  const t = useTranslation();
-  const theme = useTheme();
 
   const langs = useMemo(() => Object.values(APP_LANGUAGES), []);
 
@@ -59,7 +57,7 @@ export default function ChooseNativeLanguageScreen() {
 
   const renderItem = useCallback<ListRenderItem<LanguageRowProps>>(
     ({ item }) => <LanguageRow {...item} />,
-    [theme]
+    []
   );
 
   return (

@@ -42,6 +42,8 @@ export async function getUser(email: string): Promise<UserState | null> {
     .single();
 
   if (error) {
+    // TODO: handle this:
+    // Error fetching user: {"code": "PGRST116", "details": "The result contains 0 rows", "hint": null, "message": "JSON object requested, multiple (or no) rows returned"}
     console.log("Error fetching user:", error);
     return null;
   }
