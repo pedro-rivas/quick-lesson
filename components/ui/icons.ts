@@ -10,6 +10,7 @@ const icons = {
   "radio-button-unchecked": "radio-button-unchecked",
   "keyboard-arrow-right": 'keyboard-arrow-right',
   "add-circle": "add-circle",
+  'close': 'close',
 };
 
 export type IconSymbolName = keyof typeof icons;

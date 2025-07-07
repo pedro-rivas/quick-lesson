@@ -8,10 +8,13 @@ import ProgressBar from "@/components/ProgressBar";
 import SafeAreaView from "@/components/SafeAreaView";
 import useTranslation from "@/hooks/useTranslation";
 import { useLessonStore } from "@/store/lessonStore";
+import { cs } from "@/styles/common";
+import { spacing } from "@/styles/spacing";
 import * as lessonUtils from "@/utils/lessons";
+import { useAudioPlayer } from "expo-audio";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { InteractionManager, StyleSheet } from "react-native";
+import { InteractionManager } from "react-native";
 import PagerView from "react-native-pager-view";
 
 enum LessonType {
@@ -25,6 +28,7 @@ export default function PracticeScreenPage() {
   const lesson = getLessonById(id!);
 
   const t = useTranslation();
+  const player = useAudioPlayer("");
 
   const [page, setPage] = useState(0);
   const [showComplete, setShowComplete] = useState(false);
@@ -35,11 +39,25 @@ export default function PracticeScreenPage() {
   useEffect(() => {
     InteractionManager.runAfterInteractions(() => {
       setPartialLoad(false);
-    })
+    });
   }, []);
+
+  const handleSpeechPress = useCallback(
+    (uri: string) => {
+      if (uri) {
+        player.replace(uri);
+        player.seekTo(0);
+        setTimeout(() => {
+          player.play();
+        }, 10);
+      }
+    },
+    [player]
+  );
 
   const handleComplete = useCallback(() => {
     setShowComplete(true);
+    handleSpeechPress(require('../../assets/sounds/complete.mp3'));
   }, []);
 
   const goBack = useCallback(() => {
@@ -100,18 +118,13 @@ export default function PracticeScreenPage() {
   return (
     <SafeAreaView>
       <Layout.Header.Row>
-        <IconButton
-          name={'arrow-back'}
-          color={"black"}
-          onPress={goBack}
-        />
+        <IconButton name={'close'} color={"black"} onPress={goBack} />
         <Layout.Spacer />
         <ProgressBar progress={progress} />
       </Layout.Header.Row>
- 
       <PagerView
         ref={pagerRef}
-        style={styles.pagerContainer}
+        style={cs.f_1}
         initialPage={0}
         scrollEnabled={false}
       >
@@ -119,11 +132,12 @@ export default function PracticeScreenPage() {
           if (exercise.type === LessonType.MATCH_WORDS) {
             return (
               <MatchWordsPage
-                key={`page-${index}`}
-                vocabulary={exercise.vocabulary}
+                key={index +1}
+                vocabulary={'vocabulary' in exercise ? exercise.vocabulary : []}
                 subheading={t("Tap the matching pairs")}
                 topic={t("Vocabulary")}
                 onComplete={handleComplete}
+                onSpeechPress={handleSpeechPress}
               />
             );
           }
@@ -131,10 +145,11 @@ export default function PracticeScreenPage() {
           if (exercise.type === LessonType.COMPLETE_WORDS) {
             return (
               <CompleteTheWordPage
-                key={`page-${index}`}
-                exercise={exercise.exercise}
+                key={index +1}
+                exercise={'exercise' in exercise ? exercise.exercise : {}}
                 subheading={t("Complete the word")}
                 onComplete={handleComplete}
+                onSpeechPress={handleSpeechPress}
               />
             );
           }
@@ -142,27 +157,19 @@ export default function PracticeScreenPage() {
           return null;
         })}
       </PagerView>
-      <Layout.Row padding={16} style={styles.buttonWrapper}>
+      <Layout.View padding={spacing.m} style={cs.z_1000}>
         {showComplete ? (
           <Button title={t("Continue")} onPress={onNextPage} success />
         ) : (
-          <Button title={t("Next")} onPress={onNextPage} secondary disabled={partialLoad} />
+          <Button
+            title={t("Next")}
+            onPress={onNextPage}
+            secondary
+            disabled={partialLoad}
+          />
         )}
-      </Layout.Row>
+      </Layout.View>
       <AnimtedBottomContainer show={showComplete} />
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  pagerContainer: {
-    flex: 1,
-  },
-  buttonWrapper: {
-    zIndex: 1,
-  },
-});

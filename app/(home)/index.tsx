@@ -26,7 +26,9 @@ export default function HomeScreen() {
   const userId = useUserStore((state) => state.user.id!);
 
   useEffect(() => {
-    handleLoadLessons(userId);
+    loadLessons({
+      userId,
+    });
   }, []);
 
   const t = useTranslation();
@@ -57,20 +59,13 @@ export default function HomeScreen() {
     };
   }, [lessons]);
 
-  const handleLoadLessons = useCallback((userId: string, page = 0) => {
-    loadLessons({
-      userId,
-      page,
-    });
-  }, []);
-
   const handleLoadMore = useCallback(() => {
     const { currentPage, hasMore, loading } = refs.current;
     if (!hasMore || loading) return;
 
     const nextPage = currentPage + 1;
     refs.current.currentPage = nextPage;
-    
+
     loadLessons({
       userId,
       page: nextPage,
@@ -151,7 +146,7 @@ export default function HomeScreen() {
         renderTabBar={renderTabBar}
         onPageSelected={handlePageChange}
       >
-        <Layout.Column key={1} mh={spacing.m}>
+        <Layout.Column key={1} mh={spacing.m} collapsable={false}>
           <List.Section
             data={lessons}
             renderItem={renderItem}
@@ -181,7 +176,7 @@ export default function HomeScreen() {
           />
         </Layout.Column>
 
-        <Layout.Column key={2} mh={spacing.m}>
+        <Layout.Column key={2} mh={spacing.m} collapsable={false}>
           <List.Section
             data={allVocabulary}
             renderItem={renderVocab}
@@ -191,7 +186,7 @@ export default function HomeScreen() {
             nestedScrollEnabled={true}
             pinchGestureEnabled={false}
             initialNumToRender={4}
-            maxToRenderPerBatch={4}
+            maxToRenderPerBatch={8}
             ListHeaderComponent={
               <Layout.Header.SectionTitle title={`${vocabs} ${t("Words")}`} />
             }

@@ -7,6 +7,7 @@ import VocabularyRow, { Vocab } from "./VocabularyRow";
 
 interface VocabularySectionProps {
   vocabulary: Vocab[];
+  id: string;
 }
 
 /**
@@ -18,6 +19,7 @@ interface VocabularySectionProps {
  */
 const VocabularySection: React.FC<VocabularySectionProps> = ({
   vocabulary,
+  id,
 }) => {
   const t = useTranslation();
   const player = useAudioPlayer("");
@@ -46,7 +48,7 @@ const VocabularySection: React.FC<VocabularySectionProps> = ({
     <LessonContentWrapper
       title={`${vocabulary.length} ${t("Words")}`}
       buttonText={t("Practice Vocabulary")}
-      onButtonPress={() => router.push(`/practice/${12}` as any)}
+      onButtonPress={() => router.push(`/practice/${id}`)}
     >
       {vocabulary.map((vocab, idx) => (
         <VocabularyRow

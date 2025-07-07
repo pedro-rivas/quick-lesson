@@ -1,17 +1,33 @@
+import { LanguageCode } from "@/constants/languages";
+import useSpeech from "@/hooks/useSeech";
+import useTheme from "@/hooks/useTheme";
+import { cs } from "@/styles/common";
+import { scale } from "@/styles/scale";
 import * as Haptics from "expo-haptics";
 import React, { useCallback, useEffect } from "react";
-import { Dimensions, StyleSheet, TouchableOpacity } from "react-native";
+import { TouchableOpacity } from "react-native";
 import Animated, {
   Easing,
-  interpolateColor,
+  runOnJS,
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
   withRepeat,
   withSequence,
-  withTiming,
+  withTiming
 } from "react-native-reanimated";
+import * as Text from "./Text";
 
 const withTimeout = (cb: () => void) => setTimeout(cb, 10);
+
+enum BUTTON_STATE {
+  SELECTED,
+  MATCHED,
+  ERROR,
+  HINT,
+  DISABLED,
+  NONE,
+}
 
 const AnimatedTouchableOpacity =
   Animated.createAnimatedComponent(TouchableOpacity);
@@ -20,16 +36,21 @@ const ANGLE = 4;
 const TIME = 100;
 const EASING = Easing.elastic(1.5);
 const TIMES = 7;
+const MATCH_DURATION = 700;
+const SHIMMER_DURATION = 400;
+const WORD_BUTTON_HEIGHT = scale.ms(50);
+const COLOR_AN_DURATION = { duration: 100}
 
 interface WordButtonProps {
   word: string;
   selected: boolean;
   matched: boolean;
-  disabled: boolean;
   error: boolean;
   hint: boolean;
-  onPress: () => void;
+  disabled: boolean;
+  onPress: (uri?: string) => void;
   collapsed?: boolean;
+  langCode?: LanguageCode;
 }
 
 const WordButton = ({
@@ -37,78 +58,129 @@ const WordButton = ({
   selected,
   matched,
   error,
-  disabled,
   hint,
+  disabled: isDisabled,
   collapsed,
+  langCode,
   onPress,
 }: WordButtonProps) => {
+  const speech = useSpeech(word, langCode);
+  const theme = useTheme();
+  const lessonColors = theme.lesson;
+
   // shared value for rotation
   const rotation = useSharedValue(0);
-  const hintValue = useSharedValue(0);
-  const isSelected = useSharedValue(0);
-  const hasError = useSharedValue(0);
-  const isMatched = useSharedValue(0);
+  const shimmerTranslateX = useSharedValue(0);
+  const btnWidth = useSharedValue(0);
+  const disabled = useSharedValue(0);
+  const sparkOpacity = useSharedValue(0);
+  const translateY = useSharedValue(0);
+  const btnHeight = useSharedValue(WORD_BUTTON_HEIGHT);
+  const state = useSharedValue(BUTTON_STATE.NONE);
 
-  // whenever `error` becomes true, run the wobble sequence
-  useEffect(() => {
-    if (error) {
-      withTimeout(wobble);
-    }
-  }, [error, rotation]);
+  const hintTimeout = React.useRef<number | null>(null);
 
   useEffect(() => {
     if (hint) {
-      withTimeout(hintAnimation);
+      hintTimeout.current = setTimeout(() => {
+        withTimeout(hintAnimation);
+      }, 1000);
     }
-  }, [hint]);
-
-  useEffect(() => {
-    withTimeout(() => selectAnimation(selected));
-  }, [selected]);
-
-  useEffect(() => {
     if (matched) {
       withTimeout(matchAnimation);
     }
-  }, [matched]);
+    if (error) {
+      withTimeout(errorAnimation);
+    }
+
+    if (isDisabled) {
+      withTimeout(() => {
+        disabled.value = 1;
+      });
+    }
+
+    return cleanHintTimeout;
+  }, [hint, matched, error, isDisabled]);
+
+  useEffect(() => {
+    if (hintTimeout.current) {
+      clearTimeout(hintTimeout.current);
+    }
+
+    if (selected) {
+      selectAnimation(true);
+    } else {
+      selectAnimation(false);
+    }
+
+    return cleanHintTimeout;
+  }, [selected]);
+
+  const cleanHintTimeout = useCallback(() => {
+    if (hintTimeout.current) {
+      clearTimeout(hintTimeout.current);
+      hintTimeout.current = null;
+    }
+  }, []);
+
+  const selectAnimation = useCallback((select: boolean) => {
+    "worklet";
+    state.value = select ? BUTTON_STATE.SELECTED : BUTTON_STATE.NONE;
+  }, []);
 
   const matchAnimation = useCallback(() => {
     "worklet";
-    isMatched.value = withSequence(
-      withTiming(1, { duration: 100, easing: Easing.linear }),
-      withTiming(0, { duration: 800, easing: Easing.linear }),
-      withTiming(0, { duration: 100, easing: Easing.linear })
-    );
-  }, [isSelected]);
+    state.value = BUTTON_STATE.MATCHED;
 
-  const selectAnimation = useCallback(
-    (select: boolean) => {
-      "worklet";
-      isSelected.value = select ? 1 : 0;
-    },
-    [isSelected]
-  );
+    // sparkOpacity.value = withSequence(
+    //   withTiming(1, { duration: SHIMMER_DURATION/2, easing: Easing.linear }),
+    //   withTiming(0, { duration: SHIMMER_DURATION/2, easing: Easing.linear }),
+    // );
+
+    // translateY.value = withSequence(
+    //   withTiming(-10, { duration: 50, easing: Easing.linear }),
+    //   withTiming(-12, { duration: 150, easing: Easing.linear }),
+    //   withTiming(0, { duration: 150, easing: Easing.elastic(1.5) }),
+    //   withTiming(-4, { duration: 50, easing: Easing.elastic(1.5) }),
+    //   withTiming(0, { duration: 20, easing: Easing.elastic(1.5) }),
+    // );
+
+    // shimmerTranslateX.value = withDelay(100, withTiming(btnWidth.value, { duration: MATCH_DURATION}))
+
+    disabled.value = withDelay(
+      MATCH_DURATION,
+      withTiming(1, { duration: 100, easing: Easing.linear })
+    );
+
+    state.value = withDelay(
+      MATCH_DURATION,
+      withTiming(BUTTON_STATE.NONE, { duration: 100, easing: Easing.linear })
+    );
+  }, []);
 
   const hintAnimation = useCallback(() => {
     "worklet";
-    hintValue.value = withSequence(
-      withTiming(1, { duration: 500, easing: Easing.linear }),
-      withTiming(1, { duration: 500, easing: Easing.linear }),
-      withTiming(0, { duration: 500, easing: Easing.linear })
+    state.value = BUTTON_STATE.HINT;
+    state.value = withDelay(
+      1000,
+      withTiming(BUTTON_STATE.NONE, { duration: 100 })
     );
-  }, [hintValue]);
+    wobbleAnimation();
+  }, []);
 
-  const wobble = useCallback(() => {
+  const errorAnimation = useCallback(() => {
     "worklet";
-    hasError.value = withSequence(
-      withTiming(1, { duration: 100 }),
-      withTiming(1, { duration: 800 }),
-      withTiming(0, { duration: 100 })
+    state.value = BUTTON_STATE.ERROR;
+    state.value = withDelay(
+      MATCH_DURATION,
+      withTiming(BUTTON_STATE.NONE, { duration: 100 })
     );
+  }, []);
+
+  const wobbleAnimation = useCallback(() => {
+    "worklet";
     rotation.value = withSequence(
-      // start by rotating to -ANGLE
       withTiming(-ANGLE, { duration: 50, easing: EASING }),
-      // wobble back and forth 7 times
       withRepeat(
         withTiming(ANGLE, {
           duration: TIME,
@@ -117,82 +189,141 @@ const WordButton = ({
         TIMES,
         true
       ),
-      // finally return to 0
       withTiming(0, { duration: 50, easing: EASING })
     );
-  }, [rotation]);
+  }, []);
 
   const handlePress = useCallback(() => {
-    onPress();
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  }, [onPress]);
+    "worklet";
+    if (disabled.value) return;
+    runOnJS(onPress)(speech.uri ? speech.uri : undefined);
+    runOnJS(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    })();
+  }, [onPress, speech.uri]);
 
-  // apply rotation to the card’s style
+  const getColor = useCallback(
+    (state: BUTTON_STATE) => {
+      "worklet";
+      switch (state) {
+        case BUTTON_STATE.ERROR:
+          return lessonColors.error;
+        case BUTTON_STATE.SELECTED:
+          return lessonColors.selected;
+        case BUTTON_STATE.MATCHED:
+          return lessonColors.match;
+        case BUTTON_STATE.HINT:
+          return lessonColors.hint;
+        default:
+          return lessonColors.default;
+      }
+    },
+    [lessonColors, theme]
+  );
+
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ rotateZ: `${rotation.value}deg` }],
-    backgroundColor: isMatched.value
-      ? "#4fc805"
-      : hasError.value
-      ? "#ff0000"
-      : isSelected.value
-      ? "#0b57d0"
-      : interpolateColor(hintValue.value, [0, 1], ["#fff", "#d7ffb8"]),
+    transform: [
+      { rotateZ: `${rotation.value}deg` },
+      {
+        translateY: translateY.value,
+      },
+    ],
+    opacity: withTiming(disabled.value ? 0.4 : 1, COLOR_AN_DURATION),
+    height: btnHeight.value,
+    borderColor:  withTiming(getColor(state.value).border, COLOR_AN_DURATION),
+    backgroundColor: withTiming(getColor(state.value).background, COLOR_AN_DURATION),
   }));
 
   const animatedTextStyle = useAnimatedStyle(() => ({
-    color: isMatched.value
-      ? "#fff"
-      : hasError.value
-      ? "white"
-      : isSelected.value
-      ? "white"
-      : interpolateColor(isSelected.value, [0, 1], ["black", "white"]),
+    color: withTiming(getColor(state.value).text, COLOR_AN_DURATION),
+    zIndex: 2,
+    fontSize: 16,
+    fontWeight: "500",
   }));
+
+
+  // const animatedShimmer = useAnimatedStyle(() => ({
+  //   height:'100%',
+  //   width: '100%',
+  //   position: "absolute",
+  //   zIndex: -1,
+  //   backgroundColor:'white',
+  //   opacity: 1,
+  //   transform: [
+  //     {
+  //       translateX: shimmerTranslateX.value,
+  //     },
+  //     {
+  //       skewX: `${-10}deg`,
+  //     }
+  //   ],
+  // }));
+
+  // const animatedSparkle = useAnimatedStyle(() => ({
+  //   opacity: sparkOpacity.value,
+  // }))
 
   return (
     <AnimatedTouchableOpacity
-      style={[
-        styles.card,
-        !collapsed && styles.grow,
-        disabled && styles.disabled,
-        animatedStyle,
-      ]}
       onPress={handlePress}
-      disabled={matched || disabled}
+      disabled={matched /*|| disabled*/}
+      onLayout={(e) => {
+        if (shimmerTranslateX.value === 0) {
+          btnWidth.value = e.nativeEvent.layout.width;
+          btnHeight.value = e.nativeEvent.layout.height;
+          shimmerTranslateX.value = -e.nativeEvent.layout.width;
+        }
+      }}
+      style={[cs.wordButton, !collapsed && cs.wordButtonGrow, animatedStyle]}
     >
-      <Animated.Text style={[styles.text, animatedTextStyle]}>
-        {word}
-      </Animated.Text>
+      <Text.Animated style={animatedTextStyle}>{word}</Text.Animated>
+      {/* <Animated.View style={animatedShimmer}/> */}
+      {/* <Animated.View
+        style={[{
+          width: 12,
+          height: 12,
+          position: "absolute",
+          top: '20%',
+          left: '10%',
+          backgroundColor:'white',
+          borderRadius: 2,
+          transform: [
+            {
+              skewX: `${20}deg`,
+
+            },
+            {
+              skewY: `${-20}deg`,
+            }
+          ]
+        }, animatedSparkle]}
+      />
+
+      <Animated.View
+        style={[
+          {
+          width: 4,
+          height: 4,
+          position: "absolute",
+          bottom: '20%',
+          right: '20%',
+          backgroundColor:'white',
+          borderRadius: 1,
+          transform: [
+            {
+              skewX: `${20}deg`,
+
+            },
+            {
+              skewY: `${-20}deg`,
+            }
+          ]
+        }, animatedSparkle
+        ]}
+      /> */}
     </AnimatedTouchableOpacity>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  card: {
-    padding: 16,
-    borderRadius: 16,
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderBottomWidth: 2,
-    borderColor: "#ebebeb",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  grow: {
-    flexGrow: 1,
-    width: Dimensions.get("window").width / 2 - 32,
-  },
-  disabled: {
-    opacity: 0.4,
-  },
-  text: {
-    fontSize: 16,
-  }
-});
 
 WordButton.displayName = "WordButton";
 
@@ -201,7 +332,7 @@ export default React.memo(WordButton, (prevProps, nextProps) => {
     prevProps.selected === nextProps.selected &&
     prevProps.matched === nextProps.matched &&
     prevProps.error === nextProps.error &&
-    prevProps.disabled === nextProps.disabled &&
-    prevProps.hint === nextProps.hint
+    prevProps.hint === nextProps.hint &&
+    prevProps.disabled === nextProps.disabled
   );
 });

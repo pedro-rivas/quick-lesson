@@ -2,19 +2,14 @@ import * as Layout from "@/components/Layout";
 import * as List from "@/components/List";
 import * as Text from "@/components/Text";
 import WordButton from "@/components/WordButton";
+import { LanguageCode } from "@/constants/languages";
 import { Lesson } from "@/store/lessonStore";
+import { commonStyles as cs } from "@/styles/common";
+import { spacing } from "@/styles/spacing";
 import { shuffleArray } from "@/utils";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
 
-export const ERROR_DURATION = 800;
-const MATCH_DURATION = 600;
 export const HINT_DELAY = 1000;
 
 interface Word {
@@ -23,8 +18,9 @@ interface Word {
   word: string;
   pair: string;
   error: boolean;
-  disabled: boolean;
   hint: boolean;
+  disabled: boolean;
+  langCode?: LanguageCode;
 }
 
 interface MatchWordsPageProps {
@@ -32,17 +28,18 @@ interface MatchWordsPageProps {
   subheading: string;
   topic: string;
   onComplete: () => void;
+  onSpeechPress: (uri: string) => void;
 }
 
 const MatchWordsPage = ({
-  vocabulary: lesson,
+  vocabulary: vocabs,
   subheading,
   topic,
   onComplete,
+  onSpeechPress,
 }: MatchWordsPageProps) => {
-  
   const initialVocabulary = useMemo(() => {
-    const pairs: Word[] = (lesson || [])
+    const pairs: Word[] = (vocabs || [])
       .map((v) => {
         return {
           ...v,
@@ -53,11 +50,12 @@ const MatchWordsPage = ({
         {
           word: v.word,
           pair: v.translation,
+          langCode: v.langCode,
           selected: false,
           matched: false,
           error: false,
-          disabled: false,
           hint: false,
+          disabled: false,
         },
         {
           word: v.translation,
@@ -65,87 +63,28 @@ const MatchWordsPage = ({
           selected: false,
           matched: false,
           error: false,
-          disabled: false,
           hint: false,
+          disabled: false,
         },
       ])
       .filter((v) => v.word !== v.pair);
     return shuffleArray(pairs);
-  }, [lesson]);
+  }, [vocabs]);
 
   const [vocabulary, setVocabulary] = useState(initialVocabulary);
 
-  const shouldWait = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const hintTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    if (shouldWait.current) return;
-
-    if (hintTimeout.current) {
-      clearTimeout(hintTimeout.current);
-    }
-
-    const selectedWords = vocabulary.filter((v) => v.selected);
-    const matchedWords = vocabulary.filter((v) => v.matched);
-    const errorWords = vocabulary.filter((v) => v.error);
-
-    // Clean up selected words after showing error state
-    if (errorWords.length === 2) {
-      shouldWait.current = setTimeout(() => {
-        setVocabulary((prev) =>
-          prev.map((v) => ({ ...v, selected: false, error: false, hint: false }))
-        );
-        shouldWait.current = null;
-      }, ERROR_DURATION);
-      return;
-    }
-
-    // Disable words that are matched
-    if (matchedWords.length === 2) {
-      shouldWait.current = setTimeout(() => {
-        setVocabulary((prev) =>
-          prev.map((v) => ({
-            ...v,
-            disabled: v.matched ? true : v.disabled,
-            matched: false,
-            selected: false,
-            error: false,
-            hint: false,
-          }))
-        );
-        shouldWait.current = null;
-      }, MATCH_DURATION);
-      return;
-    }
-
-    // Show hint
-    if (selectedWords.length === 1) {
-      hintTimeout.current = setTimeout(() => {
-        setVocabulary((prev) => {
-          return prev.map((v) => ({
-            ...v,
-            hint: v.word === selectedWords[0].pair ? true : false,
-          }));
-        });
-        shouldWait.current = null;
-      }, HINT_DELAY);
-    }
-  }, [vocabulary]);
-
-  const handleSelect = useCallback((item: Word) => {
-    if (shouldWait.current) return;
-
-    if(hintTimeout.current) {
-      clearTimeout(hintTimeout.current);
+  const handleSelect = useCallback((item: Word, uri?: string) => {
+    if (uri) {
+      onSpeechPress(uri);
     }
 
     setVocabulary((prev) => {
-      let update = prev.map((v) =>
-        v.word === item.word ? { 
-          ...v, 
-          selected: !v.selected,
-        } : v
-      );
+      let update = prev.map((v) => ({
+        ...v,
+        error: false,
+        hint: false,
+        selected: v.word === item.word ? !v.selected : v.selected,
+      }));
 
       const selectedWords = update.filter((v) => v.selected);
 
@@ -163,7 +102,15 @@ const MatchWordsPage = ({
         }
 
         // No match
-        return update.map((v) => ({ ...v, error: v.selected ? true : false }));
+        return update.map((v) => ({ ...v, error: v.selected ? true : false, selected: false }));
+      }
+
+      // Show hint 
+      if (selectedWords.length === 1) {
+        update = update.map((v) => ({
+          ...v,
+          hint: v.word === selectedWords[0].pair ? true : false,
+        }));
       }
 
       return update;
@@ -178,15 +125,16 @@ const MatchWordsPage = ({
         selected={v.selected}
         matched={v.matched}
         error={v.error}
-        disabled={v.disabled}
         hint={v.hint}
-        onPress={() => handleSelect(v)}
+        disabled={v.disabled}
+        onPress={(uri) => handleSelect(v, uri)}
+        langCode={v?.langCode}
       />
     ));
   }, []);
 
   const allMatched = useMemo(() => {
-    return vocabulary.every((v) => v.disabled || v.matched);
+    return vocabulary.every((v) =>  v.matched);
   }, [vocabulary]);
 
   useEffect(() => {
@@ -196,22 +144,27 @@ const MatchWordsPage = ({
   }, [allMatched]);
 
   return (
-    <List.ScrollView style={styles.container}>
-      <Text.Subheading>{subheading}</Text.Subheading>
-      <Layout.Spacer />
-      <Text.Body>{topic}</Text.Body>
-      <Layout.Spacer />
-      <Layout.Row gap={16} flexWrap="wrap">
-        {renderVocabulary(vocabulary)}
-      </Layout.Row>
-    </List.ScrollView>
+    <Layout.Column flex={1} collapsable={false}>
+      <List.ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
+        <Text.Subheading>{subheading}</Text.Subheading>
+        <Layout.Spacer />
+        <Text.Body>{topic}</Text.Body>
+        <Layout.Spacer />
+        <Layout.Row gap={spacing.m} flexWrap="wrap">
+          {renderVocabulary(vocabulary)}
+        </Layout.Row>
+      </List.ScrollView>
+    </Layout.Column>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
+  scrollView: {
+    ...cs.f_1,
+    padding: spacing.m,
   },
 });
 

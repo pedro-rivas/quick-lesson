@@ -4,7 +4,6 @@ import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { HINT_DELAY } from "./MatchWordsPage";
-import QuickSpeechButton from "./SpeechButton";
 import { Vocab } from "./VocabularyRow";
 import WordButton from "./WordButton";
 
@@ -19,12 +18,14 @@ interface CompleteTheWordPageProps {
   };
   subheading: string;
   onComplete: () => void;
+  onSpeechPress: (uri: string) => void;
 }
 
 const CompleteTheWordPage = ({
   exercise,
   subheading,
   onComplete,
+  onSpeechPress,
 }: CompleteTheWordPageProps) => {
   const word = exercise.word.term;
   const translatedWord = exercise.word.translation;
@@ -181,12 +182,12 @@ const CompleteTheWordPage = ({
   }, [selectedLetters]);
 
   return (
-    <Layout.View style={styles.container}>
+    <Layout.View style={styles.container} collapsable={false}>
       <Layout.Column>
         <Text.Subheading>{subheading}</Text.Subheading>
         <Layout.Spacer />
         <Layout.Row alignItems="center">
-          <QuickSpeechButton text={word}/>
+          {/* <SpeechButton text={word}/> */}
           <Layout.Spacer size={'s'}/>
           <Text.AnimatedText
             text={[word, translatedWord]}

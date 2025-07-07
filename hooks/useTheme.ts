@@ -23,6 +23,39 @@ const useTheme = () => {
       onSurface: theme.colors.onSurface,
     },
     cs: commonStyles,
+    lesson: {
+      error: {
+        border: "#FF4B4B",
+        background: "#FFD6D6",
+        // @ts-ignore
+        text: theme.colors.onSurface,
+      },
+      selected: {
+        border: "#1CB0F6",
+        background: "#D6EFFF",
+        // @ts-ignore
+        text: theme.colors.onSurface,
+      },
+      match: {
+        border: "#89e219",
+        background: "#D6FFD6",
+        // @ts-ignore
+        text: theme.colors.onSurface,
+      },
+      hint: {
+        // @ts-ignore
+        border: "#1CB0F6",
+        background: theme.colors.background,
+        // @ts-ignore
+        text: theme.colors.onSurface,
+      },
+      default: {
+        border: "#ebebeb",
+        background: theme.colors.background,
+        // @ts-ignore
+        text: theme.colors.onSurface,
+      },
+    },
   };
 };
 

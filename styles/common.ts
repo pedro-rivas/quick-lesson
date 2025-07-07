@@ -1,5 +1,5 @@
 import { BUTTON_ICON_HEIGHT } from "@/constants/style";
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
 import { scale } from "./scale";
 import { spacing } from "./spacing";
 
@@ -28,6 +28,9 @@ const commonStyles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
+  z_1000: {
+    zIndex: 1000,
+  },
   w_85_p: {
     width: "85%",
   },
@@ -35,7 +38,7 @@ const commonStyles = StyleSheet.create({
   flex1: {
     flex: 1,
   },
-  f_1:{
+  f_1: {
     flex: 1,
   },
   f_s_1: {
@@ -52,10 +55,10 @@ const commonStyles = StyleSheet.create({
     paddingVertical: spacing.m,
   },
   // Margin
-     m_b_xs: {
+  m_b_xs: {
     marginBottom: spacing.xs,
   },
-    m_b_s: {
+  m_b_s: {
     marginBottom: spacing.s,
   },
   m_b_m: {
@@ -160,6 +163,18 @@ const commonStyles = StyleSheet.create({
     paddingHorizontal: spacing.s,
     borderBottomWidth: 0,
   },
+  wordButton: {
+    borderRadius: 16,
+    borderWidth: 1,
+    borderBottomWidth: 2,
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+  },
+  wordButtonGrow: {
+       flexGrow: 1,
+    width: Dimensions.get("window").width / 2 - spacing.l * 2,
+  }
 });
 
-export { commonStyles };
+export { commonStyles, commonStyles as cs };

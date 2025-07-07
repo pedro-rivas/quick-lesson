@@ -37,7 +37,7 @@ const LessonContentWrapper: React.FC<LessonContentWrapperProps> = ({
   );
 
   return (
-    <Layout.Column style={cs.f_1}>
+    <Layout.Column style={cs.f_1} collapsable={false}>
       <List.ScrollView
         onScroll={handleScroll}
         scrollEventThrottle={100}

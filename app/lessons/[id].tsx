@@ -117,6 +117,7 @@ export default function LessonDetailScreen() {
                 <VocabularySection
                   key={index + 1}
                   vocabulary={lesson.vocabulary}
+                  id={lesson.id}
                 />
               );
             case "phrases":
