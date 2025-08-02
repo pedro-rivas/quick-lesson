@@ -7,6 +7,7 @@ import Pager, { RenderTabBarFnProps } from "@/components/Pager";
 import SafeAreaView from "@/components/SafeAreaView";
 import { TabBar } from "@/components/TabBar";
 import VocabularyRow, { Vocab } from "@/components/VocabularyRow";
+import useInsets from "@/hooks/useInsents";
 import useTranslation from "@/hooks/useTranslation";
 import { Lesson, useLessonStore } from "@/store/lessonStore";
 import { useUserStore } from "@/store/userStore";
@@ -26,6 +27,7 @@ export default function HomeScreen() {
   const userId = useUserStore((state) => state.user.id!);
 
   useEffect(() => {
+    // TODO: USE reac query or something similar to handle this
     loadLessons({
       userId,
     });
@@ -33,6 +35,7 @@ export default function HomeScreen() {
 
   const t = useTranslation();
   const player = useAudioPlayer("");
+  const insets = useInsets();
 
   const fabRef = React.useRef<FABRef>(null);
   const refs = React.useRef({
@@ -145,6 +148,7 @@ export default function HomeScreen() {
         initialPage={0}
         renderTabBar={renderTabBar}
         onPageSelected={handlePageChange}
+
       >
         <Layout.Column key={1} mh={spacing.m} collapsable={false}>
           <List.Section
@@ -176,7 +180,7 @@ export default function HomeScreen() {
           />
         </Layout.Column>
 
-        <Layout.Column key={2} mh={spacing.m} collapsable={false}>
+        <Layout.Column key={2} mh={spacing.m} pb={insets.bottom + spacing.m} collapsable={false}>
           <List.Section
             data={allVocabulary}
             renderItem={renderVocab}
