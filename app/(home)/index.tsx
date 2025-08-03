@@ -17,8 +17,6 @@ import { router } from "expo-router";
 import React, { useCallback, useEffect, useMemo } from "react";
 import {
   ActivityIndicator,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
 } from "react-native";
 
 export default function HomeScreen() {
@@ -93,18 +91,6 @@ export default function HomeScreen() {
     router.push("/create-lesson");
   }, []);
 
-  const handleScroll = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      if (event.nativeEvent.contentOffset.y > FAB_THRESHOLD) {
-        fabRef.current?.collapse();
-      } else {
-        fabRef.current?.expand();
-      }
-      refs.current.prevScrollY = event.nativeEvent.contentOffset.y;
-    },
-    []
-  );
-
   const handlePageChange = useCallback((nextPage: number) => {
     if (nextPage !== 0) {
       fabRef.current?.collapse();
@@ -154,7 +140,6 @@ export default function HomeScreen() {
           <List.Section
             data={lessons}
             renderItem={renderItem}
-            onScroll={handleScroll}
             scrollEventThrottle={100}
             showsVerticalScrollIndicator={false}
             scrollEnabled={true}

@@ -7,6 +7,12 @@ export const BORDER_WIDTH = 2;
 export const BORDER_RADIUS = 16;
 export const HEADER_HEIGHT = scale.ms(50);
 export const UNSTABLE_PRESS_DELAY = 100;
+export const PRESS_RETENTION_OFFSET = {
+  top: 5,
+  left: 5,
+  right: 5,
+  bottom: 5,
+};
 
 const commonStyles = StyleSheet.create({
   o_60: {
