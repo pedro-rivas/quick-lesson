@@ -6,6 +6,7 @@ import { spacing } from "./spacing";
 export const BORDER_WIDTH = 2;
 export const BORDER_RADIUS = 16;
 export const HEADER_HEIGHT = scale.ms(50);
+export const UNSTABLE_PRESS_DELAY = 100;
 
 const commonStyles = StyleSheet.create({
   o_60: {

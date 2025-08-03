@@ -1,3 +1,4 @@
+import { UNSTABLE_PRESS_DELAY } from "@/styles/common";
 import * as Haptics from "expo-haptics";
 import React, { useCallback } from "react";
 import { PressableProps, Pressable as RNPressable } from "react-native";
@@ -42,6 +43,7 @@ const Pressable = ({ style, onPress, ...props }: PressableProps) => {
 
   return (
     <AnimatedPressable
+      unstable_pressDelay={UNSTABLE_PRESS_DELAY}
       onPress={onPress}
       onPressIn={onPressIn}
       onPressOut={onPressOut}

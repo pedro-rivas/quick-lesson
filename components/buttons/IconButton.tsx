@@ -1,5 +1,6 @@
 import { BUTTON_ICON_HEIGHT, BUTTON_ICON_HIT_SLOP, BUTTON_ICON_SIZE } from "@/constants/style";
 import useTheme from "@/hooks/useTheme";
+import { UNSTABLE_PRESS_DELAY } from "@/styles/common";
 import * as Haptics from "expo-haptics";
 import React from "react";
 import { Pressable, StyleProp, TextStyle, ViewStyle } from "react-native";
@@ -86,6 +87,7 @@ const IconButton = ({
 
   return (
     <AnimatedPressable
+      unstable_pressDelay={UNSTABLE_PRESS_DELAY}
       onPress={handlePress}
       onPressIn={onPressIn}
       onPressOut={onPressOut}

@@ -1,7 +1,7 @@
 import { LanguageCode } from "@/constants/languages";
 import { BUTTON_ICON_HIT_SLOP, BUTTON_ICON_SIZE } from "@/constants/style";
 import useSpeech from "@/hooks/useSeech";
-import { commonStyles as cs } from "@/styles/common";
+import { commonStyles as cs, UNSTABLE_PRESS_DELAY } from "@/styles/common";
 import { AntDesign } from "@expo/vector-icons";
 import { useTheme } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
@@ -65,6 +65,7 @@ const SpeechButton = ({ text, langCode, color, onPress }: SpeechButtonProps) => 
   return (
     <AnimatedPressable
       style={[animatedStyle, cs.speechButton]}
+      unstable_pressDelay={UNSTABLE_PRESS_DELAY}
       onPress={handlePress}
       onPressIn={onPressIn}
       onPressOut={onPressOut}
