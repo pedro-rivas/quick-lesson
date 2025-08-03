@@ -261,4 +261,15 @@ export const lessonTitlePrompt = (topic: string, studentLanguage:string) => `
 
   Topic: Pedir una pizza
   Title: Pidiendo una pizza
+
+  Topic: Numbers
+  Title: Learning numbers
+
+  Topic: Mathematics
+  Title: Learning mathematics
+
+  Invalid Title Examples:
+
+  Topic: Numbers
+  Title: Numbers in Spanish
 `;
