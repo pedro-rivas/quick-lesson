@@ -1,8 +1,9 @@
+import { BUTTON_HEIGHT } from "@/components/buttons/Button";
 import FAB, { FAB_THRESHOLD, FABRef } from "@/components/buttons/FAB";
 import * as Layout from "@/components/Layout";
 import LessonCard from "@/components/LessonCard";
 import LessonEmptyState from "@/components/LessonEmptyState";
-import * as List from "@/components/List";
+import { Section } from "@/components/List";
 import Pager, { RenderTabBarFnProps } from "@/components/Pager";
 import SafeAreaView from "@/components/SafeAreaView";
 import { TabBar } from "@/components/TabBar";
@@ -17,6 +18,7 @@ import { router } from "expo-router";
 import React, { useCallback, useEffect, useMemo } from "react";
 import {
   ActivityIndicator,
+  View,
 } from "react-native";
 
 export default function HomeScreen() {
@@ -128,6 +130,10 @@ export default function HomeScreen() {
     [sections]
   );
 
+  const ListFooterComponent = useCallback(() => {
+    return <View style={{ height: BUTTON_HEIGHT + spacing.m * 2 }} />;
+  }, []);
+
   return (
     <SafeAreaView>
       <Pager
@@ -137,7 +143,7 @@ export default function HomeScreen() {
 
       >
         <Layout.Column key={1} mh={spacing.m} collapsable={false}>
-          <List.Section
+          <Section
             data={lessons}
             renderItem={renderItem}
             scrollEventThrottle={100}
@@ -162,11 +168,12 @@ export default function HomeScreen() {
             onEndReached={handleLoadMore}
             onRefresh={handleLoadMore}
             refreshing={loading}
+            ListFooterComponent={ListFooterComponent}
           />
         </Layout.Column>
 
-        <Layout.Column key={2} mh={spacing.m} pb={insets.bottom + spacing.m} collapsable={false}>
-          <List.Section
+        <Layout.Column key={2} mh={spacing.m} collapsable={false}>
+          <Section
             data={allVocabulary}
             renderItem={renderVocab}
             showsVerticalScrollIndicator={false}
@@ -180,6 +187,7 @@ export default function HomeScreen() {
               <Layout.Header.SectionTitle title={`${vocabs} ${t("Words")}`} />
             }
             ListEmptyComponent={<LessonEmptyState />}
+            ListFooterComponent={ListFooterComponent}
           />
         </Layout.Column>
       </Pager>
