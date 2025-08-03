@@ -1,4 +1,3 @@
-
 export const tipsPrompt = (studentLanguage: string, tutorLanguage: string) => `
             You are a(n) ${tutorLanguage} tutor who is bilingual in ${tutorLanguage} and
             ${studentLanguage} and an expert at crafting educational content that is 
