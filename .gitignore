@@ -44,3 +44,10 @@ app-example
 .lazy-commit.sh
 .review-commit.sh
 commit-review.html
+
+# Cursor
+.cursor
+
+
+# Android
+*.keystore

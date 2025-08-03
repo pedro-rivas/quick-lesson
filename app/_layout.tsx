@@ -1,44 +1,51 @@
+import { useColorScheme } from "@/hooks/useColorScheme";
 import "@/i18n";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
-import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet } from "react-native";
+import { changeAppLanguage, getBestLocale } from "@/i18n";
+import { RootNavigator } from "@/navigation";
+import { SessionProvider } from "@/providers/AuthContext";
+import { ThemeProvider } from "@/providers/ThemeContext";
+import { SplashScreenController } from "@/splash";
+import { useAppStore } from "@/store/appStore";
+import { useUserStore } from "@/store/userStore";
+import { commonStyles as cs } from "@/styles/common";
+import { DarkTheme, LightTheme } from "@/theme";
+import { ThemeProvider as NativeThemeProvider } from "@react-navigation/native";
+import { useEffect } from "react";
+import { StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 
-import { useColorScheme } from "@/hooks/useColorScheme";
-
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-  });
 
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
-  }
+  const { setLanguage, } = useAppStore()
+  const userLanguage = useUserStore((s) => s.user.preferences.language);
+
+  useEffect(() => {
+    const systemLang = getBestLocale();
+    const lang = userLanguage || systemLang;
+    if(!userLanguage){
+      setLanguage(lang);
+    }
+    changeAppLanguage(lang);
+  }, []);
 
   return (
-    <GestureHandlerRootView style={styles.gestureHandler}>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="skia" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style="auto" />
-      </ThemeProvider>
+    <GestureHandlerRootView style={cs.f_1}>
+      <StatusBar
+        backgroundColor={colorScheme === "dark" ? "black" : "white"}
+        barStyle={colorScheme === "dark" ? "light-content" : "dark-content"}
+      />
+      <NativeThemeProvider
+        value={colorScheme === "dark" ? DarkTheme : LightTheme}
+      >
+        <ThemeProvider>
+          <SessionProvider>
+            <SplashScreenController />
+            <RootNavigator />
+          </SessionProvider>
+        </ThemeProvider>
+      </NativeThemeProvider>
     </GestureHandlerRootView>
   );
 }
-
-const styles = StyleSheet.create({
-  gestureHandler: {
-    flex: 1,
-  },
-});
