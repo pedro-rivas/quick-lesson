@@ -4,9 +4,11 @@ A React Native language learning app built with Expo that provides AI-powered pe
 
 ## App Demo Videos
 
-| Demo 1 | Demo 2 | Demo 3 | Demo 4 | Demo 5 |
-|--------|--------|--------|--------|--------|
-| <video src="./assets/readme/1.mov" width="150" controls></video> | <video src="./assets/readme/2.mov" width="150" controls></video> | <video src="./assets/readme/3.mov" width="150" controls></video> | <video src="./assets/readme/4.mov" width="150" controls></video> | <video src="./assets/readme/5.mov" width="150" controls></video> |
+*Note: Download and view these videos locally to see the app in action*
+
+| [📱 Demo 1](./assets/readme/1.mov) | [📱 Demo 2](./assets/readme/2.mov) | [📱 Demo 3](./assets/readme/3.mov) | [📱 Demo 4](./assets/readme/4.mov) | [📱 Demo 5](./assets/readme/5.mov) |
+|---|---|---|---|---|
+| App overview | Lesson creation | Speech practice | Vocabulary exercises | Progress tracking |
 
 ## Features
 
