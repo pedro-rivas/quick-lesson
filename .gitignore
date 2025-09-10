@@ -39,3 +39,15 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
+
+# AI stuff
+.lazy-commit.sh
+.review-commit.sh
+commit-review.html
+
+# Cursor
+.cursor
+
+
+# Android
+*.keystore
